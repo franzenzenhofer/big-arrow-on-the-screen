@@ -3,6 +3,7 @@
 //   testkit move-window APP X Y      moves APP's first window to X,Y via Accessibility
 //   testkit frontmost                prints the frontmost app's name
 //   testkit activate APP             brings APP to the front
+//   testkit windows APP              prints APP's windows as the window server lists them
 import AppKit
 import ApplicationServices
 
@@ -35,6 +36,13 @@ let args = CommandLine.arguments
 switch args.dropFirst().first {
 case "click": click(CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0))
 case "move-window": moveWindow(of: args[2], to: CGPoint(x: Double(args[3]) ?? 0, y: Double(args[4]) ?? 0))
+case "windows":
+    let pid = app(named: args[2]).processIdentifier
+    let list = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
+    for entry in list where entry[kCGWindowOwnerPID as String] as? Int32 == pid {
+        let keys = [kCGWindowNumber, kCGWindowLayer, kCGWindowBounds, kCGWindowIsOnscreen, kCGWindowAlpha, kCGWindowName]
+        print(keys.map { "\($0 as String)=\(entry[$0 as String] ?? "-")" }.joined(separator: " ").replacingOccurrences(of: "\n", with: ""))
+    }
 case "frontmost": print(NSWorkspace.shared.frontmostApplication?.localizedName ?? "")
 case "activate":
     app(named: args[2]).activate()

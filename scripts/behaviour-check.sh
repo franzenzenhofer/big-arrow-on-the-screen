@@ -31,6 +31,8 @@ $BIN point --at 400,500 --text "Click the target" --until-click --json > "$OUT/u
 sleep 1.5; $KIT click 400 500; wait $POINT
 check "until-click reports clicked" "[ \"\$(field $OUT/until-click.json \"['dismissedReason']\")\" = clicked ]"
 
+$KIT windows backdrop | tee "$OUT/backdrop-windows.txt"
+
 # --follow: the arrow moves with the window; closing it ends the arrow with targetGone.
 $BIN point --window backdrop --anchor title --text "Follow me" --follow --duration 8 --json > "$OUT/follow.json" & POINT=$!
 sleep 1.5; $KIT move-window backdrop 100 200; sleep 1.5; screencapture -x "$OUT/follow-moved.png"
