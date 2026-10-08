@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-10-08
+
+### Changed
+- Skill: a "Time-critical" section and a mandatory trigger for expiring codes, login or payment pages that time out, and jobs waiting on the human (red, spoken, close button, `stop` afterwards).
+
 ## [0.1.1] - 2026-10-08
 
 ### Changed
