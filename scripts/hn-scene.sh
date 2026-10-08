@@ -64,10 +64,10 @@ point() {
 # By label through Accessibility: Chrome exposes web pages to it when started with
 # --force-renderer-accessibility (or while VoiceOver runs).
 point login --element login --role link --app "$BROWSER" --text "Not a lurker? Click login." --color green
-point logo --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp
 point comments --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape zigzag
 point past --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight
 point vote --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red
+point logo --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp
 sleep 2
 screencapture -x "$OUT"
 echo "wrote $OUT"
