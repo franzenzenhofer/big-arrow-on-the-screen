@@ -1,0 +1,7 @@
+owner=probe layer=1000 bounds={
+    Height = 768;
+    Width = 1024;
+    X = 0;
+    Y = 0;
+} alpha=1
+probe exit 0

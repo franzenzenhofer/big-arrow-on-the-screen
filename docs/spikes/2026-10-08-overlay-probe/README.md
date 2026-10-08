@@ -19,7 +19,17 @@ swiftc -o wincheck wincheck.swift && ./wincheck
 - Binary size 70,616 bytes.
 - The process exited on its own after the 6 s timer.
 
-The screenshot taken during the run showed personal content (an inbox) and is therefore not committed. Ticket T03 re-records the proof over a neutral window.
+The screenshot taken during the planning run showed personal content (an inbox) and is therefore not committed.
+
+## Re-run on a clean desktop (ticket T03)
+
+The `visual.yml` workflow compiles and runs the same `probe.swift` and `wincheck.swift` on a
+GitHub Actions macOS 15 runner, whose desktop shows nothing personal
+(run https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/runs/37762304745):
+
+- Screenshot: `probe-screenshot-ci.png` (the sign is cut at the left because the probe places it
+  at a fixed offset; the product computes the placement, see `Sources/BigArrowCore/Placement.swift`).
+- Window server: `wincheck-output-ci.txt`, `owner=probe layer=1000 bounds={0,0,1024x768} alpha=1`, probe exit 0.
 
 ## Settings that made it work
 
