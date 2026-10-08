@@ -34,8 +34,8 @@ scene agent-needs-you "Deploy" "Deploying to production on a Friday at 17:55. Co
   $BIN start --element Cancel --app backdrop --text "The agent strongly suggests this one" --color red --close-button --from bottom-left --no-animation
 
 scene which-button "Save changes?" "Do you want to save the changes you made to Untitled 37?" "Don't Save,Cancel,Save" \
-  bash -c "$BIN start --element Save --app backdrop --role button --text 'This one' --color blue --from bottom-left --no-animation > /dev/null; \
-           $BIN start --element Save --app backdrop --role button --text 'Yes, this one' --color purple --shape straight --from bottom --no-animation > /dev/null; \
+  bash -c "$BIN start --element Save --app backdrop --role button --text 'This one' --color blue --from top-right --no-animation > /dev/null; \
+           $BIN start --element Save --app backdrop --role button --text 'Yes, this one' --color purple --shape straight --from bottom-left --no-animation > /dev/null; \
            $BIN start --element Save --app backdrop --role button --text 'Seriously. THIS one.' --color red --shape zigzag --from bottom-right --no-animation > /dev/null"
 
 scene permissions "System Settings" "\"Terminal\" would like to control this computer using accessibility features." "Deny,Open System Settings" \
