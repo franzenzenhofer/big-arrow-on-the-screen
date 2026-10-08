@@ -18,7 +18,7 @@ easy to miss; an arrow on the thing itself is not.
 
 | You know... | Use |
 |---|---|
-| The label of a button, field or menu in a native app | `--element "Reload" --app "Google Chrome"` |
+| The label of a button, field or menu in a native or Electron app | `--element "Reload" --app "Google Chrome"` |
 | Only the app / its window | `--window "Safari"` (add `:title part` to pick a window) |
 | A spot in a screenshot | `--at X,Y` (convert, see below) |
 | A rectangle (a field, a region) | `--rect X,Y,W,H` (draws a box around it) |
@@ -68,6 +68,9 @@ report. Displays to the right or above the main display have their own offsets; 
   comes from `tinyscreenshot list` (`@ (x,y)`).
 - From a screenshot of one display: `--at X,Y --display N` makes the coordinates relative to
   display N (numbers from `bigarrow doctor`).
+- Inside a Chrome web page, `--element` only works if Chrome runs with
+  `--force-renderer-accessibility` (or VoiceOver is on); Chrome's own toolbar always works.
+  Otherwise use the page's coordinates:
 - From Claude in Chrome (CSS pixels in the page): run in the page
   `[screenX + rect.x, screenY + (outerHeight - innerHeight) + rect.y]` for the element's
   `getBoundingClientRect()`, then `--rect x,y,w,h`. This holds at 100 % zoom with no side panel

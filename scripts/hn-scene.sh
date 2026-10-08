@@ -13,7 +13,7 @@ KIT="$WORK/testkit"
 cleanup() { $BIN stop --all >/dev/null 2>&1; $AB close >/dev/null 2>&1; }
 trap cleanup EXIT
 
-$AB --headed --profile "$WORK/profile" --args "--hide-crash-restore-bubble,--no-first-run,--no-default-browser-check" \
+$AB --headed --profile "$WORK/profile" --args "--hide-crash-restore-bubble,--no-first-run,--no-default-browser-check,--force-renderer-accessibility" \
   open https://news.ycombinator.com > /dev/null
 sleep 3
 $KIT move-window frontmost 15 35; $KIT resize-window frontmost 1440 860; sleep 1.5
@@ -35,8 +35,9 @@ $BIN start --rect "$(rect logo)" --text "Same design since 2007. Still works." -
 $BIN start --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight --from bottom-right --size S --no-animation > /dev/null
 $BIN start --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape zigzag --from right --size S --no-animation > /dev/null
 $BIN start --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red --from right --size S --no-animation > /dev/null
-# By label through Accessibility, which reaches web content in Chromium browsers.
-$BIN start --element login --app "$BROWSER" --text "Agents can't do this part. That's the point." --color green --from bottom-left --size S --no-animation --json
+# By label through Accessibility: Chrome exposes web pages to it when started with
+# --force-renderer-accessibility (or while VoiceOver runs).
+$BIN start --element login --role link --app "$BROWSER" --text "Agents can't do this part. That's the point." --color green --from bottom-left --size S --no-animation --json
 sleep 2
 screencapture -x "$OUT"
 echo "wrote $OUT"

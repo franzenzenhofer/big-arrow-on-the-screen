@@ -24,8 +24,10 @@ public struct AXWalker {
         self.pid = pid
     }
 
-    /// Chromium and Electron build the Accessibility tree of web content only on request:
-    /// Chrome reacts to `AXEnhancedUserInterface`, Electron apps to `AXManualAccessibility`.
+    /// Electron apps build the Accessibility tree of their web content only on request
+    /// (`AXManualAccessibility`, verified with Claude.app). Chrome 2026 rejects both attributes
+    /// and exposes web pages only when started with --force-renderer-accessibility or while
+    /// VoiceOver runs (verified 2026-10-08); the request is harmless there.
     static let webTreeAttributes = ["AXEnhancedUserInterface", "AXManualAccessibility"]
     /// Time Chromium needs to build that tree after the first request.
     static let webTreeDelay: TimeInterval = 0.6
