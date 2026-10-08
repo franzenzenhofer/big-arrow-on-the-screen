@@ -1,6 +1,6 @@
 ---
 name: big-arrow
-description: "Point at something on the human's macOS screen with a big arrow and a sign (\"Franz, click HERE\") using the bigarrow CLI. Use whenever the human has to look at, click, type into or choose a specific spot, button, field, window or menu: show me where, point to it, which button, where do I click, zeig mir wo, guide me through this UI, the human must approve or sign something, or you need the human's hand and they may not be looking at the terminal."
+description: "Point at something on the human's macOS screen with a big arrow and a sign (\"Franz, click HERE\") using the bigarrow CLI. Use whenever the human has to look at, click, type into or choose a specific spot, button, field, window or menu: show me where, point to it, which button, where do I click, zeig mir wo, guide me through this UI, the human must approve or sign something, or you need the human's hand and they may not be looking at the terminal. Mandatory when it is time-critical: a code that expires, a login or payment page that times out, a build waiting on the human."
 license: MIT
 allowed-tools: Bash(bigarrow:*) Bash(say:*)
 metadata:
@@ -40,6 +40,19 @@ bigarrow point --at 760,500 --text "Check this, close with X" --close-button   #
 
 `point` blocks for its duration; use `start` (or `point --detach`) when you want to keep working.
 Always `bigarrow stop` once the human has acted.
+
+## Time-critical: make it impossible to miss
+
+When the human must act before something expires (2FA code, login or payment page timeout, an
+approval a running job waits on), point immediately, in red, out loud, and keep it up until done:
+
+```bash
+bigarrow start --element "Verify" --app "Safari" --raise --text "Franz, enter the 2FA code now, it expires in 60 s" --color red --say --close-button
+# ... watch for the result (the page changed, the job continued) ...
+bigarrow stop
+```
+
+Say what to do and by when. One arrow per step; `stop` the old one before pointing at the next.
 
 ## Make sure the target is visible
 
