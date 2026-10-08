@@ -4,6 +4,8 @@
 //   testkit frontmost                prints the frontmost app's name
 //   testkit activate APP             brings APP to the front
 //   testkit windows APP              prints APP's windows as the window server lists them
+//   testkit pixel X Y                prints the screen colour at X,Y as "r g b" (0-255)
+//   testkit cpu PID SECONDS          prints the CPU share PID used over SECONDS, in percent
 import AppKit
 import ApplicationServices
 
@@ -43,6 +45,34 @@ case "windows":
         let keys = [kCGWindowNumber, kCGWindowLayer, kCGWindowBounds, kCGWindowIsOnscreen, kCGWindowAlpha, kCGWindowName]
         print(keys.map { "\($0 as String)=\(entry[$0 as String] ?? "-")" }.joined(separator: " ").replacingOccurrences(of: "\n", with: ""))
     }
+case "pixel":
+    let file = "/tmp/testkit-pixel.png"
+    let capture = Process()
+    capture.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+    capture.arguments = ["-x", "-R", "\(args[2]),\(args[3]),1,1", file]
+    try? capture.run()
+    capture.waitUntilExit()
+    guard let image = NSImage(contentsOfFile: file), let tiff = image.tiffRepresentation,
+          let bitmap = NSBitmapImageRep(data: tiff), let color = bitmap.colorAt(x: 0, y: 0)?.usingColorSpace(.sRGB) else { exit(1) }
+    print(Int(color.redComponent * 255), Int(color.greenComponent * 255), Int(color.blueComponent * 255))
+case "cpu":
+    let pid = args[2]
+    let seconds = Double(args[3]) ?? 5
+    func cpuTime() -> Double {
+        let ps = Process()
+        let pipe = Pipe()
+        ps.executableURL = URL(fileURLWithPath: "/bin/ps")
+        ps.arguments = ["-o", "cputime=", "-p", pid]
+        ps.standardOutput = pipe
+        try? ps.run()
+        ps.waitUntilExit()
+        let text = String(bytes: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        let parts = text.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ":").compactMap { Double($0) }
+        return parts.reduce(0) { $0 * 60 + $1 }
+    }
+    let start = cpuTime()
+    Thread.sleep(forTimeInterval: seconds)
+    print(String(format: "%.2f", (cpuTime() - start) / seconds * 100))
 case "frontmost": print(NSWorkspace.shared.frontmostApplication?.localizedName ?? "")
 case "activate":
     app(named: args[2]).activate()

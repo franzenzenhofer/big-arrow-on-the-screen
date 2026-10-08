@@ -19,6 +19,18 @@ jobs:
         run: |
           .build/release/bigarrow doctor
           screencapture -x probe.png && sips -g pixelWidth -g pixelHeight probe.png
+      - name: Re-run the planning spike over a clean desktop (ticket T03)
+        run: |
+          mkdir -p visual-out/spike
+          cd docs/spikes/2026-10-08-overlay-probe
+          swiftc -O -o ../../../visual-out/spike/probe probe.swift
+          swiftc -o ../../../visual-out/spike/wincheck wincheck.swift
+          cd ../../../visual-out/spike
+          ./probe 512 380 & PROBE=$!
+          sleep 2
+          screencapture -x probe-screenshot.png
+          ./wincheck | tee wincheck-output.txt
+          wait $PROBE; echo "probe exit $?" | tee -a wincheck-output.txt
       - name: Record
         run: scripts/visual-check.sh visual-out
       - name: Behaviour (clicks, follow, raise, say, second display)

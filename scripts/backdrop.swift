@@ -1,5 +1,6 @@
 // A neutral demo window for screenshots and tests: a small "permission" dialog with Cancel and
 // Allow buttons, nothing personal. Exits after 5 minutes or on SIGTERM.
+// `backdrop --fullscreen` puts the window into its own full-screen Space.
 import AppKit
 
 let app = NSApplication.shared
@@ -23,7 +24,11 @@ content.addSubview(cancel)
 content.addSubview(allow)
 window.contentView = content
 window.center()
+window.collectionBehavior = [.fullScreenPrimary]
 window.makeKeyAndOrderFront(nil)
 app.activate(ignoringOtherApps: true)
+if CommandLine.arguments.contains("--fullscreen") {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { window.toggleFullScreen(nil) }
+}
 DispatchQueue.main.asyncAfter(deadline: .now() + 300) { exit(0) }
 app.run()
