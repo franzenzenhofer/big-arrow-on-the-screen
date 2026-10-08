@@ -106,11 +106,8 @@ struct OverlayLayers {
             let rect = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
             path = CGPath(ellipseIn: rect, transform: [flip])
         }
-        let fill = CAShapeLayer()
-        fill.path = path
-        fill.fillColor = color.cgColor.copy(alpha: 0.12)
+        // Border only, no fill: the human must see exactly what is being pointed at.
         return [
-            fill,
             stroked(path, color: color.contrast.cgColor, width: markLineWidth + outlineWidth),
             stroked(path, color: color.cgColor, width: markLineWidth)
         ]

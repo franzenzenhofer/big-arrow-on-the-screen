@@ -130,6 +130,24 @@ struct CLITests {
         #expect((target["detail"] as? [String: String])?["role"] == "AXMenuBarItem")
     }
 
+    @Test(
+        "A dry run never raises an app, even with --raise",
+        .enabled(if: ProcessInfo.processInfo.environment["BIGARROW_SCREEN_TESTS"] == "1", "a regression would steal the focus")
+    )
+    func dryRunDoesNotRaise() async throws {
+        let front = await MainActor.run { NSWorkspace.shared.frontmostApplication }
+        let other = await MainActor.run {
+            NSWorkspace.shared.runningApplications.first { $0.activationPolicy == .regular && $0 != front && $0.localizedName != nil }
+        }
+        guard let name = other?.localizedName else {
+            print("skipped: no second regular app is running")
+            return
+        }
+        _ = try BigArrowProcess.run(["point", "--window", name, "--raise", "--text", "x", "--dry-run"])
+        let after = await MainActor.run { NSWorkspace.shared.frontmostApplication }
+        #expect(after == front)
+    }
+
     @Test("doctor reports displays and the permission owner as JSON")
     func doctor() throws {
         let result = try BigArrowProcess.run(["doctor", "--json"])

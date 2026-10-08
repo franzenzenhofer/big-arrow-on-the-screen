@@ -53,7 +53,10 @@ point at something the human cannot see.
 - Add `--say` when the human is probably not looking at the screen; it speaks the sign.
 - Colours: `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`.
   Several arrows at once: one colour each. `--corners sharp` for square signs.
-- `--size S|M|L`, `--style ring` (circle around a point), `--style box` (box around it).
+- `--size S|M|L`, `--style ring` (circle around a point), `--style box` (box around it);
+  rings and boxes are border-only, so the target stays visible.
+- `--shape bend|straight|zigzag`: bend is the default; straight for a calm, direct pointer;
+  zigzag when it must grab attention.
 
 ## Coordinates (only for --at and --rect)
 

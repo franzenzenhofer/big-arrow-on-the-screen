@@ -21,6 +21,7 @@ struct PointConfig {
     let style: ArrowStyle
     let color: ArrowColor
     let corners: SignCorners
+    let shape: ArrowShape
     let noAnimation: Bool
     let say: Bool
     let voice: String?
@@ -48,6 +49,7 @@ struct PointConfig {
         style = try ArrowStyle.parse(look.style)
         color = try ArrowColor.parse(look.color)
         corners = try SignCorners.parse(look.corners)
+        shape = try ArrowShape.parse(look.shape)
         noAnimation = look.noAnimation
         click = try Self.click(behaviour)
         closeButton = behaviour.closeButton

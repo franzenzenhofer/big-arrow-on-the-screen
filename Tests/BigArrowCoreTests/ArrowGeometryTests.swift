@@ -133,3 +133,52 @@ struct ArrowRootTests {
         #expect(layout.arrow.root.junction.normal == CGPoint(x: 1, y: 0))
     }
 }
+
+@Suite("Arrow shapes")
+struct ArrowShapeTests {
+    let display = TestDisplays.builtIn
+    static let cases = ArrowShape.allCases.flatMap { shape in ApproachDirection.allCases.map { (shape, $0) } }
+
+    func plan(_ shape: ArrowShape, from direction: ApproachDirection) -> OverlayLayout {
+        OverlayLayout.plan(OverlayLayout.Request(
+            target: .point(CGPoint(x: 756, y: 500)), display: display, signSize: CGSize(width: 421, height: 84),
+            style: .arrow, size: .medium, forced: direction, shape: shape
+        ))
+    }
+
+    @Test("Every shape hits the target, points the head along its last stretch and stays on screen", arguments: cases)
+    func shapes(shape: ArrowShape, direction: ApproachDirection) {
+        let arrow = plan(shape, from: direction).arrow
+        #expect(arrow.tip.distance(to: CGPoint(x: 756, y: 500)) <= 0.5)
+        #expect((arrow.shaftEnd - arrow.control).normalized.dot(arrow.direction) > 0.9999)
+        #expect(display.localBounds.contains(arrow.shaftPath.boundingBoxOfPath))
+    }
+
+    @Test("A straight shaft is a straight line from the sign to the head", arguments: ApproachDirection.allCases)
+    func straight(direction: ApproachDirection) {
+        let arrow = plan(.straight, from: direction).arrow
+        let line = (arrow.shaftEnd - arrow.tail).normalized
+        #expect((arrow.control - arrow.tail).normalized.dot(line) > 0.9999)
+        #expect(arrow.direction.dot(line) > 0.9999)
+    }
+
+    @Test("A zigzag leaves the sign straight out, then swings, then runs straight into the head", arguments: ApproachDirection.allCases)
+    func zigzag(direction: ApproachDirection) throws {
+        let arrow = plan(.zigzag, from: direction).arrow
+        guard case .polyline(let points) = arrow.shaft else {
+            Issue.record("a zigzag must be a polyline")
+            return
+        }
+        #expect(points.count >= 5)
+        let leadOut = (points[1] - points[0]).normalized
+        #expect(leadOut.dot(arrow.root.junction.normal) > 0.999)
+        let lastLeg = (points[points.count - 1] - points[points.count - 2]).normalized
+        #expect(lastLeg.dot(arrow.direction) > 0.9999)
+    }
+
+    @Test("Shapes parse by name and reject anything else")
+    func parsing() throws {
+        #expect(try ArrowShape.parse("ZigZag") == .zigzag)
+        #expect(throws: BigArrowError.self) { try ArrowShape.parse("spiral") }
+    }
+}

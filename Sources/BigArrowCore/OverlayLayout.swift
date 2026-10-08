@@ -34,12 +34,14 @@ public struct OverlayLayout: Sendable {
         public let size: ArrowSize
         public let forced: ApproachDirection?
         public let corners: SignCorners
+        public let shape: ArrowShape
 
         public init(
-            target: TargetShape, display: Display, signSize: CGSize,
-            style: ArrowStyle, size: ArrowSize, forced: ApproachDirection?, corners: SignCorners = .round
+            target: TargetShape, display: Display, signSize: CGSize, style: ArrowStyle, size: ArrowSize,
+            forced: ApproachDirection?, corners: SignCorners = .round, shape: ArrowShape = .bend
         ) {
             self.corners = corners
+            self.shape = shape
             self.target = target
             self.display = display
             self.signSize = signSize
@@ -68,7 +70,9 @@ public struct OverlayLayout: Sendable {
         let outline = SignOutline(
             rect: placement.signRect, cornerRadius: request.corners.radius(height: placement.signRect.height)
         )
-        let arrow = ArrowGeometry(tip: tip, sign: outline, bounds: display.localBounds, metrics: metrics)
+        let arrow = ArrowGeometry(
+            tip: tip, sign: outline, bounds: display.localBounds, style: ArrowGeometry.Style(metrics: metrics, shape: request.shape)
+        )
         return OverlayLayout(
             display: display, mark: mark, signRect: placement.signRect,
             direction: placement.direction, arrow: arrow, size: request.size

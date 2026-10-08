@@ -62,6 +62,9 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("red, orange, yellow, green, teal, blue, purple, pink, black, white, or hex like #FF3B1F / #F31.", "colour"))
     var color = "red"
 
+    @Option(help: help("Shaft shape: bend, straight or zigzag.", "shape"))
+    var shape = "bend"
+
     @Option(help: help("Sign corners: round or sharp.", "corners"))
     var corners = "round"
 

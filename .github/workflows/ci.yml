@@ -25,4 +25,6 @@ jobs:
       - name: Test
         # The window-server tests run here too: drawing needs no permission. Checks that need
         # Screen Recording or Accessibility skip themselves with a printed reason.
+        env:
+          BIGARROW_SCREEN_TESTS: "1"
         run: swift test

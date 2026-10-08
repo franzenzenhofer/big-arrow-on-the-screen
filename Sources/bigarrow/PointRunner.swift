@@ -18,7 +18,8 @@ struct PointRunner {
 
     func run() throws {
         OverlayApplication.prepare()
-        if config.raise, let raise = config.target.raiseApp {
+        // A dry run or a PNG render changes nothing on screen, so it never raises an app.
+        if config.raise, !config.dryRun, config.png == nil, let raise = config.target.raiseApp {
             _ = try AppRaiser.raise(app: raise.app, windowTitle: raise.windowTitle)
         }
         let screens = ScreenReader.current()
@@ -54,7 +55,7 @@ struct PointRunner {
         let sign = SignRenderer.render(text: config.text, appearance: appearance, display: display)
         let request = OverlayLayout.Request(
             target: resolved.shape, display: display, signSize: sign.size,
-            style: config.style, size: config.size, forced: config.forced, corners: config.corners
+            style: config.style, size: config.size, forced: config.forced, corners: config.corners, shape: config.shape
         )
         return PlannedArrow(resolved: resolved, layout: OverlayLayout.plan(request), sign: sign)
     }

@@ -29,6 +29,8 @@ def cases() -> list[Case]:
     result = [Case(f"{d} round", ["--from", d]) for d in directions]
     result += [Case(f"{d} sharp", ["--from", d, "--corners", "sharp", "--color", "blue"]) for d in directions]
     result += [Case(f"size {s}", ["--size", s, "--color", "green"]) for s in ["S", "M", "L"]]
+    result += [Case(f"{shape} {d}", ["--shape", shape, "--from", d, "--color", "purple"])
+               for shape in ["straight", "zigzag"] for d in ["top-left", "right", "bottom"]]
     result += [Case(f"{c}", ["--color", c, "--from", "bottom-left"]) for c in ["yellow", "white", "black", "purple"]]
     result += [
         Case("ring", ["--style", "ring", "--color", "teal"]),

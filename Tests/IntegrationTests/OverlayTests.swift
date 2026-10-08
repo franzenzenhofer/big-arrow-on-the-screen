@@ -4,7 +4,12 @@ import Foundation
 import Testing
 
 /// Spawns the real CLI against the real window server. `.serialized` because arrows share the screen.
-@Suite("Overlay on the real window server", .serialized)
+/// Opt-in with `BIGARROW_SCREEN_TESTS=1` (CI and the test Mac set it): these draw on the screen,
+/// so a plain `swift test` on a Mac somebody is working on never does.
+@Suite(
+    "Overlay on the real window server", .serialized,
+    .enabled(if: ProcessInfo.processInfo.environment["BIGARROW_SCREEN_TESTS"] == "1", "set BIGARROW_SCREEN_TESTS=1 to draw on screen")
+)
 struct OverlayTests {
     /// A point on the primary display, away from the menu bar and the Dock.
     static var target: CGPoint {
