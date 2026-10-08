@@ -4,7 +4,7 @@ macOS CLI (`bigarrow`) plus an agent skill (`big-arrow`, Claude Code and Codex) 
 
 ## State
 
-Implemented 2026-10-08: everything in `docs/plan/PLAN.md` through M4, see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
+Released 0.1.1 on 2026-10-08 (Homebrew `franzenzenhofer/tap/bigarrow`): everything in `docs/plan/PLAN.md` plus T31-T40, see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
 
 ## Rules
 
@@ -22,7 +22,7 @@ Implemented 2026-10-08: everything in `docs/plan/PLAN.md` through M4, see `CHANG
 
 - **Franz's Mac (where he works): never draw, click, raise, speak or change displays.** Only build, unit tests, `--dry-run` and offscreen renders (`--png`, `scripts/gallery.py`). Plain `swift test` is safe: screen tests only run with `BIGARROW_SCREEN_TESTS=1`.
 - **CI runner** (clean desktop, Accessibility and Screen Recording granted): `ci.yml` runs all tests with screen tests on; `visual.yml` (`gh workflow run visual.yml`) records screenshots, runs `scripts/behaviour-check.sh` (clicks, follow, raise, say, second display via `scripts/virtual-display`) and records the README demo GIF.
-- **Arthur Mac** (`ssh arthur-mac`): `sudo launchctl asuser 501 sudo -u arthurficial env BIGARROW_SCREEN_TESTS=1 swift test` runs the screen tests in its GUI session (no Accessibility/Screen Recording there). Its screen is often locked; then visuals are black.
+- **Arthur Mac** (`ssh arthur-mac`, macOS 27): `scripts/arthur-gui.sh '<command>'` runs a command in a Ghostty window there, with Ghostty's Accessibility, PostEvent and Screen Recording, and returns its output (e.g. `'BIGARROW_SCREEN_TESTS=1 swift test'`, `'scripts/hn-scene.sh /tmp/hn.png'`, `'BACKDROP_ARGS=--cover scripts/funny-scenes.sh /tmp/scenes'`). Pull and build there first. If its screen is locked, pixels come out black and remote input cannot unlock it; ask Franz. `backdrop --cover` hides Arthur's desktop, menu bar and notifications in shots.
 - After any visual change: `python3 scripts/gallery.py .build/debug/bigarrow <out>` and look at `gallery.png` and `junctions.png` (every shape, side, size, colour; zoomed sign-to-shaft joints).
 
 ## Commands
