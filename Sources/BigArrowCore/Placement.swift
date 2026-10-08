@@ -72,7 +72,7 @@ public enum Placement {
         // avoided while that is possible, and ignored only when nothing else fits.
         let attempts: [(Situation, [ApproachDirection])] = [
             (situation, forced.map { [$0] } ?? []), (situation, directions),
-            (situation.ignoringOthers, forced.map { [$0] } ?? []), (situation.ignoringOthers, directions)
+            (situation.toleratingOthers, forced.map { [$0] } ?? []), (situation.toleratingOthers, directions)
         ]
         for (context, sides) in attempts where !sides.isEmpty {
             if let result = best(context, directions: sides) { return result }
@@ -86,6 +86,15 @@ public enum Placement {
     /// Space kept between this sign and the signs of other live arrows.
     public static let otherGap: CGFloat = 12
 
+    /// How other arrows' signs count: never overlap them, or overlap them as little as possible.
+    enum OthersPolicy {
+        case avoid
+        case minimizeOverlap
+    }
+
+    /// Score cost per square point of overlap with another sign, when overlap cannot be avoided.
+    static let overlapPenalty: CGFloat = 0.05
+
     /// What every candidate is judged against.
     struct Situation {
         let size: CGSize
@@ -93,9 +102,19 @@ public enum Placement {
         let usable: CGRect
         let reach: CGFloat
         let others: [CGRect]
+        var policy = OthersPolicy.avoid
 
-        var ignoringOthers: Situation {
-            Situation(size: size, keepOut: keepOut, usable: usable, reach: reach, others: [])
+        var toleratingOthers: Situation {
+            var copy = self
+            copy.policy = .minimizeOverlap
+            return copy
+        }
+
+        func overlap(_ rect: CGRect) -> CGFloat {
+            others.reduce(0) { total, other in
+                let shared = rect.intersection(other)
+                return shared.isNull ? total : total + shared.width * shared.height
+            }
         }
     }
 
@@ -106,9 +125,11 @@ public enum Placement {
         for (rank, direction) in directions.enumerated() {
             for scale in reachScales {
                 let rect = signRect(size: size, keepOut: keepOut, direction: direction, reach: reach * scale)
+                let overlap = situation.overlap(rect)
                 guard usable.contains(rect), !rect.intersects(keepOut),
-                      !situation.others.contains(where: rect.intersects) else { continue }
+                      situation.policy == .minimizeOverlap || overlap == 0 else { continue }
                 let score = clearance(of: rect, in: usable) - abs(scale - 1) * Self.shortcutPenalty - CGFloat(rank) * 4
+                    - overlap * Self.overlapPenalty
                 if score > best?.score ?? -.infinity {
                     best = (score, Result(direction: direction, signRect: rect, keepOut: keepOut))
                 }
