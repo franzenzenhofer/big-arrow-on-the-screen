@@ -3,7 +3,7 @@
 [![CI](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml/badge.svg)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Big arrows with signs: click here, sign here, over here, you are here, type your name, read this first, no the other one, click Allow](docs/images/hero.png)
+![Hacker News with five bigarrow arrows: the actual article is in here, finally an arrow bigger than this one, same design since 2007, today's thread already argued in 2014, agents can't do this part](docs/images/hero-hn.png)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
@@ -78,6 +78,8 @@ Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found,
 
 It is an arrow, so we spent an unreasonable amount of time on how it looks.
 
+![Big arrows with signs: click here, sign here, over here, you are here, type your name, read this first, no the other one, click Allow](docs/images/hero.png)
+
 ![every style, shape, size and colour](docs/images/gallery.png)
 
 - `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
@@ -85,6 +87,7 @@ It is an arrow, so we spent an unreasonable amount of time on how it looks.
 - `--size S|M|L`, `--corners round|sharp`
 - `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; light colours automatically get a dark outline and text
 - `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
+- Several arrows at once keep their signs out of each other's way (the HN shot above is five independent `bigarrow start` calls)
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
 
@@ -104,6 +107,9 @@ Yes, yes, yes, yes. Displays left of or above the main one (negative coordinates
 
 **How much CPU does a pulsing arrow cost?**
 1.4 % measured on a CI runner. Core Animation does the work in the render server.
+
+**Does `--element` work inside web pages?**
+In Electron apps, yes. In Chrome, only when Chrome runs with `--force-renderer-accessibility` (or VoiceOver is on); Chrome ignores the usual request to expose page content, verified on Chrome in October 2026. Chrome's own toolbar always works. Otherwise point at the page's coordinates, which the skill explains.
 
 **Why not just use [some screen annotation app]?**
 Those are for humans drawing on screens. This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked before writing a line ([research](docs/research/)). None did this.
