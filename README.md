@@ -1,9 +1,11 @@
-# big-arrow-on-the-screen
+# Let your AI agents paint big arrows, boxes and text on your screen
+
+**big-arrow-on-the-screen** (`bigarrow`): one small macOS CLI and an agent skill. Click-through, never steals the focus, gone by itself. MIT.
 
 [![CI](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml/badge.svg)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Hacker News with five bigarrow arrows: the actual article is in here, finally an arrow bigger than this one, same design since 2007, today's thread already argued in 2014, agents can't do this part](docs/images/hero-hn.png)
+![Hacker News with five bigarrow arrows: the actual article is in here, finally an arrow bigger than this one, same design since 2007, today's thread already argued in 2014, not a lurker? click login](docs/images/hero-hn.png)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
