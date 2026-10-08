@@ -157,3 +157,14 @@ Research date: 2026-10-08. Every fact below was read on the page linked next to 
 2. Targeting tiers: `--at x,y` and `--mouse` (no permission), `--window "App"` via running-application pid + `kCGWindowBounds` (no permission; do not rely on owner or window names on Tahoe), `--element` via Accessibility (permission on the responsible terminal or IDE; prompt with `kAXTrustedCheckOptionPrompt`).
 3. Distribution: source-built formula in Franz's existing tap, no notarization needed, the linker ad-hoc signs on arm64; no cask. Claude Code skill with `allowed-tools: Bash(bigarrow *) Bash(say *)`; OpenClaw skill with `requires.bins` and a `brew` installer entry.
 4. Test matrix: full-screen app Space, Stage Manager, "Displays have separate Spaces" on and off, every macOS 26.x point release (26.3 RC click-through regression).
+
+## Addendum 2026-10-08: window-server positions on GitHub's macOS runners
+
+On GitHub Actions `macos-15` runners (1024x768 virtual display), `CGWindowListCopyWindowInfo`
+reported a test dialog at `X=252, Y=-252, 520x288` while Accessibility (`kAXPosition`) and the
+screenshot both put it at `252,124`. On real Macs the two agree (the Calculator fixture in
+`Tests/BigArrowCoreTests/Fixtures/` was recorded with both at `306,492`). Consequences: `--window`
+targets cannot be verified for position on those runners, so the behaviour checks follow an
+`--element` target there; and `WindowMatcher` ignores windows without a real part on a display.
+Evidence: run https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/runs/37760877490
+(`testkit windows backdrop` output in the Behaviour step).

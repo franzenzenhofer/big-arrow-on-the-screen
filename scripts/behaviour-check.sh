@@ -33,12 +33,14 @@ check "until-click reports clicked" "[ \"\$(field $OUT/until-click.json \"['dism
 
 $KIT windows backdrop | tee "$OUT/backdrop-windows.txt"
 
-# --follow: the arrow moves with the window; closing it ends the arrow with targetGone.
-$BIN point --window backdrop --anchor title --text "Follow me" --follow --duration 8 --json > "$OUT/follow.json" & POINT=$!
-sleep 1.5; $KIT move-window backdrop 100 200; sleep 1.5; screencapture -x "$OUT/follow-moved.png"
+# --follow: the arrow moves with its target; closing the window ends the arrow with targetGone.
+# Followed through --element, because on GitHub's virtual machines the window server reports
+# window positions that disagree with Accessibility and the screen (see docs/research).
+$BIN point --element Allow --app backdrop --text "Follow me" --follow --duration 8 --json > "$OUT/follow.json" & POINT=$!
+sleep 1.5; $KIT move-window backdrop 252 200; sleep 1.5; screencapture -x "$OUT/follow-moved.png"
 kill $BACKDROP; wait $POINT
 check "follow ends with targetGone when the window closes" "[ \"\$(field $OUT/follow.json \"['dismissedReason']\")\" = targetGone ]"
-check "follow tracked the moved window" "python3 -c \"import json; t=json.load(open('$OUT/follow.json'))['target']; exit(0 if abs(t['y'] - 214) < 3 else 1)\""
+check "follow tracked the moved button (window moved down 76 pt)" "python3 -c \"import json; t=json.load(open('$OUT/follow.json'))['target']; exit(0 if abs(t['y'] - 431) < 3 else 1)\""
 "$OUT/backdrop" & BACKDROP=$!
 sleep 2
 
