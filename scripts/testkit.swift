@@ -1,6 +1,7 @@
 // Test helper for scripts/behaviour-check.sh, run only on a disposable machine (CI runner):
 //   testkit click X Y                posts a left click at global top-left point X,Y
 //   testkit move-window APP X Y      moves APP's first window to X,Y via Accessibility
+//   testkit resize-window APP W H    resizes APP's first window via Accessibility
 //   testkit frontmost                prints the frontmost app's name
 //   testkit activate APP             brings APP to the front
 //   testkit windows APP              prints APP's windows as the window server lists them
@@ -24,14 +25,24 @@ func click(_ point: CGPoint) {
     }
 }
 
-func moveWindow(of name: String, to point: CGPoint) {
+func firstWindow(of name: String) -> AXUIElement {
     let element = AXUIElementCreateApplication(app(named: name).processIdentifier)
     var windows: CFTypeRef?
     AXUIElementCopyAttributeValue(element, kAXWindowsAttribute as CFString, &windows)
     guard let window = (windows as? [AXUIElement])?.first else { exit(1) }
+    return window
+}
+
+func moveWindow(of name: String, to point: CGPoint) {
     var position = point
     guard let value = AXValueCreate(.cgPoint, &position) else { exit(1) }
-    exit(AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, value) == .success ? 0 : 1)
+    exit(AXUIElementSetAttributeValue(firstWindow(of: name), kAXPositionAttribute as CFString, value) == .success ? 0 : 1)
+}
+
+func resizeWindow(of name: String, to size: CGSize) {
+    var extent = size
+    guard let value = AXValueCreate(.cgSize, &extent) else { exit(1) }
+    exit(AXUIElementSetAttributeValue(firstWindow(of: name), kAXSizeAttribute as CFString, value) == .success ? 0 : 1)
 }
 
 let args = CommandLine.arguments
@@ -73,6 +84,7 @@ case "cpu":
     let start = cpuTime()
     Thread.sleep(forTimeInterval: seconds)
     print(String(format: "%.2f", (cpuTime() - start) / seconds * 100))
+case "resize-window": resizeWindow(of: args[2], to: CGSize(width: Double(args[3]) ?? 800, height: Double(args[4]) ?? 600))
 case "frontmost": print(NSWorkspace.shared.frontmostApplication?.localizedName ?? "")
 case "activate":
     app(named: args[2]).activate()

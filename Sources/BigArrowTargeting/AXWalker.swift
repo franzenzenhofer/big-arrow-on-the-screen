@@ -22,10 +22,16 @@ public struct AXWalker {
         self.pid = pid
     }
 
+    /// Chromium and Electron build the Accessibility tree of web content only on request.
+    static let manualAccessibility = "AXManualAccessibility"
+    /// Time Chromium needs to build that tree after the first request.
+    static let webTreeDelay: TimeInterval = 0.6
+
     /// Flattened nodes in breadth-first order. Stops early when `stop` returns true.
     public func walk(stop: (AXNodeInfo) -> Bool = { _ in false }) -> [AXNodeInfo] {
         let app = AXUIElementCreateApplication(pid)
         AXUIElementSetMessagingTimeout(app, Self.messagingTimeout)
+        requestWebContentTree(app)
         var queue: [(AXUIElement, Int)] = roots(of: app).map { ($0, 0) }
         var nodes: [AXNodeInfo] = []
         let deadline = Date().addingTimeInterval(Self.budget)
@@ -39,6 +45,15 @@ public struct AXWalker {
             if depth < Self.maxDepth { queue.append(contentsOf: children.map { ($0, depth + 1) }) }
         }
         return nodes
+    }
+
+    /// Asks a Chromium or Electron app for its web content tree; other apps ignore the attribute.
+    /// The first request waits briefly so the tree exists before the walk.
+    func requestWebContentTree(_ app: AXUIElement) {
+        let enabled: Bool? = copy(app, Self.manualAccessibility)
+        guard enabled != true else { return }
+        let result = AXUIElementSetAttributeValue(app, Self.manualAccessibility as CFString, kCFBooleanTrue)
+        if result == .success { Thread.sleep(forTimeInterval: Self.webTreeDelay) }
     }
 
     /// Focused window first, then the other windows, then the menu bar.
