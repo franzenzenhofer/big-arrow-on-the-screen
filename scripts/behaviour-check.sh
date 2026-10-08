@@ -101,7 +101,7 @@ $BIN stop --all > /dev/null
 defaults write com.apple.WindowManager GloballyEnabled -bool false
 
 # A Retina (2x) second display next to the 1x main display.
-scripts/virtual-display/.build/virtual-display --width 1280 --height 800 --hidpi 1 --seconds 10 > "$OUT/display-2x.json" & DISPLAY_PID=$!
+scripts/virtual-display/.build/virtual-display --width 800 --height 500 --hidpi 1 --seconds 10 > "$OUT/display-2x.json" & DISPLAY_PID=$!
 sleep 4
 $BIN doctor --json > "$OUT/doctor-2x.json"
 check "the second display reports scale 2" "[ \"\$(field $OUT/doctor-2x.json \"['displays'][1]['scale']\")\" = 2.0 ]"
