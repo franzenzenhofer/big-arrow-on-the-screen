@@ -21,6 +21,8 @@ jobs:
           screencapture -x probe.png && sips -g pixelWidth -g pixelHeight probe.png
       - name: Record
         run: scripts/visual-check.sh visual-out
+      - name: Behaviour (clicks, follow, raise, say, second display)
+        run: scripts/behaviour-check.sh visual-out/behaviour
       - name: Record the demo GIF
         run: |
           brew install ffmpeg

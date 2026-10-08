@@ -16,14 +16,14 @@ REGION=$(python3 -c "
 import json, subprocess
 nodes = json.loads(subprocess.check_output(['$BIN', 'elements', '--app', 'backdrop', '--json']))
 (x, y), (w, h) = next(n['frame'] for n in nodes if n.get('role') == 'AXWindow')
-print(f'{int(x - 150)},{int(y - 60)},{int(w + 300)},{int(h + 330)}')
+print(f'{int(x - 200)},{int(y - 110)},{int(w + 400)},{int(h + 380)}')
 ")
 screencapture -v -V 15 -R "$REGION" "$OUT/demo.mov" &
 RECORDER=$!
 sleep 1
 $BIN point --element Allow --app backdrop --text "Franz, click Allow" --color green --duration 3.5
 $BIN point --element Cancel --app backdrop --text "Not this one" --shape zigzag --color purple --from bottom-left --duration 3
-$BIN start --element "would like" --app backdrop --text "Read this first" --color orange --close-button --from top > /dev/null
+$BIN start --element "would like" --app backdrop --text "Read this first" --color orange --close-button --from bottom-right > /dev/null
 sleep 3
 $BIN stop --all > /dev/null
 wait $RECORDER
