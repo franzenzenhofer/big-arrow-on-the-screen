@@ -21,6 +21,10 @@ jobs:
           screencapture -x probe.png && sips -g pixelWidth -g pixelHeight probe.png
       - name: Record
         run: scripts/visual-check.sh visual-out
+      - name: Record the demo GIF
+        run: |
+          brew install ffmpeg
+          scripts/record-demo.sh visual-out
       - uses: actions/upload-artifact@v4
         if: always()
         with:
