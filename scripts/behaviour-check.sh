@@ -59,7 +59,7 @@ $BIN doctor --json > "$OUT/doctor-two-displays.json"
 check "doctor sees two displays" "[ \"\$(field $OUT/doctor-two-displays.json \"['displays'].__len__()\")\" = 2 ]"
 $BIN start --at 200,200 --display 2 --text "On the second display" --color blue --json > "$OUT/second.json"
 check "arrow lands on display 2" "[ \"\$(field $OUT/second.json \"['target']['display']\")\" = 2 ]"
-screencapture -x "$OUT/two-displays.png"
+sleep 1; screencapture -x "$OUT/two-displays-1.png" "$OUT/two-displays-2.png"
 SECOND=$(field "$OUT/second.json" "['pid']")
 kill $DISPLAY_PID; sleep 2
 check "unplugging the display ends its arrow" "! kill -0 $SECOND 2>/dev/null"

@@ -23,7 +23,7 @@ RECORDER=$!
 sleep 1
 $BIN point --element Allow --app backdrop --text "Franz, click Allow" --color green --duration 3.5
 $BIN point --element Cancel --app backdrop --text "Not this one" --shape zigzag --color purple --from bottom-left --duration 3
-$BIN start --element "would like" --app backdrop --text "Read this first" --color orange --close-button --from bottom-right > /dev/null
+$BIN start --element "would like" --app backdrop --text "Read this first" --color orange --close-button --from bottom > /dev/null
 sleep 3
 $BIN stop --all > /dev/null
 wait $RECORDER
