@@ -668,6 +668,34 @@
    "status": "done",
    "outcome": "`docs/images/scenes/`.",
    "issue": null
+  },
+  {
+   "key": "T39",
+   "milestone": "M3",
+   "title": "Several arrows at once without overlapping signs",
+   "labels": [
+    "type:feature",
+    "priority:P1",
+    "size:M"
+   ],
+   "body": "Found while shooting the Hacker News hero: independent `bigarrow start` calls placed their signs on top of each other.",
+   "status": "done",
+   "outcome": "New arrows read the live arrows' sign frames from the pid registry and avoid them, move further out when crowded, and minimize overlap as the last resort; placement test; `docs/images/hero-hn.png` is five independent arrows.",
+   "issue": null
+  },
+  {
+   "key": "T40",
+   "milestone": "M2",
+   "title": "`--element` inside web content (Electron, Chrome)",
+   "labels": [
+    "type:feature",
+    "priority:P2",
+    "size:S"
+   ],
+   "body": "Agents point at web pages most of the time.",
+   "status": "done",
+   "outcome": "Electron apps expose their web tree after `AXManualAccessibility` (verified with Claude.app); Chrome 2026 rejects both requests and exposes pages only with `--force-renderer-accessibility` or VoiceOver (verified on the test Mac); documented in the README FAQ and the skill.",
+   "issue": null
   }
  ]
 }

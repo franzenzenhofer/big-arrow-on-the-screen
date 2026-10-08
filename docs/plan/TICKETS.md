@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 38 tickets: 37 done, 1 not now.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 40 tickets: 39 done, 1 not now.
 
 ## M0 Skeleton and proof
 
@@ -254,6 +254,15 @@ Labels: `type:feature` `priority:P1` `size:M`
 
 Agents look before they point.
 
+### T40 `--element` inside web content (Electron, Chrome)
+
+**Status: Done**  
+Labels: `type:feature` `priority:P2` `size:S`
+
+**Outcome**: Electron apps expose their web tree after `AXManualAccessibility` (verified with Claude.app); Chrome 2026 rejects both requests and exposes pages only with `--force-renderer-accessibility` or VoiceOver (verified on the test Mac); documented in the README FAQ and the skill.
+
+Agents point at web pages most of the time.
+
 ## M3 Beauty and behaviour
 
 Animations, auto placement, styles, follow moving targets, speak the sign, dismiss on click.
@@ -394,6 +403,15 @@ Labels: `type:feature` `priority:P1` `size:M`
 **Outcome**: Gallery and demo committed; screen tests opt-in.
 
 `--png` renders offscreen; `scripts/gallery.py` renders every combination and zooms into every joint; `visual.yml` records on a clean runner.
+
+### T39 Several arrows at once without overlapping signs
+
+**Status: Done**  
+Labels: `type:feature` `priority:P1` `size:M`
+
+**Outcome**: New arrows read the live arrows' sign frames from the pid registry and avoid them, move further out when crowded, and minimize overlap as the last resort; placement test; `docs/images/hero-hn.png` is five independent arrows.
+
+Found while shooting the Hacker News hero: independent `bigarrow start` calls placed their signs on top of each other.
 
 ## M4 Distribution
 

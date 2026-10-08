@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-08
+
+### Changed
+- Several arrows at once keep their signs clear of each other (live arrows publish their sign frames); when the screen is crowded a sign moves further out, and overlaps as little as possible only when nothing else fits.
+- `--from` is a preference: a side where the sign does not fit falls back to the roomiest side, so an arrow never covers its own target.
+- When several running apps share a name (two Chrome instances), `--element`, `elements`, `front` and `--raise` use the one the human sees.
+- `--element` asks Electron apps for their web content tree (`AXManualAccessibility`) and searches deeper and longer, for web pages.
+
+### Fixed
+- `--window` skips windows an app parks off-screen.
+
 ## [0.1.0] - 2026-10-08
 
 ### Added
