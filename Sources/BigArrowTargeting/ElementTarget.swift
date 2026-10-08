@@ -10,7 +10,7 @@ public enum ElementTarget {
 
     public static func resolve(_ query: ElementQuery, app: String?, screens: ScreenSpace) throws -> ResolvedTarget {
         try Permission.accessibility.require(for: "Pointing at a UI element (--element)")
-        let running = try application(named: app)
+        let running = try application(named: app, screens: screens)
         let nodes = AXWalker(pid: running.processIdentifier).walk { node in
             query.score(node) == 3 && ElementMatcher.isVisible(node, screens.displays)
         }
@@ -37,7 +37,7 @@ public enum ElementTarget {
         "\(Int(rect.minX)),\(Int(rect.minY)),\(Int(rect.width)),\(Int(rect.height))"
     }
 
-    public static func application(named name: String?) throws -> NSRunningApplication {
+    public static func application(named name: String?, screens: ScreenSpace) throws -> NSRunningApplication {
         guard let name else {
             guard let front = NSWorkspace.shared.frontmostApplication else {
                 throw BigArrowError.unresolvable("no frontmost app, pass --app")
@@ -45,9 +45,12 @@ public enum ElementTarget {
             return front
         }
         let apps = WindowTarget.runningApps()
-        guard let match = WindowMatcher.apps(matching: name, in: apps).first,
+        let windows = WindowTarget.onScreenWindows()
+        let active = NSWorkspace.shared.frontmostApplication?.processIdentifier
+        let matches = WindowMatcher.apps(matching: name, in: apps)
+        guard let match = WindowMatcher.preferred(matches, activePID: active, windows: windows, displays: screens.displays),
               let running = NSRunningApplication(processIdentifier: match.pid) else {
-            let names = WindowMatcher.appsWithWindows(apps, WindowTarget.onScreenWindows()).joined(separator: ", ")
+            let names = WindowMatcher.appsWithWindows(apps, windows).joined(separator: ", ")
             throw BigArrowError.unresolvable("no running app matches '\(name)'; apps with windows: \(names)")
         }
         return running

@@ -116,6 +116,17 @@ public enum WindowMatcher {
         }
     }
 
+    /// When several running apps share a name (two Chrome instances), the one the human sees wins:
+    /// the active app, else the app owning the frontmost visible window, else the first match.
+    public static func preferred(
+        _ matches: [RunningAppInfo], activePID: Int32?, windows: [WindowInfo], displays: [Display]
+    ) -> RunningAppInfo? {
+        if let active = matches.first(where: { $0.pid == activePID }) { return active }
+        let pids = Set(matches.map(\.pid))
+        let front = windows.first { pids.contains($0.ownerPID) && $0.isVisibleAppWindow && isOnScreen($0, displays) }
+        return front.flatMap { window in matches.first { $0.pid == window.ownerPID } } ?? matches.first
+    }
+
     /// Names of apps that have at least one visible window, for the "unknown app" message.
     public static func appsWithWindows(_ apps: [RunningAppInfo], _ windows: [WindowInfo]) -> [String] {
         let pids = Set(windows.filter(\.isVisibleAppWindow).map(\.ownerPID))

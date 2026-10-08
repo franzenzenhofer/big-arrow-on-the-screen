@@ -1,6 +1,6 @@
 // Test helper for scripts/behaviour-check.sh, run only on a disposable machine (CI runner):
 //   testkit click X Y                posts a left click at global top-left point X,Y
-//   testkit move-window APP X Y      moves APP's first window to X,Y via Accessibility
+//   testkit move-window APP X Y      moves APP's first window to X,Y via Accessibility (APP may be 'frontmost')
 //   testkit resize-window APP W H    resizes APP's first window via Accessibility
 //   testkit frontmost                prints the frontmost app's name
 //   testkit activate APP             brings APP to the front
@@ -11,6 +11,7 @@ import AppKit
 import ApplicationServices
 
 func app(named name: String) -> NSRunningApplication {
+    if name == "frontmost", let front = NSWorkspace.shared.frontmostApplication { return front }
     guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.localizedName == name }) else {
         FileHandle.standardError.write(Data("testkit: no app named \(name)\n".utf8))
         exit(1)

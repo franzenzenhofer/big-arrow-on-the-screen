@@ -17,8 +17,8 @@ public enum AppRaiser {
     static let settleTimeout: TimeInterval = 1.5
     static let pollStep: TimeInterval = 0.05
 
-    public static func raise(app query: String, windowTitle: String?) throws -> Raised {
-        let running = try ElementTarget.application(named: query)
+    public static func raise(app query: String, windowTitle: String?, screens: ScreenSpace) throws -> Raised {
+        let running = try ElementTarget.application(named: query, screens: screens)
         running.unhide()
         var raisedWindow: String?
         if let windowTitle {

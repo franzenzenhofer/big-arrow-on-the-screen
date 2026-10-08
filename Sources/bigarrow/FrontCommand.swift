@@ -1,5 +1,6 @@
 import ArgumentParser
 import BigArrowCore
+import BigArrowOverlay
 import BigArrowTargeting
 
 struct FrontCommand: ParsableCommand {
@@ -25,7 +26,7 @@ struct FrontCommand: ParsableCommand {
 
     func run() throws {
         try MainActor.assumeIsolated {
-            let raised = try AppRaiser.raise(app: app, windowTitle: window)
+            let raised = try AppRaiser.raise(app: app, windowTitle: window, screens: ScreenReader.current())
             if json {
                 Output.json(raised)
             } else {

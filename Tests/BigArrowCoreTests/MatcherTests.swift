@@ -42,6 +42,20 @@ struct MatcherTests {
         #expect(windows.first?.bounds == CGRect(x: 968, y: 144, width: 320, height: 448))
     }
 
+    @Test("Two apps with the same name: the active one wins, else the one with the frontmost window")
+    func sameNamedApps() {
+        let first = RunningAppInfo(pid: 10, name: "Google Chrome", bundleID: "com.google.Chrome")
+        let second = RunningAppInfo(pid: 20, name: "Google Chrome", bundleID: "com.google.Chrome")
+        let windows = [
+            WindowInfo(ownerPID: 20, layer: 0, bounds: CGRect(x: 40, y: 60, width: 900, height: 700), alpha: 1, title: nil),
+            WindowInfo(ownerPID: 10, layer: 0, bounds: CGRect(x: 0, y: 40, width: 900, height: 700), alpha: 1, title: nil)
+        ]
+        let matches = [first, second]
+        #expect(WindowMatcher.preferred(matches, activePID: 10, windows: windows, displays: displays)?.pid == 10)
+        #expect(WindowMatcher.preferred(matches, activePID: 99, windows: windows, displays: displays)?.pid == 20)
+        #expect(WindowMatcher.preferred(matches, activePID: nil, windows: [], displays: displays)?.pid == 10)
+    }
+
     @Test("Title filtering is a case-insensitive substring match")
     func titleFilter() {
         let calculator = WindowMatcher.apps(matching: "Calculator", in: recorded.apps).map(\.pid)

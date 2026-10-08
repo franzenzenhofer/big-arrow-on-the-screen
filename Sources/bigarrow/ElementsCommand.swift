@@ -25,8 +25,9 @@ struct ElementsCommand: ParsableCommand {
     func run() throws {
         try MainActor.assumeIsolated {
             try Permission.accessibility.require(for: "Listing UI elements")
-            let running = try ElementTarget.application(named: app)
-            let displays = ScreenReader.current().displays
+            let screens = ScreenReader.current()
+            let running = try ElementTarget.application(named: app, screens: screens)
+            let displays = screens.displays
             let nodes = AXWalker(pid: running.processIdentifier).walk().filter { node in
                 ElementMatcher.isVisible(node, displays) && !node.texts.isEmpty && matches(node)
             }
