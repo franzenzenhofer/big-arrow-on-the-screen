@@ -42,7 +42,7 @@ enum TargetSpec {
         case .mouse:
             return ResolvedTarget(shape: .point(ScreenReader.mouseLocation()), source: "mouse")
         case .window(let query, let anchor):
-            return try WindowTarget.resolve(query, anchor: anchor)
+            return try WindowTarget.resolve(query, anchor: anchor, screens: screens)
         case .element(let query, let app):
             return try ElementTarget.resolve(query, app: app, screens: screens)
         case .peekabooElement(let id, let snapshot):

@@ -1,0 +1,44 @@
+name: Release
+
+# On a version tag: build a universal binary, sign it ad hoc, and attach it with the skill to
+# the GitHub release. The Homebrew formula builds from the source tarball instead; see
+# scripts/release.sh, which also bumps franzenzenhofer/homebrew-tap.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select the newest Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)"
+      - name: Check the tag matches the version
+        run: grep -q "\"${GITHUB_REF_NAME#v}\"" Sources/BigArrowCore/BigArrowVersion.swift
+      - name: Build universal
+        run: swift build -c release --arch arm64 --arch x86_64
+      - name: Package
+        run: |
+          BIN=.build/apple/Products/Release/bigarrow
+          codesign --force --sign - "$BIN"
+          lipo -info "$BIN"
+          mkdir -p dist/bigarrow-${GITHUB_REF_NAME}/share/bigarrow/skill
+          cp "$BIN" dist/bigarrow-${GITHUB_REF_NAME}/
+          cp -R skill/big-arrow dist/bigarrow-${GITHUB_REF_NAME}/share/bigarrow/skill/
+          cp LICENSE README.md CHANGELOG.md dist/bigarrow-${GITHUB_REF_NAME}/
+          tar -C dist -czf bigarrow-${GITHUB_REF_NAME}-macos-universal.tar.gz bigarrow-${GITHUB_REF_NAME}
+          shasum -a 256 bigarrow-${GITHUB_REF_NAME}-macos-universal.tar.gz > bigarrow-${GITHUB_REF_NAME}-macos-universal.tar.gz.sha256
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES=$(awk "/^## \[${GITHUB_REF_NAME#v}\]/{flag=1;next}/^## \[/{flag=0}flag" CHANGELOG.md)
+          gh release create "$GITHUB_REF_NAME" --title "bigarrow ${GITHUB_REF_NAME}" --notes "$NOTES
+          
+          The prebuilt binary is signed ad hoc, not notarized: Gatekeeper blocks it when it is downloaded with a browser (remove the quarantine flag with xattr -d com.apple.quarantine bigarrow). Installing with Homebrew builds from source and avoids this." \
+            bigarrow-${GITHUB_REF_NAME}-macos-universal.tar.gz bigarrow-${GITHUB_REF_NAME}-macos-universal.tar.gz.sha256

@@ -36,7 +36,7 @@ struct MatcherTests {
     @Test("Windows are the app's visible layer-0 windows, front to back, menu bar items excluded")
     func windowsOfApp() throws {
         let chrome = WindowMatcher.apps(matching: "Google Chrome", in: recorded.apps).map(\.pid)
-        let windows = WindowMatcher.windows(of: chrome, in: recorded.windows, title: nil)
+        let windows = WindowMatcher.windows(of: chrome, in: recorded.windows, title: nil, displays: displays)
         #expect(windows.count == 3)
         #expect(windows.allSatisfy { $0.layer == 0 })
         #expect(windows.first?.bounds == CGRect(x: 968, y: 144, width: 320, height: 448))
@@ -45,8 +45,15 @@ struct MatcherTests {
     @Test("Title filtering is a case-insensitive substring match")
     func titleFilter() {
         let calculator = WindowMatcher.apps(matching: "Calculator", in: recorded.apps).map(\.pid)
-        #expect(WindowMatcher.windows(of: calculator, in: recorded.windows, title: "calc").count == 1)
-        #expect(WindowMatcher.windows(of: calculator, in: recorded.windows, title: "inbox").isEmpty)
+        #expect(WindowMatcher.windows(of: calculator, in: recorded.windows, title: "calc", displays: displays).count == 1)
+        #expect(WindowMatcher.windows(of: calculator, in: recorded.windows, title: "inbox", displays: displays).isEmpty)
+    }
+
+    @Test("A window parked off-screen is skipped, the visible one is taken (seen on a CI runner)")
+    func offScreenWindowsAreSkipped() {
+        let parked = WindowInfo(ownerPID: 7, layer: 0, bounds: CGRect(x: 312, y: -252, width: 400, height: 28), alpha: 1, title: nil)
+        let visible = WindowInfo(ownerPID: 7, layer: 0, bounds: CGRect(x: 252, y: 124, width: 520, height: 288), alpha: 1, title: nil)
+        #expect(WindowMatcher.windows(of: [7], in: [parked, visible], title: nil, displays: displays) == [visible])
     }
 
     @Test("The unknown-app message lists only apps with visible windows")

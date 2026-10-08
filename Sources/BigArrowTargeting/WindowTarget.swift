@@ -7,7 +7,7 @@ import BigArrowCore
 /// https://developer.apple.com/forums/thread/839069
 @MainActor
 public enum WindowTarget {
-    public static func resolve(_ query: WindowQuery, anchor: WindowAnchor) throws -> ResolvedTarget {
+    public static func resolve(_ query: WindowQuery, anchor: WindowAnchor, screens: ScreenSpace) throws -> ResolvedTarget {
         let apps = runningApps()
         let windows = onScreenWindows()
         let matchedApps = WindowMatcher.apps(matching: query.app, in: apps)
@@ -18,7 +18,7 @@ public enum WindowTarget {
         if query.title != nil {
             try Permission.screenRecording.require(for: "Matching a window by title")
         }
-        let found = WindowMatcher.windows(of: matchedApps.map(\.pid), in: windows, title: query.title)
+        let found = WindowMatcher.windows(of: matchedApps.map(\.pid), in: windows, title: query.title, displays: screens.displays)
         let appName = matchedApps[0].name ?? query.app
         guard let window = found.first else {
             let what = query.title.map { "no window titled '*\($0)*'" } ?? "no visible window"

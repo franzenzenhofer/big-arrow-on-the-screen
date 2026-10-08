@@ -96,12 +96,23 @@ public enum WindowMatcher {
         return []
     }
 
+    /// The smallest part of a window, in points per side, that must lie on a display.
+    static let minimumVisibleSide: CGFloat = 40
+
     /// Visible windows of the given pids, front to back, optionally filtered by title substring.
-    public static func windows(of pids: [Int32], in windows: [WindowInfo], title: String?) -> [WindowInfo] {
+    /// Apps park helper windows off-screen; only windows with a real part on a display count.
+    public static func windows(of pids: [Int32], in windows: [WindowInfo], title: String?, displays: [Display]) -> [WindowInfo] {
         windows.filter { window in
-            guard pids.contains(window.ownerPID), window.isVisibleAppWindow else { return false }
+            guard pids.contains(window.ownerPID), window.isVisibleAppWindow, isOnScreen(window, displays) else { return false }
             guard let title else { return true }
             return window.title?.lowercased().contains(title.lowercased()) ?? false
+        }
+    }
+
+    static func isOnScreen(_ window: WindowInfo, _ displays: [Display]) -> Bool {
+        displays.contains { display in
+            let visible = display.frame.intersection(window.bounds)
+            return !visible.isNull && visible.width >= minimumVisibleSide && visible.height >= minimumVisibleSide
         }
     }
 
