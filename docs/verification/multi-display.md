@@ -5,7 +5,7 @@ Ticket T16 matrix plus the behaviour checks of M3. Every row was run by a script
 Where: **CI** = GitHub Actions `macos-15` runner (macOS 15.7, clean desktop, Accessibility and
 Screen Recording granted), via `scripts/behaviour-check.sh` in
 [visual.yml](../../.github/workflows/visual.yml), run
-https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/runs/37762304745 .
+https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/runs/37762744052 .
 **MBP** = the planning MacBook Pro (macOS 26.1, built-in display at 2x), `swift test` with the
 screen tests on. **Arthur** = Arthur Mac (macOS 27.0.1), `BIGARROW_SCREEN_TESTS=1 swift test` in its GUI session.
 
