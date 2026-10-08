@@ -1,6 +1,6 @@
 #!/bin/bash
 # Stages the README's "real-world situations": a neutral dialog plus arrows, one screenshot
-# each, cropped around the scene. Clean machines only (CI runner), never a desk in use.
+# each, full screen. Clean machines only (CI runner), never a desk in use.
 # Usage: scripts/funny-scenes.sh <out-dir>
 set -uo pipefail
 OUT="$1"
@@ -17,14 +17,7 @@ scene() {
   sleep 2.5
   "$@"
   sleep 1.6
-  local region
-  region=$(python3 -c "
-import json, subprocess
-nodes = json.loads(subprocess.check_output(['$BIN', 'elements', '--app', 'backdrop', '--json']))
-(x, y), (w, h) = next(n['frame'] for n in nodes if n.get('role') == 'AXWindow')
-print(f'{max(int(x - 190), 0)},{max(int(y - 120), 0)},{int(w + 380)},{int(h + 330)}')
-")
-  screencapture -x -R "$region" "$OUT/$name.png"
+  screencapture -x "$OUT/$name.png"
   $BIN stop --all > /dev/null
 }
 
@@ -41,9 +34,9 @@ scene agent-needs-you "Deploy" "Deploying to production on a Friday at 17:55. Co
   $BIN start --element Cancel --app backdrop --text "The agent strongly suggests this one" --color red --close-button --from bottom-left --no-animation
 
 scene which-button "Save changes?" "Do you want to save the changes you made to Untitled 37?" "Don't Save,Cancel,Save" \
-  bash -c "$BIN start --element Save --app backdrop --role button --text 'This one' --color blue --from bottom-right --no-animation > /dev/null; \
+  bash -c "$BIN start --element Save --app backdrop --role button --text 'This one' --color blue --from bottom-left --no-animation > /dev/null; \
            $BIN start --element Save --app backdrop --role button --text 'Yes, this one' --color purple --shape straight --from bottom --no-animation > /dev/null; \
-           $BIN start --element Save --app backdrop --role button --text 'Seriously. THIS one.' --color red --shape zigzag --from right --no-animation > /dev/null"
+           $BIN start --element Save --app backdrop --role button --text 'Seriously. THIS one.' --color red --shape zigzag --from bottom-right --no-animation > /dev/null"
 
 scene permissions "System Settings" "\"Terminal\" would like to control this computer using accessibility features." "Deny,Open System Settings" \
   $BIN start --element "Open System Settings" --app backdrop --text "Grant it to Terminal, not to bigarrow" --style box --color teal --corners sharp --no-animation

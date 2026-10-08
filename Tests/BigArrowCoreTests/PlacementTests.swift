@@ -43,6 +43,16 @@ struct PlacementTests {
         #expect(place(CGPoint(x: 756, y: 500), forced: .topLeft).direction == .topLeft)
     }
 
+    @Test("A forced side where the sign does not fit falls back to a side that keeps the target visible")
+    func forcedSideNeverCoversTarget() {
+        let target = CGPoint(x: Self.display.localBounds.maxX - 30, y: 500)
+        let result = place(target, forced: .right)
+        let zone = CGRect(x: target.x - 60, y: target.y - 60, width: 120, height: 120)
+        #expect(result.direction != .right)
+        #expect(!result.signRect.intersects(zone))
+        #expect(Self.display.localBounds.contains(result.signRect))
+    }
+
     @Test("A sign that cannot fit anywhere is clamped onto the display instead of leaving it")
     func clampsHugeSign() {
         let result = Placement.place(

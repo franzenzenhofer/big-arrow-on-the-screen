@@ -61,9 +61,35 @@ public enum Placement {
         reach: CGFloat,
         forced: ApproachDirection? = nil
     ) -> Result {
-        let keepOut = keepOutZone(around: marked)
-        let usable = area.insetBy(dx: margin, dy: margin)
-        let directions = forced.map { [$0] } ?? ApproachDirection.allCases
+        let situation = Situation(
+            size: size, keepOut: keepOutZone(around: marked), usable: area.insetBy(dx: margin, dy: margin), reach: reach
+        )
+        // A forced side is a preference: if the sign does not fit there, the roomiest other side
+        // wins, because an arrow must never hide what it points at.
+        if let forced, let result = best(situation, directions: [forced]) {
+            return result
+        }
+        let directions = ApproachDirection.allCases
+        if let result = best(situation, directions: directions) {
+            return result
+        }
+        let candidates = directions.map {
+            signRect(size: size, keepOut: situation.keepOut, direction: $0, reach: reach)
+        }
+        return fallbackClamped(candidates, directions: directions, keepOut: situation.keepOut, usable: situation.usable)
+    }
+
+    /// What every candidate is judged against.
+    struct Situation {
+        let size: CGSize
+        let keepOut: CGRect
+        let usable: CGRect
+        let reach: CGFloat
+    }
+
+    /// The best-scoring sign that fits fully and clears the keep-out zone, if any.
+    static func best(_ situation: Situation, directions: [ApproachDirection]) -> Result? {
+        let (size, keepOut, usable, reach) = (situation.size, situation.keepOut, situation.usable, situation.reach)
         var best: (score: CGFloat, result: Result)?
         for (rank, direction) in directions.enumerated() {
             for scale in reachScales {
@@ -75,9 +101,7 @@ public enum Placement {
                 }
             }
         }
-        if let best { return best.result }
-        let candidates = directions.map { signRect(size: size, keepOut: keepOut, direction: $0, reach: reach) }
-        return fallbackClamped(candidates, directions: directions, keepOut: keepOut, usable: usable)
+        return best?.result
     }
 
     /// The square keep-out zone, grown to cover the marked rect.
