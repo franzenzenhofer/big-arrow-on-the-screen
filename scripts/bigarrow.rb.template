@@ -12,7 +12,7 @@ class Bigarrow < Formula
   def install
     system "swift", "build", "--disable-sandbox", "--configuration", "release"
     bin.install ".build/release/bigarrow"
-    (share/"bigarrow/skill").install "skill/big-arrow"
+    (pkgshare/"skill").install "skill/big-arrow"
   end
 
   def caveats
@@ -29,6 +29,6 @@ class Bigarrow < Formula
     assert_equal "bigarrow #{version}", shell_output("#{bin}/bigarrow --version").strip
     assert_match "\"drawingNeedsPermission\":false", shell_output("#{bin}/bigarrow doctor --json")
     assert_match "is not one of", shell_output("#{bin}/bigarrow point --at 1,1 --text x --size XL 2>&1", 2)
-    assert_path_exists share/"bigarrow/skill/big-arrow/SKILL.md"
+    assert_path_exists pkgshare/"skill/big-arrow/SKILL.md"
   end
 end
