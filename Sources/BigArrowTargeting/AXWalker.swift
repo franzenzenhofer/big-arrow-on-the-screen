@@ -22,8 +22,9 @@ public struct AXWalker {
         self.pid = pid
     }
 
-    /// Chromium and Electron build the Accessibility tree of web content only on request.
-    static let manualAccessibility = "AXManualAccessibility"
+    /// Chromium and Electron build the Accessibility tree of web content only on request:
+    /// Chrome reacts to `AXEnhancedUserInterface`, Electron apps to `AXManualAccessibility`.
+    static let webTreeAttributes = ["AXEnhancedUserInterface", "AXManualAccessibility"]
     /// Time Chromium needs to build that tree after the first request.
     static let webTreeDelay: TimeInterval = 0.6
 
@@ -47,13 +48,16 @@ public struct AXWalker {
         return nodes
     }
 
-    /// Asks a Chromium or Electron app for its web content tree; other apps ignore the attribute.
+    /// Asks a Chromium or Electron app for its web content tree; other apps reject the attributes.
     /// The first request waits briefly so the tree exists before the walk.
     func requestWebContentTree(_ app: AXUIElement) {
-        let enabled: Bool? = copy(app, Self.manualAccessibility)
-        guard enabled != true else { return }
-        let result = AXUIElementSetAttributeValue(app, Self.manualAccessibility as CFString, kCFBooleanTrue)
-        if result == .success { Thread.sleep(forTimeInterval: Self.webTreeDelay) }
+        var switchedOn = false
+        for attribute in Self.webTreeAttributes {
+            let enabled: Bool? = copy(app, attribute)
+            guard enabled != true else { continue }
+            switchedOn = AXUIElementSetAttributeValue(app, attribute as CFString, kCFBooleanTrue) == .success || switchedOn
+        }
+        if switchedOn { Thread.sleep(forTimeInterval: Self.webTreeDelay) }
     }
 
     /// Focused window first, then the other windows, then the menu bar.
