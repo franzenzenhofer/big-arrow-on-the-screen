@@ -53,6 +53,17 @@ struct PlacementTests {
         #expect(Self.display.localBounds.contains(result.signRect))
     }
 
+    @Test("A second arrow keeps its sign clear of the first arrow's sign")
+    func avoidsOtherSigns() {
+        let target = CGPoint(x: 756, y: 500)
+        let first = place(target)
+        let second = Placement.place(
+            sign: Self.signSize, around: CGRect(origin: target, size: .zero), in: Self.display.localVisibleBounds,
+            reach: ArrowSize.medium.metrics.reach, avoiding: [first.signRect]
+        )
+        #expect(!second.signRect.intersects(first.signRect.insetBy(dx: -Placement.otherGap, dy: -Placement.otherGap)))
+    }
+
     @Test("A sign that cannot fit anywhere is clamped onto the display instead of leaving it")
     func clampsHugeSign() {
         let result = Placement.place(

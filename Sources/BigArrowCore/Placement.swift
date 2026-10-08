@@ -59,19 +59,23 @@ public enum Placement {
         around marked: CGRect,
         in area: CGRect,
         reach: CGFloat,
-        forced: ApproachDirection? = nil
+        forced: ApproachDirection? = nil,
+        avoiding others: [CGRect] = []
     ) -> Result {
         let situation = Situation(
-            size: size, keepOut: keepOutZone(around: marked), usable: area.insetBy(dx: margin, dy: margin), reach: reach
+            size: size, keepOut: keepOutZone(around: marked), usable: area.insetBy(dx: margin, dy: margin), reach: reach,
+            others: others.map { $0.insetBy(dx: -otherGap, dy: -otherGap) }
         )
-        // A forced side is a preference: if the sign does not fit there, the roomiest other side
-        // wins, because an arrow must never hide what it points at.
-        if let forced, let result = best(situation, directions: [forced]) {
-            return result
-        }
         let directions = ApproachDirection.allCases
-        if let result = best(situation, directions: directions) {
-            return result
+        // A forced side is a preference: if the sign does not fit there, the roomiest other side
+        // wins, because an arrow must never hide what it points at. Other arrows' signs are
+        // avoided while that is possible, and ignored only when nothing else fits.
+        let attempts: [(Situation, [ApproachDirection])] = [
+            (situation, forced.map { [$0] } ?? []), (situation, directions),
+            (situation.ignoringOthers, forced.map { [$0] } ?? []), (situation.ignoringOthers, directions)
+        ]
+        for (context, sides) in attempts where !sides.isEmpty {
+            if let result = best(context, directions: sides) { return result }
         }
         let candidates = directions.map {
             signRect(size: size, keepOut: situation.keepOut, direction: $0, reach: reach)
@@ -79,12 +83,20 @@ public enum Placement {
         return fallbackClamped(candidates, directions: directions, keepOut: situation.keepOut, usable: situation.usable)
     }
 
+    /// Space kept between this sign and the signs of other live arrows.
+    public static let otherGap: CGFloat = 12
+
     /// What every candidate is judged against.
     struct Situation {
         let size: CGSize
         let keepOut: CGRect
         let usable: CGRect
         let reach: CGFloat
+        let others: [CGRect]
+
+        var ignoringOthers: Situation {
+            Situation(size: size, keepOut: keepOut, usable: usable, reach: reach, others: [])
+        }
     }
 
     /// The best-scoring sign that fits fully and clears the keep-out zone, if any.
@@ -94,7 +106,8 @@ public enum Placement {
         for (rank, direction) in directions.enumerated() {
             for scale in reachScales {
                 let rect = signRect(size: size, keepOut: keepOut, direction: direction, reach: reach * scale)
-                guard usable.contains(rect), !rect.intersects(keepOut) else { continue }
+                guard usable.contains(rect), !rect.intersects(keepOut),
+                      !situation.others.contains(where: rect.intersects) else { continue }
                 let score = clearance(of: rect, in: usable) - abs(scale - 1) * Self.shortcutPenalty - CGFloat(rank) * 4
                 if score > best?.score ?? -.infinity {
                     best = (score, Result(direction: direction, signRect: rect, keepOut: keepOut))

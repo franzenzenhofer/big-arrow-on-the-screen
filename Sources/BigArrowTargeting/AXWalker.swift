@@ -5,9 +5,11 @@ import Foundation
 /// Walks an app's Accessibility tree breadth first, windows before the menu bar,
 /// within a depth limit, a node limit and a time budget.
 public struct AXWalker {
-    public static let maxDepth = 25
-    public static let maxNodes = 20_000
-    public static let budget: TimeInterval = 2
+    /// Web pages nest deeply and Chromium answers slowly, so the limits are generous; the walk
+    /// still stops at the first exact, visible match.
+    public static let maxDepth = 45
+    public static let maxNodes = 30_000
+    public static let budget: TimeInterval = 6
     static let messagingTimeout: Float = 0.5
 
     static let attributes: [String] = [

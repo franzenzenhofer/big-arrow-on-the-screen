@@ -35,11 +35,14 @@ public struct OverlayLayout: Sendable {
         public let forced: ApproachDirection?
         public let corners: SignCorners
         public let shape: ArrowShape
+        /// Signs of other live arrows on this display, display-local, to keep clear of.
+        public let others: [CGRect]
 
         public init(
             target: TargetShape, display: Display, signSize: CGSize, style: ArrowStyle, size: ArrowSize,
-            forced: ApproachDirection?, corners: SignCorners = .round, shape: ArrowShape = .bend
+            forced: ApproachDirection?, corners: SignCorners = .round, shape: ArrowShape = .bend, others: [CGRect] = []
         ) {
+            self.others = others
             self.corners = corners
             self.shape = shape
             self.target = target
@@ -64,7 +67,7 @@ public struct OverlayLayout: Sendable {
         let metrics = request.size.metrics
         let placement = Placement.place(
             sign: request.signSize, around: marked, in: display.localVisibleBounds,
-            reach: metrics.reach, forced: request.forced
+            reach: metrics.reach, forced: request.forced, avoiding: request.others
         )
         let tip = tipPoint(local: local, mark: mark, toward: placement.signRect.center)
         let outline = SignOutline(

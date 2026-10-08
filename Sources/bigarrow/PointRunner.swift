@@ -55,9 +55,19 @@ struct PointRunner {
         let sign = SignRenderer.render(text: config.text, appearance: appearance, display: display)
         let request = OverlayLayout.Request(
             target: resolved.shape, display: display, signSize: sign.size,
-            style: config.style, size: config.size, forced: config.forced, corners: config.corners, shape: config.shape
+            style: config.style, size: config.size, forced: config.forced, corners: config.corners, shape: config.shape,
+            others: Self.otherSigns(on: display)
         )
         return PlannedArrow(resolved: resolved, layout: OverlayLayout.plan(request), sign: sign)
+    }
+
+    /// Sign frames of the other live arrows on this display, so several arrows do not overlap.
+    static func otherSigns(on display: Display) -> [CGRect] {
+        PidRegistry().live().filter { $0.pid != getpid() && $0.display == display.index + 1 }.compactMap { record in
+            guard record.signFrame.count == 4 else { return nil }
+            let frame = record.signFrame
+            return display.local(CGRect(x: frame[0], y: frame[1], width: frame[2], height: frame[3]))
+        }
     }
 
     func report(_ result: PointResult) {
