@@ -42,7 +42,7 @@ public enum Placement {
     public static let keepOutSide: CGFloat = 120
     /// Gap between the sign and the edge of the usable area.
     public static let margin: CGFloat = 16
-    static let reachScales: [CGFloat] = [1.0, 0.75, 1.4, 0.55]
+    static let reachScales: [CGFloat] = [1.0, 0.75, 1.4, 0.55, 1.9, 2.5]
     /// Score cost per unit of reach change: a cramped or overlong arrow only wins when the
     /// preferred length does not fit.
     static let shortcutPenalty: CGFloat = 400
