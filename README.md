@@ -26,6 +26,19 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
 - **Debugging coordinates.** Not sure your Accessibility, screenshot or Peekaboo coordinates are right? Point at them and look. `--dry-run --json` tells you where it *would* point without drawing.
 
+### Situations we have all been in
+
+Staged with a neutral demo dialog and recorded with the real `bigarrow` on a test Mac (`scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
+
+| | |
+|---|---|
+| ![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png) | ![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png) |
+| `--color green` | `--shape zigzag --color orange` |
+| ![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png) | ![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png) |
+| `--color purple` | `--close-button`, because the human gets the last word |
+| ![Three arrows, one Save button](docs/images/scenes/which-button.png) | ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png) |
+| three `start`s, one button, zero ambiguity | `--style box --corners sharp`, plus a lesson about macOS permissions |
+
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
 ## Install
