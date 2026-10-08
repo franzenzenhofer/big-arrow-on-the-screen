@@ -50,7 +50,10 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("The sign. Write a full sentence: 'Franz, click Allow'.", "text"))
     var text: String
 
-    @Option(help: help("Preferred side for the sign (another side is used if it does not fit there): auto, top-left, top, top-right, right, bottom-right, bottom, bottom-left, left.", "side"))
+    @Option(help: help(
+        "Preferred side for the sign (another side if it does not fit there): auto, top-left, top, top-right, "
+            + "right, bottom-right, bottom, bottom-left, left.", "side"
+    ))
     var from = "auto"
 
     @Option(help: help("S, M or L.", "size"))
