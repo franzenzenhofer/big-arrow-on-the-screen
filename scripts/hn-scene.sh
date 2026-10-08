@@ -31,13 +31,14 @@ RECTS=$($AB eval '(() => {
 echo "$RECTS"
 rect() { python3 -c "import json,sys; v=json.loads(sys.argv[1]); v=json.loads(v) if isinstance(v,str) else v; print(v[sys.argv[2]])" "$RECTS" "$1"; }
 
-$BIN start --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp --from bottom --size S --no-animation > /dev/null
-$BIN start --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight --from bottom-right --size S --no-animation > /dev/null
-$BIN start --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape zigzag --from right --size S --no-animation > /dev/null
-$BIN start --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red --from right --size S --no-animation > /dev/null
+# The most constrained arrow first (far right, longest sign); later arrows keep clear of earlier ones.
 # By label through Accessibility: Chrome exposes web pages to it when started with
 # --force-renderer-accessibility (or while VoiceOver runs).
-$BIN start --element login --role link --app "$BROWSER" --text "Agents can't do this part. That's the point." --color green --from bottom-left --size S --no-animation --json
+$BIN start --element login --role link --app "$BROWSER" --text "Agents can't do this part. That's the point." --color green --size S --no-animation --json
+$BIN start --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape zigzag --size S --no-animation > /dev/null
+$BIN start --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight --size S --no-animation > /dev/null
+$BIN start --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red --size S --no-animation > /dev/null
+$BIN start --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp --size S --no-animation > /dev/null
 sleep 2
 screencapture -x "$OUT"
 echo "wrote $OUT"
