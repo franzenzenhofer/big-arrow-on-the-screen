@@ -1,7 +1,7 @@
 // A neutral demo window for screenshots and tests, nothing personal and no real brand.
 //   backdrop [--fullscreen] [--cover] [--title T] [--message M] [--buttons "Cancel,Allow"] [--x X --y Y]
-// --cover paints a neutral background over the main display behind the dialog, so screenshots on
-// a Mac in use show nothing but the scene. Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
+// --cover paints a neutral background over the whole main display (menu bar, Dock and
+// notifications included) behind the dialog, so screenshots on a Mac in use show only the scene. Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
 import AppKit
 
 func option(_ name: String) -> String? {
@@ -46,6 +46,9 @@ if CommandLine.arguments.contains("--cover"), let screen = NSScreen.screens.firs
     let background = NSWindow(contentRect: screen.frame, styleMask: [.borderless], backing: .buffered, defer: false)
     background.backgroundColor = NSColor(calibratedRed: 0.82, green: 0.86, blue: 0.92, alpha: 1)
     background.setFrame(screen.frame, display: true)
+    // Just below bigarrow's level (screenSaver), above notifications, menu bar and Dock.
+    background.level = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue - 2)
+    window.level = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue - 1)
     background.orderFront(nil)
     cover = background
 }
