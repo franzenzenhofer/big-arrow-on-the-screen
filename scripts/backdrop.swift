@@ -1,6 +1,7 @@
 // A neutral demo window for screenshots and tests, nothing personal and no real brand.
-//   backdrop [--fullscreen] [--title T] [--message M] [--buttons "Cancel,Allow"] [--x X --y Y]
-// Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
+//   backdrop [--fullscreen] [--cover] [--title T] [--message M] [--buttons "Cancel,Allow"] [--x X --y Y]
+// --cover paints a neutral background over the main display behind the dialog, so screenshots on
+// a Mac in use show nothing but the scene. Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
 import AppKit
 
 func option(_ name: String) -> String? {
@@ -39,6 +40,14 @@ if let x = option("--x").flatMap(Double.init), let y = option("--y").flatMap(Dou
     window.setFrameTopLeftPoint(NSPoint(x: x, y: (NSScreen.screens.first?.frame.height ?? 0) - y))
 } else {
     window.center()
+}
+var cover: NSWindow?
+if CommandLine.arguments.contains("--cover"), let screen = NSScreen.screens.first {
+    let background = NSWindow(contentRect: screen.frame, styleMask: [.borderless], backing: .buffered, defer: false)
+    background.backgroundColor = NSColor(calibratedRed: 0.82, green: 0.86, blue: 0.92, alpha: 1)
+    background.setFrame(screen.frame, display: true)
+    background.orderFront(nil)
+    cover = background
 }
 window.makeKeyAndOrderFront(nil)
 app.activate(ignoringOtherApps: true)

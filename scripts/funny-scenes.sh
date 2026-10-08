@@ -1,7 +1,7 @@
 #!/bin/bash
 # Stages the README's "real-world situations": a neutral dialog plus arrows, one screenshot
 # each, full screen. Clean machines only (CI runner), never a desk in use.
-# Usage: scripts/funny-scenes.sh <out-dir>
+# Usage: [BACKDROP_ARGS=--cover] scripts/funny-scenes.sh <out-dir>
 set -uo pipefail
 OUT="$1"
 BIN=.build/release/bigarrow
@@ -13,7 +13,7 @@ trap '[ -n "$BACKDROP" ] && kill $BACKDROP 2>/dev/null; $BIN stop --all >/dev/nu
 scene() {
   local name="$1" title="$2" message="$3" buttons="$4"; shift 4
   [ -n "$BACKDROP" ] && kill $BACKDROP 2>/dev/null
-  "$OUT/backdrop" --title "$title" --message "$message" --buttons "$buttons" & BACKDROP=$!
+  "$OUT/backdrop" --title "$title" --message "$message" --buttons "$buttons" ${BACKDROP_ARGS:-} & BACKDROP=$!
   sleep 2.5
   "$@"
   sleep 1.6
