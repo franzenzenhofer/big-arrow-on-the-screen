@@ -3,76 +3,112 @@
 [![CI](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml/badge.svg)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> An AI agent points at your screen. A big, good-looking arrow with a sign ("Franz, click HERE"), click-through, gone by itself. macOS. One shell command. MIT.
+> Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
 ![bigarrow pointing at a dialog's Allow button](docs/images/demo.gif)
 
-Agents like Claude Code and Codex can see the screen and act on it, but when they need the human to do something ("click Allow", "pick the second account", "sign here") all they can do is write a sentence into a terminal the human is not looking at. `bigarrow` gives them a hand to point with.
+```bash
+bigarrow point --element "Allow" --app "System Settings" --text "Franz, click Allow"
+```
 
-- **One binary, no app to keep running.** The CLI process owns the arrow while it is shown.
-- **Never in the way.** Click-through, never takes the focus, above full-screen apps, on every Space and every display.
-- **Needs no permission to draw.** Only pointing at a UI element by its label uses Accessibility.
-- **A skill for Claude Code and Codex** teaches agents when and how to point.
+A big, friendly arrow with a sign appears on top of everything, points at the thing, and goes away again. It is click-through, it never steals your focus, it works on every display and every Space, and it needs **no permission at all** to draw. It is one small Swift binary. There is no daemon, no menu-bar icon, no account, no telemetry, and, we checked twice, no AI inside. It is an arrow.
+
+## What is this actually for?
+
+Fair question. Arrows have existed since roughly the Paleolithic. Here is what changed: software agents now do real work on your Mac, and they keep hitting the same wall, **the part that only a human may do.**
+
+- **"Click Allow."** macOS permission prompts, OAuth consent screens, "Open with...?" dialogs. The agent can find the button but must not, or cannot, press it for you. It can now point at it.
+- **"Your turn."** 2FA codes, CAPTCHAs, passkeys, a payment confirmation, a signature, a legal checkbox. The things an agent should never click on its own behalf. It points, you decide, it continues.
+- **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request" --raise`.
+- **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
+- **Guided setups and onboarding.** Walk a human through a settings pane step by step: `start`, wait until they acted, `stop`, next step. Like a product tour, minus the product.
+- **Remote help.** "No, the *other* gear icon." Point at it instead of describing it.
+- **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
+- **Debugging coordinates.** Not sure your Accessibility, screenshot or Peekaboo coordinates are right? Point at them and look. `--dry-run --json` tells you where it *would* point without drawing.
+
+What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
 ## Install
 
 ```bash
 brew install franzenzenhofer/tap/bigarrow
-bigarrow install-skill          # Claude Code (~/.claude/skills) and Codex (~/.agents/skills)
+bigarrow install-skill          # teaches Claude Code (~/.claude/skills) and Codex (~/.agents/skills)
 ```
 
 From source: `swift build -c release` (Xcode 16 or newer, macOS 14 or newer), binary at `.build/release/bigarrow`.
 
-## The commands an agent needs
+## The three commands an agent needs
 
 ```bash
 bigarrow point --element "Allow" --app "System Settings" --text "Franz, click Allow"   # by label
 bigarrow point --at 760,500 --text "Franz, click HERE"                                 # by coordinate
-bigarrow start --window "Safari:Inbox" --raise --text "This window" && bigarrow stop   # stays until stop
+bigarrow start --window "Safari:Inbox" --raise --text "This window" && bigarrow stop   # until stopped
 ```
 
-Three ways an arrow ends:
+Three ways an arrow ends, pick your level of commitment:
 
 | | |
 |---|---|
 | Time limit | `bigarrow point ... --duration 10` (default 8 s) |
 | Start and stop | `bigarrow start ...` returns at once; `bigarrow stop` (or `stop --all`) removes it |
-| Human closes it | `bigarrow point ... --close-button` puts a clickable X on the sign |
+| The human closes it | `bigarrow point ... --close-button` puts a clickable X on the sign |
 
-Targets: `--at X,Y`, `--rect X,Y,W,H`, `--mouse`, `--window App[:title]`, `--element Label --app App`, `--peekaboo ID --snapshot see.json` (from `peekaboo see --json`). Coordinates are global top-left logical points, the space Accessibility, CGWindowList and Peekaboo report. `--display N` makes `--at`/`--rect` relative to one display.
+Targets: `--at X,Y`, `--rect X,Y,W,H`, `--mouse`, `--window App[:title]`, `--element Label --app App`, `--peekaboo ID --snapshot see.json` (from Peekaboo's `see --json`). Coordinates are global top-left logical points, the space Accessibility, CGWindowList and Peekaboo report. `--display N` makes `--at` and `--rect` relative to one display.
 
-`bigarrow front --app X` or `point --raise` bring the target's app to the front first. `bigarrow elements --app X` lists what `--element` can match. `bigarrow doctor` shows permissions, who owns them, and the displays.
+`bigarrow front --app X` or `point --raise` brings the target's app to the front first, because pointing at a window hidden behind your terminal is a special kind of unhelpful. `bigarrow elements --app X` lists what `--element` can match. `bigarrow doctor` shows permissions, who owns them, and your displays.
 
-Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found, 4 permission missing.
+Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found, 4 permission missing. Agents love exit codes. Humans tolerate them.
 
 ## Looks
 
+It is an arrow, so we spent an unreasonable amount of time on how it looks.
+
 ![every style, shape, size and colour](docs/images/gallery.png)
 
-- `--shape bend|straight|zigzag`, `--style arrow|ring|box` (rings and boxes are border-only), `--size S|M|L`, `--corners round|sharp`
-- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; light colours get a dark outline and text
-- `--say` speaks the sign (for when the human is not looking), `--follow` moves with a window or element, `--until-click` ends on a click
-- `--png file.png` renders the arrow into an image instead of the screen
+- `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
+- `--style arrow|ring|box`; rings and boxes are border-only, so you still see what is under them
+- `--size S|M|L`, `--corners round|sharp`
+- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; light colours automatically get a dark outline and text
+- `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
 
-The shaft grows out of the sign through a flared joint that never touches a rounded corner; `scripts/gallery.py` renders every combination offscreen and zooms into each joint ([junctions](docs/images/junctions.png)).
+The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
 
-## Permissions (FAQ)
+## FAQ
 
-- **Drawing needs nothing.** No Screen Recording, no Accessibility.
-- **`--element`, `elements`, `--until-click`, `front --window`** need Accessibility, which macOS grants to the app that runs your shell (Terminal, iTerm2, Ghostty, VS Code, Claude), never to `bigarrow` itself. `bigarrow doctor` names that app; exit code 4 says the same.
-- **`--window App:title`** reads window titles, which macOS 26 hides without Screen Recording. `--window App` alone needs nothing (the app is matched by its process, not by name).
-- **Does it click for me?** No. It never clicks, types or captures. It only points.
-- **Multiple displays?** Yes, any arrangement, including displays above or left of the main one (negative coordinates). Each arrow is drawn on the display that contains its target.
+**Does it need Screen Recording or Accessibility?**
+Drawing needs neither. `--element`, `elements`, `--until-click` and `front --window` use Accessibility, which macOS grants to the app that runs your shell (Terminal, iTerm2, Ghostty, VS Code, Claude), never to `bigarrow` itself. `bigarrow doctor` names that app, and exit code 4 tells the agent exactly what to ask you for. `--window App:title` reads window titles, which macOS 26 hides without Screen Recording; `--window App` alone needs nothing.
 
-## Why we know it works
+**Will it steal my focus while I'm typing?**
+No. That was the hardest bug in the project: `NSApplication.run()` quietly activates a process that has no terminal, so detached arrows grabbed the focus. `bigarrow` pumps events itself instead, and the tests check that the frontmost app never changes.
 
-- 72 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, the focus never moves, detach and stop timing). CI runs them on macOS 15; they also pass on macOS 26 and 27.
-- A visual workflow records every arrow over a neutral dialog on a clean runner ([visual.yml](.github/workflows/visual.yml)).
-- The planning spike: `docs/spikes/2026-10-08-overlay-probe/`.
+**Can I click through it?**
+Yes, everywhere except the optional X, which is its own tiny panel that also never takes the focus.
+
+**Multiple displays? Full-screen apps? Stage Manager? Spaces?**
+Yes, yes, yes, yes. Displays left of or above the main one (negative coordinates) included. Unplug a display while an arrow is on it and the arrow politely leaves. See the [verification matrix](docs/verification/multi-display.md).
+
+**How much CPU does a pulsing arrow cost?**
+1.4 % measured on a CI runner. Core Animation does the work in the render server.
+
+**Why not just use [some screen annotation app]?**
+Those are for humans drawing on screens. This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked before writing a line ([research](docs/research/)). None did this.
+
+**Is it AI?**
+No. It is the least intelligent part of your AI stack, and proud of it.
+
+## How we know it works
+
+- 73 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, `--raise`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
+- A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
+
+## For agents (and the humans who configure them)
+
+The skill in `skill/big-arrow/` works for both Claude Code and Codex (one `SKILL.md`, Agent Skills format, plus `agents/openai.yaml` for Codex). It tells the agent when to point, how to pick a target, to write a full sentence on the sign, to add `--say` when you are probably not looking, and to `stop` once you have acted.
 
 ## Plan, decisions, research
 
-`docs/plan/PLAN.md` (goal, architecture, risks), `docs/plan/TICKETS.md` (generated from `docs/plan/tickets.json`), `docs/research/` (verified facts with links), `docs/decisions/`, `docs/skill-tests/`.
+`docs/plan/PLAN.md` (goal, architecture, risks), `docs/plan/TICKETS.md` (generated from `docs/plan/tickets.json`), `docs/decisions/`, `docs/research/` (verified facts with links), `docs/verification/`, `docs/skill-tests/`, `CHANGELOG.md`.
 
 ## Prior art and thanks
 
@@ -80,4 +116,4 @@ Peekaboo's visualizer (https://github.com/openclaw/Peekaboo) and Nameplate (http
 
 ## License
 
-MIT, see `LICENSE`.
+MIT. Point responsibly.

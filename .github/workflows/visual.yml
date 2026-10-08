@@ -35,6 +35,8 @@ jobs:
         run: scripts/visual-check.sh visual-out
       - name: Behaviour (clicks, follow, raise, say, second display)
         run: scripts/behaviour-check.sh visual-out/behaviour
+      - name: Funny scenes for the README
+        run: scripts/funny-scenes.sh visual-out/scenes
       - name: Record the demo GIF
         run: |
           brew install ffmpeg

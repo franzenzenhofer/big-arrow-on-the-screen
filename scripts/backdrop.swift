@@ -1,7 +1,16 @@
-// A neutral demo window for screenshots and tests: a small "permission" dialog with Cancel and
-// Allow buttons, nothing personal. Exits after 5 minutes or on SIGTERM.
-// `backdrop --fullscreen` puts the window into its own full-screen Space.
+// A neutral demo window for screenshots and tests, nothing personal and no real brand.
+//   backdrop [--fullscreen] [--title T] [--message M] [--buttons "Cancel,Allow"] [--x X --y Y]
+// Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
 import AppKit
+
+func option(_ name: String) -> String? {
+    guard let index = CommandLine.arguments.firstIndex(of: name), index + 1 < CommandLine.arguments.count else { return nil }
+    return CommandLine.arguments[index + 1]
+}
+
+let title = option("--title") ?? "Demo App"
+let message = option("--message") ?? "\"Demo App\" would like to access your Downloads folder."
+let buttons = (option("--buttons") ?? "Cancel,Allow").split(separator: ",").map(String.init)
 
 let app = NSApplication.shared
 app.setActivationPolicy(.regular)
@@ -9,22 +18,28 @@ let window = NSWindow(
     contentRect: NSRect(x: 0, y: 0, width: 520, height: 260),
     styleMask: [.titled], backing: .buffered, defer: false
 )
-window.title = "Demo App"
+window.title = title
 let content = NSView(frame: window.contentRect(forFrameRect: window.frame))
-let label = NSTextField(labelWithString: "\"Demo App\" would like to access your Downloads folder.")
+let label = NSTextField(wrappingLabelWithString: message)
 label.font = .systemFont(ofSize: 16, weight: .semibold)
-label.frame = NSRect(x: 30, y: 150, width: 460, height: 40)
-let cancel = NSButton(title: "Cancel", target: nil, action: nil)
-cancel.frame = NSRect(x: 250, y: 40, width: 110, height: 32)
-let allow = NSButton(title: "Allow", target: nil, action: nil)
-allow.frame = NSRect(x: 380, y: 40, width: 110, height: 32)
-allow.keyEquivalent = "\r"
+label.frame = NSRect(x: 30, y: 110, width: 460, height: 90)
 content.addSubview(label)
-content.addSubview(cancel)
-content.addSubview(allow)
+var right: CGFloat = 490
+for (index, name) in buttons.reversed().enumerated() {
+    let button = NSButton(title: name, target: nil, action: nil)
+    let width = max(110, CGFloat(name.count) * 9 + 30)
+    button.frame = NSRect(x: right - width, y: 40, width: width, height: 32)
+    if index == 0 { button.keyEquivalent = "\r" }
+    content.addSubview(button)
+    right -= width + 20
+}
 window.contentView = content
-window.center()
 window.collectionBehavior = [.fullScreenPrimary]
+if let x = option("--x").flatMap(Double.init), let y = option("--y").flatMap(Double.init) {
+    window.setFrameTopLeftPoint(NSPoint(x: x, y: (NSScreen.screens.first?.frame.height ?? 0) - y))
+} else {
+    window.center()
+}
 window.makeKeyAndOrderFront(nil)
 app.activate(ignoringOtherApps: true)
 if CommandLine.arguments.contains("--fullscreen") {
