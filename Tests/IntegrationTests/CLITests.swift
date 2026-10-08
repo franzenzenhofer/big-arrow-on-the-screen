@@ -68,9 +68,19 @@ struct CLITests {
     }
 
     @Test("A recorded Peekaboo 4.9.0 snapshot resolves from a file and from stdin")
-    func peekaboo() throws {
+    func peekaboo() async throws {
         let path = BigArrowProcess.fixture("peekaboo-see-4.9.0.json")
         let fromFile = try BigArrowProcess.run(["point", "--peekaboo", "elem_28", "--snapshot", path, "--text", "x", "--dry-run", "--json"])
+        let recordedCenter = CGPoint(x: 502, y: 865)
+        let onScreen = await MainActor.run {
+            let height = NSScreen.screens[0].frame.height
+            return NSScreen.screens.contains { $0.frame.contains(CGPoint(x: recordedCenter.x, y: height - recordedCenter.y)) }
+        }
+        guard onScreen else {
+            #expect(fromFile.code == 2, "the recorded element is off this machine's screens, so it is bad input")
+            print("skipped the stdin half: the recorded element lies outside this machine's displays")
+            return
+        }
         let target = try #require(fromFile.json()["target"] as? [String: Any])
         #expect(target["rect"] as? [Double] == [478, 841, 48, 48])
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
