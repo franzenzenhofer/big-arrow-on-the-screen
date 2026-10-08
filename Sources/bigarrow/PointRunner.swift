@@ -1,0 +1,78 @@
+import AppKit
+import BigArrowCore
+import BigArrowOverlay
+import BigArrowTargeting
+import Foundation
+
+/// A planned arrow: the layout plus the rendered sign for one resolved target.
+struct PlannedArrow {
+    let resolved: ResolvedTarget
+    let layout: OverlayLayout
+    let sign: SignImage
+}
+
+/// Resolves the target, then either prints the plan, detaches, or runs the overlay.
+@MainActor
+struct PointRunner {
+    let config: PointConfig
+
+    func run() throws {
+        OverlayApplication.prepare()
+        if config.raise, let raise = config.target.raiseApp {
+            _ = try AppRaiser.raise(app: raise.app, windowTitle: raise.windowTitle)
+        }
+        let screens = ScreenReader.current()
+        let planned = try plan(config.target.resolve(screens: screens), screens: screens)
+        if let png = config.png {
+            var result = PointResult(pid: getpid(), resolved: planned.resolved, layout: planned.layout)
+            result.image = try PNGExporter.write(planned.layout, sign: planned.sign, color: config.color, to: URL(fileURLWithPath: png))
+            Output.print(config.json ? JSONOutput.encode(result) : "bigarrow: wrote \(png)")
+            exit(0)
+        }
+        if config.dryRun {
+            var result = PointResult(pid: getpid(), resolved: planned.resolved, layout: planned.layout)
+            result.dryRun = true
+            report(result)
+            exit(0)
+        }
+        if config.detach {
+            let child = try Detacher(config: config).spawn()
+            var result = PointResult(pid: child.pid, resolved: planned.resolved, layout: planned.layout)
+            result.detached = true
+            result.sign = child.signFrame
+            result.direction = child.direction
+            report(result)
+            exit(0)
+        }
+        try PointSession(config: config, planner: self, initial: planned).start()
+        OverlayApplication.runWithoutActivating()
+    }
+
+    func plan(_ resolved: ResolvedTarget, screens: ScreenSpace) throws -> PlannedArrow {
+        let display = try screens.display(containing: resolved.shape.anchor)
+        let appearance = SignAppearance(color: config.color, size: config.size, corners: config.corners)
+        let sign = SignRenderer.render(text: config.text, appearance: appearance, display: display)
+        let request = OverlayLayout.Request(
+            target: resolved.shape, display: display, signSize: sign.size,
+            style: config.style, size: config.size, forced: config.forced, corners: config.corners
+        )
+        return PlannedArrow(resolved: resolved, layout: OverlayLayout.plan(request), sign: sign)
+    }
+
+    func report(_ result: PointResult) {
+        if config.json {
+            Output.json(result)
+            return
+        }
+        let target = "\(Output.number(result.target.x)),\(Output.number(result.target.y)) on display \(result.target.display)"
+        if result.dryRun {
+            Output.print("bigarrow: would point at \(target), sign on the \(result.direction)")
+        } else if result.detached {
+            Output.print("bigarrow: pointing at \(target) in the background, pid \(result.pid); 'bigarrow clear' removes it")
+        } else {
+            let after = result.dismissedAfter.map { Output.number(($0 * 10).rounded() / 10) } ?? "?"
+            let reason = result.dismissedReason?.rawValue ?? "?"
+            Output.print("bigarrow: pointed at \(target) for \(after) s, dismissed by \(reason)")
+        }
+    }
+}

@@ -1,0 +1,577 @@
+{
+ "data": {
+  "application_name": "Calculator",
+  "capture_mode": "window",
+  "coordinate_context": {
+   "delivered_image_size": [
+    230,
+    408
+   ],
+   "display": {
+    "index": 0
+   },
+   "logical_bounds": [
+    [
+     306,
+     492
+    ],
+    [
+     230,
+     408
+    ]
+   ],
+   "logical_space": "global_display_points",
+   "native_scale": 2,
+   "origin": "top_left",
+   "output_scale": 1,
+   "reference_id": "ps1_e6ba5b8bcd6600fcadb59627ca0e2d1d",
+   "requested_scale": {
+    "logical1x": {}
+   },
+   "version": 1,
+   "window": {
+    "index": 0,
+    "title": "Calculator",
+    "window_id": 2043
+   }
+  },
+  "element_count": 40,
+  "execution_time": 0.4987599849700928,
+  "interactable_count": 26,
+  "is_dialog": false,
+  "mutation_targeting_available": true,
+  "semantic_scope": "exact_or_requested",
+  "snapshot_id": "ps1_e6ba5b8bcd6600fcadb59627ca0e2d1d",
+  "snapshot_reusable": true,
+  "ui_elements": [
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 316,
+     "y": 625
+    },
+    "description": "Delete",
+    "help": "Delete the last digit or operation entered (long press to delete all)",
+    "id": "elem_9",
+    "identifier": "Delete",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Delete",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 370,
+     "y": 625
+    },
+    "description": "All Clear",
+    "help": "",
+    "id": "elem_10",
+    "identifier": "AllClear",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "All Clear",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 424,
+     "y": 625
+    },
+    "description": "Percent",
+    "help": "",
+    "id": "elem_11",
+    "identifier": "Percent",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Percent",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 478,
+     "y": 625
+    },
+    "description": "Divide",
+    "help": "",
+    "id": "elem_12",
+    "identifier": "Divide",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Divide",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 316,
+     "y": 679
+    },
+    "description": "7",
+    "help": "",
+    "id": "elem_13",
+    "identifier": "Seven",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "7",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 370,
+     "y": 679
+    },
+    "description": "8",
+    "help": "",
+    "id": "elem_14",
+    "identifier": "Eight",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "8",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 424,
+     "y": 679
+    },
+    "description": "9",
+    "help": "",
+    "id": "elem_15",
+    "identifier": "Nine",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "9",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 478,
+     "y": 679
+    },
+    "description": "Multiply",
+    "help": "",
+    "id": "elem_16",
+    "identifier": "Multiply",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Multiply",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 316,
+     "y": 733
+    },
+    "description": "4",
+    "help": "",
+    "id": "elem_17",
+    "identifier": "Four",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "4",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 370,
+     "y": 733
+    },
+    "description": "5",
+    "help": "",
+    "id": "elem_18",
+    "identifier": "Five",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "5",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 424,
+     "y": 733
+    },
+    "description": "6",
+    "help": "",
+    "id": "elem_19",
+    "identifier": "Six",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "6",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 478,
+     "y": 733
+    },
+    "description": "Subtract",
+    "help": "",
+    "id": "elem_20",
+    "identifier": "Subtract",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Subtract",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 316,
+     "y": 787
+    },
+    "description": "1",
+    "help": "",
+    "id": "elem_21",
+    "identifier": "One",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "1",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 370,
+     "y": 787
+    },
+    "description": "2",
+    "help": "",
+    "id": "elem_22",
+    "identifier": "Two",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "2",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 424,
+     "y": 787
+    },
+    "description": "3",
+    "help": "",
+    "id": "elem_23",
+    "identifier": "Three",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "3",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 478,
+     "y": 787
+    },
+    "description": "Add",
+    "help": "",
+    "id": "elem_24",
+    "identifier": "Add",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Add",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 316,
+     "y": 841
+    },
+    "description": "Change Sign",
+    "help": "Change sign of a value",
+    "id": "elem_25",
+    "identifier": "Negate",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Change Sign",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 370,
+     "y": 841
+    },
+    "description": "0",
+    "help": "",
+    "id": "elem_26",
+    "identifier": "Zero",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "0",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 424,
+     "y": 841
+    },
+    "description": "Point",
+    "help": "",
+    "id": "elem_27",
+    "identifier": "Decimal",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Point",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 48,
+     "width": 48,
+     "x": 478,
+     "y": 841
+    },
+    "description": "Equals",
+    "help": "",
+    "id": "elem_28",
+    "identifier": "Equals",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Equals",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 52,
+     "width": 48,
+     "x": 406,
+     "y": 492
+    },
+    "description": "Show Sidebar",
+    "id": "elem_30",
+    "identifier": "",
+    "is_actionable": true,
+    "is_enabled": true,
+    "is_selected": false,
+    "label": "Show Sidebar",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 36,
+     "width": 39.5,
+     "x": 410.5,
+     "y": 500
+    },
+    "description": "Show Sidebar",
+    "help": "Show Sidebar",
+    "id": "elem_31",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Show Sidebar",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 52,
+     "width": 44,
+     "x": 488,
+     "y": 492
+    },
+    "description": "Mode",
+    "id": "elem_32",
+    "identifier": "Mode: basic; unitConversion: false",
+    "is_actionable": true,
+    "is_enabled": true,
+    "is_selected": false,
+    "label": "Mode",
+    "role": "button",
+    "role_description": "button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 36,
+     "width": 36,
+     "x": 492,
+     "y": 500
+    },
+    "description": "Change Mode",
+    "id": "elem_33",
+    "identifier": "Mode: basic; unitConversion: false",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "Change Mode",
+    "role": "button",
+    "role_description": "change calculator mode"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 16,
+     "width": 16,
+     "x": 324,
+     "y": 510
+    },
+    "id": "elem_35",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "close button",
+    "role": "button",
+    "role_description": "close button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 16,
+     "width": 16,
+     "x": 370,
+     "y": 510
+    },
+    "id": "elem_36",
+    "is_actionable": false,
+    "is_enabled": false,
+    "label": "zoom button",
+    "role": "button",
+    "role_description": "zoom button"
+   },
+   {
+    "ax_role": "AXButton",
+    "bounds": {
+     "height": 16,
+     "width": 16,
+     "x": 347,
+     "y": 510
+    },
+    "id": "elem_39",
+    "is_actionable": true,
+    "is_enabled": true,
+    "label": "minimize button",
+    "role": "button",
+    "role_description": "minimize button"
+   },
+   {
+    "ax_role": "AXGroup",
+    "bounds": {
+     "height": 408,
+     "width": 230,
+     "x": 306,
+     "y": 492
+    },
+    "id": "elem_1",
+    "is_actionable": false,
+    "label": "group",
+    "role": "group",
+    "role_description": "group"
+   },
+   {
+    "ax_role": "AXGroup",
+    "bounds": {
+     "height": 408,
+     "width": 230,
+     "x": 306,
+     "y": 492
+    },
+    "id": "elem_3",
+    "is_actionable": false,
+    "label": "group",
+    "role": "group",
+    "role_description": "group"
+   },
+   {
+    "ax_role": "AXGroup",
+    "bounds": {
+     "height": 354,
+     "width": 230,
+     "x": 306,
+     "y": 545
+    },
+    "id": "elem_4",
+    "identifier": "CalculatorKeypadView",
+    "is_actionable": false,
+    "is_enabled": true,
+    "label": "group",
+    "role": "group",
+    "role_description": "group"
+   }
+  ],
+  "used_cache": false,
+  "window_title": "Calculator"
+ },
+ "success": true,
+ "target_receipt": {
+  "pid": 21017,
+  "process_start_identity": 1791450889174395,
+  "process_start_identity_decimal": "1791450889174395",
+  "window_id": 2043
+ }
+}

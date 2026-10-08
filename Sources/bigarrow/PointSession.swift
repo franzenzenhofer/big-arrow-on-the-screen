@@ -1,0 +1,154 @@
+import AppKit
+import BigArrowCore
+import BigArrowOverlay
+import BigArrowTargeting
+import Foundation
+
+/// One arrow on screen, from show to dismissal. The process exits when it ends.
+@MainActor
+final class PointSession {
+    let config: PointConfig
+    let planner: PointRunner
+    private(set) var planned: PlannedArrow
+    let overlay: OverlayController
+    let registry = PidRegistry()
+    let startedAt = Date()
+    var speech: Process?
+    var clicks: ClickWatcher?
+    var follower: Follower?
+    var displayWatcher: DisplayWatcher?
+    var signalSources: [DispatchSourceSignal] = []
+    var finished = false
+
+    static let clickZone: CGFloat = 80
+    static let signals = [SIGTERM, SIGINT, SIGHUP]
+
+    init(config: PointConfig, planner: PointRunner, initial: PlannedArrow) {
+        self.config = config
+        self.planner = planner
+        self.planned = initial
+        self.overlay = OverlayController(mode: AnimationMode.resolve(disabled: config.noAnimation), color: config.color)
+    }
+
+    func start() throws {
+        try startClickWatcher()
+        if config.closeButton {
+            overlay.enableCloseButton { [weak self] in self?.finish(.closed) }
+        }
+        try overlay.show(planned.layout, sign: planned.sign, animated: true)
+        announceWhenShown()
+        installSignalHandlers()
+        observeScreens()
+        if config.duration > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + config.duration) {
+                MainActor.assumeIsolated { self.finish(.timeout) }
+            }
+        }
+        if config.follow { follower = Follower(session: self) }
+        if config.say { DispatchQueue.main.async { MainActor.assumeIsolated { self.speak() } } }
+    }
+
+    /// Replaces the arrow with a new plan, without the entrance animation.
+    func move(to next: PlannedArrow) throws {
+        planned = next
+        try overlay.show(next.layout, sign: next.sign, animated: false)
+    }
+
+    /// The pid file is the "arrow is on screen" signal for `--detach`, so it is written after the
+    /// first run-loop turn has committed the panel to the window server.
+    func announceWhenShown() {
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated {
+                do {
+                    try self.writeRecord()
+                } catch {
+                    Output.fail(.badInput("cannot write the pid file: \(error.localizedDescription)"), json: self.config.json)
+                }
+            }
+        }
+    }
+
+    func writeRecord() throws {
+        let display = planned.layout.display
+        try registry.write(ArrowRecord(
+            pid: getpid(), text: config.text, target: planned.resolved.shape.anchor, display: display.index + 1,
+            sign: (planned.layout.signRect.offsetBy(dx: display.frame.minX, dy: display.frame.minY), planned.layout.direction.rawValue),
+            startedAt: startedAt
+        ))
+    }
+
+    /// Without the permission: exit 4, unless an explicit --duration lets the timer end it instead.
+    func startClickWatcher() throws {
+        guard config.click != .off else { return }
+        do {
+            clicks = try ClickWatcher { [weak self] location in self?.clicked(at: location) }
+        } catch let error as BigArrowError where config.durationExplicit {
+            Output.printError("bigarrow: \(error.message) Falling back to --duration \(Output.number(config.duration)) s.")
+        }
+    }
+
+    func clicked(at location: CGPoint) {
+        guard config.click == .anywhere || clickZone.contains(location) else { return }
+        finish(.clicked)
+    }
+
+    /// The target rect, or a square around a point target, in global top-left points.
+    var clickZone: CGRect {
+        let shape = planned.resolved.shape
+        if let rect = shape.rect { return rect.insetBy(dx: -8, dy: -8) }
+        let half = Self.clickZone / 2
+        return CGRect(x: shape.anchor.x - half, y: shape.anchor.y - half, width: Self.clickZone, height: Self.clickZone)
+    }
+
+    func speak() {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/say")
+        process.arguments = (config.voice.map { ["-v", $0] } ?? []) + [config.text]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        do {
+            try process.run()
+            speech = process
+        } catch {
+            Output.printError("bigarrow: could not run /usr/bin/say: \(error.localizedDescription)")
+        }
+    }
+
+    func installSignalHandlers() {
+        for number in Self.signals {
+            signal(number, SIG_IGN)
+            let source = DispatchSource.makeSignalSource(signal: number, queue: .main)
+            source.setEventHandler { MainActor.assumeIsolated { self.finish(.signal) } }
+            source.resume()
+            signalSources.append(source)
+        }
+    }
+
+    /// Ends the arrow when its display goes away. A CoreGraphics callback, because AppKit's
+    /// screen notifications need the AppKit event loop this process deliberately does not run.
+    func observeScreens() {
+        displayWatcher = DisplayWatcher { [weak self] in self?.displaysChanged() }
+    }
+
+    func displaysChanged() {
+        if !DisplayWatcher.activeDisplayIDs().contains(planned.layout.display.id) {
+            finish(.displayGone)
+        }
+    }
+
+    func finish(_ reason: DismissReason) {
+        guard !finished else { return }
+        finished = true
+        speech?.terminate()
+        clicks?.stop()
+        follower?.stop()
+        overlay.dismiss {
+            self.registry.remove(pid: getpid())
+            var result = PointResult(pid: getpid(), resolved: self.planned.resolved, layout: self.planned.layout)
+            result.dismissedAfter = (Date().timeIntervalSince(self.startedAt) * 100).rounded() / 100
+            result.dismissedReason = reason
+            self.planner.report(result)
+            exit(0)
+        }
+    }
+}

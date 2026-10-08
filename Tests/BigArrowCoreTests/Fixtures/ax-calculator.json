@@ -1,0 +1,474 @@
+[
+ {
+  "frame": [
+   [
+    306,
+    492
+   ],
+   [
+    230,
+    408
+   ]
+  ],
+  "identifier": "main",
+  "role": "AXWindow",
+  "title": "Calculator"
+ },
+ {
+  "frame": [
+   [
+    306,
+    492
+   ],
+   [
+    230,
+    408
+   ]
+  ],
+  "identifier": "main, SidebarNavigationSplitView",
+  "role": "AXSplitGroup"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    406,
+    492
+   ],
+   [
+    48,
+    52
+   ]
+  ],
+  "identifier": "",
+  "label": "Show Sidebar",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    488,
+    492
+   ],
+   [
+    44,
+    52
+   ]
+  ],
+  "identifier": "Mode: basic; unitConversion: false",
+  "label": "Mode",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    410.5,
+    500
+   ],
+   [
+    39.5,
+    36
+   ]
+  ],
+  "label": "Show Sidebar",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    492,
+    500
+   ],
+   [
+    36,
+    36
+   ]
+  ],
+  "identifier": "Mode: basic; unitConversion: false",
+  "label": "Change Mode",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    306,
+    545
+   ],
+   [
+    230,
+    354
+   ]
+  ],
+  "identifier": "CalculatorKeypadView",
+  "role": "AXGroup"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    492,
+    500
+   ],
+   [
+    36,
+    36
+   ]
+  ],
+  "role": "AXMenuButton",
+  "title": "calculator.fill"
+ },
+ {
+  "frame": [
+   [
+    316,
+    550
+   ],
+   [
+    210,
+    29
+   ]
+  ],
+  "identifier": "StandardResultView",
+  "label": "Last Expression",
+  "role": "AXScrollArea"
+ },
+ {
+  "frame": [
+   [
+    316,
+    578
+   ],
+   [
+    210,
+    42
+   ]
+  ],
+  "identifier": "StandardInputView",
+  "label": "Edit field",
+  "role": "AXScrollArea"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    316,
+    625
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Delete",
+  "label": "Delete",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    370,
+    625
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "AllClear",
+  "label": "All Clear",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    424,
+    625
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Percent",
+  "label": "Percent",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    478,
+    625
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Divide",
+  "label": "Divide",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    316,
+    679
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Seven",
+  "label": "7",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    370,
+    679
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Eight",
+  "label": "8",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    424,
+    679
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Nine",
+  "label": "9",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    478,
+    679
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Multiply",
+  "label": "Multiply",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    316,
+    733
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Four",
+  "label": "4",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    370,
+    733
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Five",
+  "label": "5",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    424,
+    733
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Six",
+  "label": "6",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    478,
+    733
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Subtract",
+  "label": "Subtract",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    316,
+    787
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "One",
+  "label": "1",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    370,
+    787
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Two",
+  "label": "2",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    424,
+    787
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Three",
+  "label": "3",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    478,
+    787
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Add",
+  "label": "Add",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    316,
+    841
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Negate",
+  "label": "Change Sign",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    370,
+    841
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Zero",
+  "label": "0",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    424,
+    841
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Decimal",
+  "label": "Point",
+  "role": "AXButton"
+ },
+ {
+  "enabled": true,
+  "frame": [
+   [
+    478,
+    841
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "identifier": "Equals",
+  "label": "Equals",
+  "role": "AXButton"
+ }
+]

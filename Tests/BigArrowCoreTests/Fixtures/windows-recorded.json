@@ -1,0 +1,536 @@
+{
+ "apps": [
+  {
+   "bundleID": "com.mitchellh.ghostty",
+   "name": "Ghostty",
+   "pid": 693
+  },
+  {
+   "bundleID": "com.google.Chrome",
+   "name": "Google Chrome",
+   "pid": 695
+  },
+  {
+   "bundleID": "com.apple.Preview",
+   "name": "Preview",
+   "pid": 699
+  },
+  {
+   "bundleID": "com.apple.Keynote",
+   "name": "Keynote",
+   "pid": 702
+  },
+  {
+   "bundleID": "com.sublimetext.4",
+   "name": "Sublime Text",
+   "pid": 708
+  },
+  {
+   "bundleID": "net.whatsapp.WhatsApp",
+   "name": "\u200eWhatsApp",
+   "pid": 711
+  },
+  {
+   "bundleID": "com.apple.Terminal",
+   "name": "Terminal",
+   "pid": 715
+  },
+  {
+   "bundleID": "org.videolan.vlc",
+   "name": "VLC",
+   "pid": 716
+  },
+  {
+   "bundleID": "com.apple.finder",
+   "name": "Finder",
+   "pid": 721
+  },
+  {
+   "bundleID": "com.apple.calculator",
+   "name": "Calculator",
+   "pid": 21017
+  }
+ ],
+ "windows": [
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     815,
+     69
+    ],
+    [
+     112,
+     160
+    ]
+   ],
+   "layer": 2147483630,
+   "ownerPID": 407,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     925,
+     0
+    ],
+    [
+     38,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     889,
+     0
+    ],
+    [
+     36,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     963,
+     0
+    ],
+    [
+     38,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1001,
+     0
+    ],
+    [
+     34,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1081,
+     0
+    ],
+    [
+     38,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1035,
+     0
+    ],
+    [
+     46,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1119,
+     0
+    ],
+    [
+     32,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1151,
+     0
+    ],
+    [
+     38,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1189,
+     0
+    ],
+    [
+     35,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1224,
+     0
+    ],
+    [
+     38,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1262,
+     0
+    ],
+    [
+     42,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1304,
+     0
+    ],
+    [
+     42,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1346,
+     0
+    ],
+    [
+     31,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     1377,
+     0
+    ],
+    [
+     137,
+     33
+    ]
+   ],
+   "layer": 25,
+   "ownerPID": 719,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     0,
+     0
+    ],
+    [
+     1512,
+     33
+    ]
+   ],
+   "layer": 24,
+   "ownerPID": 407,
+   "title": ""
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     15,
+     34
+    ],
+    [
+     1427,
+     948
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 693,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     306,
+     492
+    ],
+    [
+     230,
+     408
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 21017,
+   "title": "Calculator"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     968,
+     144
+    ],
+    [
+     320,
+     448
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 695,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     6,
+     64
+    ],
+    [
+     1360,
+     948
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 695,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     -14,
+     155
+    ],
+    [
+     1360,
+     948
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 695,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     101,
+     34
+    ],
+    [
+     1196,
+     948
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 708,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     72,
+     34
+    ],
+    [
+     1196,
+     948
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 708,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     14,
+     62
+    ],
+    [
+     1476,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     4,
+     38
+    ],
+    [
+     911,
+     581
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     87,
+     48
+    ],
+    [
+     1082,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     116,
+     77
+    ],
+    [
+     1082,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     29,
+     76
+    ],
+    [
+     1476,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     0,
+     34
+    ],
+    [
+     1476,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  },
+  {
+   "alpha": 1,
+   "bounds": [
+    [
+     408,
+     605
+    ],
+    [
+     1476,
+     904
+    ]
+   ],
+   "layer": 0,
+   "ownerPID": 699,
+   "title": "Untitled"
+  }
+ ]
+}

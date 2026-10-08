@@ -1,0 +1,31 @@
+{
+ "data": {
+  "inventory_completeness": "complete",
+  "inventory_warnings": [],
+  "target_application_info": {
+   "app_name": "Calculator",
+   "bundle_id": "com.apple.calculator",
+   "pid": 21017
+  },
+  "windows": [
+   {
+    "bounds": {
+     "height": 408,
+     "width": 230,
+     "x": 306,
+     "y": 492
+    },
+    "is_frontmost": false,
+    "is_key": true,
+    "is_on_screen": true,
+    "layer": 0,
+    "observation_capability": "combined_eligible",
+    "subrole": "AXStandardWindow",
+    "window_id": 2043,
+    "window_index": 0,
+    "window_title": "Calculator"
+   }
+  ]
+ },
+ "success": true
+}
