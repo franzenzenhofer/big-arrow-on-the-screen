@@ -14,7 +14,7 @@ screen tests on. **Arthur** = Arthur Mac (macOS 27.0.1), `BIGARROW_SCREEN_TESTS=
 | Overlay at window level 1000, covering the display | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` |
 | Clicks pass through the arrow to the window below | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` hit test |
 | Frontmost app unchanged by `point`, `start`, `--detach` | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests`; root cause of the one failure found: `NSApplication.run()` activates detached processes, replaced by a plain event pump |
-| Sign pixels have the arrow colour | pass | CI, MBP, 2026-10-08 | `OverlayTests` pixel check |
+| Sign pixels have the arrow colour | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` pixel check |
 | Above a full-screen app, which keeps its Space and the focus | pass | CI, 2026-10-08 | ![](images/fullscreen.png) pixel 255,83,39 |
 | Stage Manager on | pass | CI, 2026-10-08 | ![](images/stage-manager.png) pixel 0,153,255 |
 | Second display (virtual, right of main), `--display 2` | pass | CI, 2026-10-08 | ![](images/two-displays-2.png) |
@@ -39,5 +39,7 @@ screen tests on. **Arthur** = Arthur Mac (macOS 27.0.1), `BIGARROW_SCREEN_TESTS=
   elements. On real Macs both sources agree.
 - On the runner, AppKit reports backing scale 1 for the virtual display even in its 2x pixel
   mode; scale 2 is covered by the MacBook's built-in display.
-- Arthur Mac's screen was locked during the run, so its tests cover the window server but no
-  pixels; remote unlocking over VNC and posted key events was refused by the lock screen.
+- Arthur Mac: the first run happened while its screen was locked (window-server checks only).
+  After Franz unlocked it, all 74 tests ran through Ghostty (Accessibility and Screen
+  Recording granted) with no skips, including the pixel check and the live `--element` test,
+  and the README scenes were recorded there (`scripts/funny-scenes.sh` with `--cover`).

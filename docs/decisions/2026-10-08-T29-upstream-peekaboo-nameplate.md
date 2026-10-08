@@ -1,7 +1,8 @@
 # T29: propose an arrow event upstream to Peekaboo and Nameplate
 
-Date: 2026-10-08. Status: **drafted, not posted.** Opening an issue on someone else's repository
-is a message to other people, so it goes out only after Franz approves the exact text.
+Date: 2026-10-08. Status: **posted** after Franz approved the exact text:
+https://github.com/openclaw/Peekaboo/issues/1008 and https://github.com/steipete/Nameplate/issues/38 .
+Maintainer answers: none yet.
 
 ## Evidence
 
@@ -15,7 +16,7 @@ is a message to other people, so it goes out only after Franz approves the exact
 
 ## Decision
 
-Later. The hand-off through `peekaboo see --json > snap.json && bigarrow point --peekaboo ...`
+Proposed upstream; nothing in bigarrow depends on the answer. The hand-off through `peekaboo see --json > snap.json && bigarrow point --peekaboo ...`
 needs nothing from upstream. Whether to propose an `arrow` visualizer event is Franz's call once
 he has seen the drafts below.
 

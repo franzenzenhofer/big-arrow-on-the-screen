@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 38 tickets: 36 done, 1 later, 1 not now.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 38 tickets: 37 done, 1 not now.
 
 ## M0 Skeleton and proof
 
@@ -479,10 +479,10 @@ Generate the OpenClaw variant of the skill from the same source body: frontmatte
 
 ### T29 Evaluate upstreaming an `arrow` visualizer event into openclaw/peekaboo
 
-**Status: Later** · Issue: https://github.com/franzenzenhofer/big-arrow-on-the-screen/issues/29  
+**Status: Done** · Issue: https://github.com/franzenzenhofer/big-arrow-on-the-screen/issues/29  
 Labels: `type:research` `size:S` `priority:P2`
 
-**Outcome**: Decision record and both issue drafts in `docs/decisions/2026-10-08-T29-upstream-peekaboo-nameplate.md`; posting to other people's repositories waits for Franz's approval of the text.
+**Outcome**: Proposals posted 2026-10-08 after Franz approved the text: https://github.com/openclaw/Peekaboo/issues/1008 and https://github.com/steipete/Nameplate/issues/38. Decision record: `docs/decisions/2026-10-08-T29-upstream-peekaboo-nameplate.md`; answers get recorded there.
 
 Decision record after v0.1.0 ships: open an issue in `openclaw/Peekaboo` proposing an `arrow` visualizer event (`point`, `text`, `duration`, sticky flag) backed by this project's geometry and placement code, or a documented `peekaboo see --json` to `bigarrow` hand-off in Peekaboo's agent skill. Evidence base: Peekaboo's visualizer has no arrow or label primitive, no sticky mode, and sets no `collectionBehavior` (see `docs/research/2026-10-08-peekaboo-and-steipete-tools.md`). Also consider the same proposal for `steipete/Nameplate` (`nameplate attention` already has sticky semantics but no positioned arrow). Record the maintainers' answers in `docs/decisions/`.
 
