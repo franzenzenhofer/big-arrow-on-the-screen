@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- README: a one-line table of contents under the hero, and "Starred by" with the stargazers' avatars.
+- `main` is protected by a ruleset: no force pushes, no deletion.
+
 ## [0.4.5] - 2026-10-09
 
 ### Changed
