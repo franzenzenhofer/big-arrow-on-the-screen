@@ -1,6 +1,6 @@
 # How to allow screen recording on a Mac
 
-This guide shows how to let an app record your screen on macOS: Google Chrome here, and the same steps work for Zoom, Microsoft Teams, TeamViewer or any other app that shares or records your screen. Every screenshot is a real arrow, drawn by an agent with [bigarrow](../../../README.md) on macOS 27.0.1 (build 26A434).
+This guide shows how to let an app record your screen on macOS: Google Chrome here, and the same steps work for Zoom, Microsoft Teams, TeamViewer or any other app that shares or records your screen. Every screenshot is a real arrow, drawn by an agent with [bigarrow](../../../README.md) on macOS 27.0.1 (build 26A434). The steps follow Apple's own instructions, [Control access to screen and system audio recording on Mac](https://support.apple.com/guide/mac-help/control-access-screen-system-audio-recording-mchld6aa7d23/mac#:~:text=Choose%20Apple%20menu), checked on 2026-10-09.
 
 ## 1. Open Privacy & Security
 
@@ -66,7 +66,7 @@ The shot starts below the user-name field, so no name is in it. To take it, the 
 
 ## 6. Quit & Reopen
 
-macOS then tells you the app needs to restart before it can record. Click **Quit & Reopen**. After that the app can share or record your screen.
+If the app is open, macOS then tells you it cannot record your screen until you quit and reopen it. Click **Quit & Reopen**. After that the app can share or record your screen. Apple's page does not show this prompt; it is described, for example, by [UNC Asheville IT](https://kb.unca.edu/kb/allow-an-app-to-record-your-mac-s-screen#:~:text=Quit%20%26%20Reopen). This step is text only: showing it would mean really granting a permission on the test Mac.
 
 ## Let your agent do it
 
