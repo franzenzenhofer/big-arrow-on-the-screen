@@ -70,6 +70,17 @@ struct MatcherTests {
         #expect(WindowMatcher.windows(of: [7], in: [parked, visible], title: nil, displays: displays) == [visible])
     }
 
+    @Test("A window half off every display is pointed at in its visible part")
+    func halfOffScreen() {
+        let window = WindowInfo(ownerPID: 1, layer: 0, bounds: CGRect(x: 1400, y: -900, width: 800, height: 1000), alpha: 1, title: nil)
+        let visible = WindowMatcher.visiblePart(of: window, on: displays)
+        let screen = displays[0].frame
+        #expect(visible == CGRect(x: 1400, y: 0, width: screen.width - 1400, height: 100))
+        for anchor in WindowAnchor.allCases {
+            #expect(screen.contains(anchor.point(in: visible)), "\(anchor)")
+        }
+    }
+
     @Test("The unknown-app message lists only apps with visible windows")
     func appsWithWindows() {
         let names = WindowMatcher.appsWithWindows(recorded.apps, recorded.windows)

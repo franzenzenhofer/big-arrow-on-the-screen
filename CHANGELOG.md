@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2026-10-09
+
+After the [Hacker News thread](https://news.ycombinator.com/item?id=50018817); triage in `docs/feedback/2026-10-09-hacker-news.md`.
+
+### Fixed
+- The box or ring around the target no longer drifts while it pulses: its layer scaled around the display's centre, so a box near a corner swam up to 55 pt off its target and back. Found by @jarombouts in #37 (#38).
+- `--window` on a window left half off every display (after unplugging one) points at its visible part instead of failing with "outside every display".
+
+### Changed
+- Skill: when a click approves, grants, pays, signs, sends or deletes something, the sign says what happens (#42).
+- Skill: open the exact System Settings pane or page first, then point; deep links verified on macOS 27 (#43, research in `docs/research/2026-10-09-system-settings-deep-links.md`).
+- Permission errors name the pane macOS shows: on macOS 27 the Accessibility list is titled "Device Control and Data Access".
+- README: plain-language tagline and permissions FAQ, new FAQ entries on focus, trust and token cost, use cases that lead with guiding and helping (#39, #44).
+- GitHub's language stats ignore `scripts/`; the binary is Swift only (#45).
+
 ## [0.4.2] - 2026-10-09
 
 ### Changed

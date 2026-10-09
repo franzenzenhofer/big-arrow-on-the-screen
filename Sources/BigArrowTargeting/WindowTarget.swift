@@ -26,7 +26,7 @@ public enum WindowTarget {
         }
         var detail = ["app": appName, "anchor": anchor.rawValue, "windowCount": String(found.count)]
         detail["title"] = window.title
-        let point = anchor.point(in: window.bounds)
+        let point = anchor.point(in: WindowMatcher.visiblePart(of: window, on: screens.displays))
         return ResolvedTarget(shape: .point(point), source: "window", detail: detail)
     }
 
