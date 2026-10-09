@@ -36,7 +36,7 @@ close_terminal() {
   if [ -n "$tty" ]; then
     ps -t "$tty" -o pid= | xargs kill -KILL 2>/dev/null
     # Closing while the shell is still there asks "Terminate?" and leaves the window behind.
-    for _ in $(seq 50); do [ -z "$(ps -t "$tty" -o pid=)" ] && break; sleep 0.1; done
+    for _ in $(seq 50); do [ -z "$(ps -t "$tty" -o pid= 2>/dev/null)" ] && break; sleep 0.1; done
   fi
   osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
   TERMINAL_TITLE=""
@@ -298,6 +298,8 @@ AS
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
 print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
+  # Windows that appeared since (the runner's own terminal, Finder) go too.
+  hide_others Terminal
   sleep 1; $KIT click $chip; sleep 0.2
   osascript -e 'tell application "System Events" to keystroke "v" using command down'
   shoot terminal "$win" 0.4
