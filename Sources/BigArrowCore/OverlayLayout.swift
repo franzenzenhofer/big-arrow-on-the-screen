@@ -7,7 +7,7 @@ public enum TargetMark: Equatable, Sendable {
     case ring(center: CGPoint, radius: CGFloat)
 
     /// The area the mark occupies, used as the zone the sign keeps clear of.
-    var area: CGRect? {
+    public var area: CGRect? {
         switch self {
         case .none: nil
         case .box(let rect): rect
