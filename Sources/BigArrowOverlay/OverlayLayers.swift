@@ -49,7 +49,7 @@ struct OverlayLayers {
         let tip = layout.arrow.tip.applying(flip)
         for layer in [root, markGroup] + shaftLayers + headLayers { layer.frame = bounds }
         for layer in headLayers { Self.pin(layer, at: tip, in: bounds) }
-        markGroup.sublayers = Self.markLayers(layout.mark, flip: flip, appearance: appearance)
+        Self.fill(markGroup, with: layout.mark, flip: flip, appearance: appearance)
         let signFrame = Self.flipped(layout.signRect, height: height)
         for (layer, contents) in [(signEdge, image.edge), (sign, image.body), (signText, image.text)] {
             layer.contents = contents
@@ -116,6 +116,14 @@ struct OverlayLayers {
         layer.shadowOpacity = 0.35
         layer.shadowRadius = shadowRadius
         layer.shadowOffset = CGSize(width: 0, height: -shadowDrop)
+    }
+
+    /// Puts the mark into its display-sized group and pins the group to the mark's centre, so the
+    /// pulse grows the box or ring in place instead of around the display's centre.
+    static func fill(_ group: CALayer, with mark: TargetMark, flip: CGAffineTransform, appearance: SignAppearance) {
+        group.sublayers = markLayers(mark, flip: flip, appearance: appearance)
+        guard let area = mark.area else { return }
+        pin(group, at: CGPoint(x: area.midX, y: area.midY).applying(flip), in: group.bounds)
     }
 
     static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, appearance: SignAppearance) -> [CALayer] {

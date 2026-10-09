@@ -57,7 +57,10 @@ Say what and by when. One arrow per step: `stop` before pointing at the next thi
 
 ## Sign and look
 
-Full short sentence ("Franz, click Allow", not "here"). `--say` speaks it. `--color` red, orange,
+Full short sentence ("Franz, click Save", not "here"). When the click approves, grants, pays,
+signs, sends or deletes something, the sign also says what happens: "Franz, click Allow: Ghostty
+may control your Mac", "Franz, click Pay: 49 EUR to Hetzner". The human decides; give them the
+facts on the sign, not only in the terminal. `--say` speaks it. `--color` red, orange,
 yellow, green, teal, blue, purple, pink, black, white or #hex. `--style box|ring` marks without
 covering, `--size S|M|L`, `--duration N` for a plain timed hint (default 8 s with `point`).
 Default look is a white border with a drop shadow; `--border white-black|black` and
@@ -67,9 +70,10 @@ Default look is a white border with a drop shadow; `--border white-black|black` 
 ## Errors
 
 Exit 2 bad input, 3 target not found (the message lists what exists), 4 permission missing.
-On 4 run `bigarrow doctor`: Accessibility (for `--element`, `App:title`, `--until-click`) belongs
-to the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and
-the pane: System Settings > Privacy & Security > Accessibility.
+On 4 run `bigarrow doctor` and read which permission the message names. Accessibility (for
+`--element`, `App:title`, `--until-click`) and Screen Recording (for `--window App:title`) belong to
+the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and the
+pane: System Settings > Privacy & Security > Accessibility, or > Screen & System Audio Recording.
 
 ## Setup once: clear arrows when the human answers
 

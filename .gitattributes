@@ -1,0 +1,2 @@
+# Screenshot, test and release tooling; the shipped binary is Swift only.
+scripts/** linguist-detectable=false

@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 40 tickets: 39 done, 1 not now.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 44 done, 3 not now, 3 later.
 
 ## M0 Skeleton and proof
 
@@ -518,3 +518,125 @@ Spike whether a stdio MCP server exposing `point`, `clear`, `doctor` adds value 
 
 **Acceptance criteria**
 - Decision record with the consumer named, or 'not now' with reason.
+
+## M6 Hacker News feedback (2026-10-09)
+
+The real criticism and the real use cases from the Hacker News thread (https://news.ycombinator.com/item?id=50018817) and from PRs #36 and #37. Triage: docs/feedback/2026-10-09-hacker-news.md.
+
+### T41 Fix: the box or ring around the target drifts while it pulses
+
+**Status: Done** · Issue: #38  
+Labels: `bug` `priority:P1` `size:S`
+
+**Outcome**: Mark group pinned to the mark's centre (MarkTests: 55 pt drift before, under 0.5 pt after); found by @jarombouts in #37.
+
+The mark layer covers the whole display, so the pulse scales it around the display's centre and a box away from the centre swims by up to 8 % of that distance every 0.9 s. Pulse each mark around its own centre. Found and fixed by @jarombouts in PR #37 (commit 5d1d1c4); take that fix with credit, without the effects.
+
+**Acceptance criteria**
+- A unit test proves every mark layer's anchor is the target's centre.
+- A real screen check on the test Mac shows the box still while it pulses.
+
+### T42 README: rewrite the passages that read like generated text, keep the tone
+
+**Status: Done** · Issue: #39  
+Labels: `type:docs` `priority:P1` `size:M`
+
+**Outcome**: Tagline, intro, permissions table and new FAQ entries rewritten in plain sentences; jokes kept. Facts checked by a Codex review.
+
+Commenters could not parse the permissions FAQ (https://news.ycombinator.com/item?id=50019459) and found the tagline empty (https://news.ycombinator.com/item?id=50020886); one asked how an arrow without focus can be in front at all (https://news.ycombinator.com/item?id=50018945), one why this needs a skill and how many tokens it costs (https://news.ycombinator.com/item?id=50019964). Keep the jokes and the voice. Replace vague or stacked phrases with concrete sentences: what it draws, where, for how long, what it needs.
+
+**Acceptance criteria**
+- Tagline says what the tool does in plain words.
+- Permissions FAQ answers in a table: feature, permission, who grants it.
+- New FAQ entries: 'How is it in front without taking the focus?' and 'Why a skill?' with the measured SKILL.md token count.
+
+### T43 README: real apps, real use cases, big screenshots from the test Mac
+
+**Status: Later** · Issue: #40  
+Labels: `type:docs` `priority:P1` `size:M`
+
+**Outcome**: Open.
+
+The strongest reactions were about guiding, not doing: a tutorial in a complicated app (https://news.ycombinator.com/item?id=50019008, https://news.ycombinator.com/item?id=50020002), docs where the screenshot still makes you search (https://news.ycombinator.com/item?id=50019113), helping a parent over the phone (https://news.ycombinator.com/item?id=50019233, https://news.ycombinator.com/item?id=50019407, https://news.ycombinator.com/item?id=50020456). The README only shows staged dialogs and a joke HN page. Record real apps on the test Mac (System Settings, Keynote, Chrome, Finder) with real bigarrow commands, nothing personal on screen, C2PA stripped, and show them big further down the README.
+
+**Acceptance criteria**
+- A script reproduces every shot from the repo.
+- At least four real-app scenes, each with the exact command under it.
+
+### T44 Hero: re-stage the arrows on short, clean paths
+
+**Status: Later** · Issue: #41  
+Labels: `type:docs` `priority:P2` `size:S`
+
+**Outcome**: Open.
+
+'Even the example arrows in the first screenshot are wonky' (https://news.ycombinator.com/item?id=50020187). The long orange arc crosses six headlines and the red one hooks back on itself. Keep the scene and the jokes; pick sources and shapes so no shaft crosses text. No rendering change.
+
+**Acceptance criteria**
+- No shaft crosses a headline; every arrow takes the short way to its target.
+
+### T45 Skill: on approvals the sign says what the click does
+
+**Status: Done** · Issue: #42  
+Labels: `type:docs` `priority:P1` `size:S`
+
+**Outcome**: SKILL.md rule plus examples; README hero command names the consequence.
+
+'An arrow on the screen solves where do I click; it doesn't solve should this happen' (https://news.ycombinator.com/item?id=50020731, https://news.ycombinator.com/item?id=50019401). Fair. The skill must make the agent name the consequence: 'Franz, click Allow: Terminal gets Accessibility', not just 'click Allow'.
+
+**Acceptance criteria**
+- SKILL.md rule plus examples; README examples follow it.
+
+### T46 Skill: deep-link first, point second
+
+**Status: Later** · Issue: #43  
+Labels: `type:docs` `priority:P2` `size:S`
+
+**Outcome**: Open.
+
+'Have we thought about using hyperlinks?' (https://news.ycombinator.com/item?id=50020859). For System Settings the agent should open the exact pane with its `x-apple.systempreferences:` URL, then point at the one control, instead of pointing through five clicks.
+
+**Acceptance criteria**
+- SKILL.md lists the pane URLs verified on macOS 27 on the test Mac.
+
+### T47 FAQ: could an agent use the overlay to trick me?
+
+**Status: Done** · Issue: #44  
+Labels: `type:docs` `priority:P2` `size:S`
+
+**Outcome**: FAQ answer; guarantees backed by MarkTests (outline only), PlacementTests (clear of the target), behaviour checks (click removes, ends by itself).
+
+'What's stopping it from drawing a box that hides the decline button?' (https://news.ycombinator.com/item?id=50019459, https://news.ycombinator.com/item?id=50019723). Answer honestly: nothing the agent could not already do, since it runs code as you (https://news.ycombinator.com/item?id=50020728); what bigarrow guarantees: boxes and rings are border-only, the sign is placed off the target, every arrow ends by itself, a click on it removes it.
+
+**Acceptance criteria**
+- Every guarantee in the answer is backed by a named test.
+
+### T48 Language bar: the shipped binary is Swift only
+
+**Status: Done** · Issue: #45  
+Labels: `type:infra` `priority:P3` `size:S`
+
+**Outcome**: `.gitattributes` marks scripts/ non-detectable.
+
+'Does one need 4 programming languages to draw something on a mac?' (https://news.ycombinator.com/item?id=50019011). It does not: Shell, Python and Objective-C are screenshot and test tooling under `scripts/`. Mark them as non-detectable for GitHub's language stats.
+
+**Acceptance criteria**
+- GitHub's language bar shows Swift only; the scripts stay in the repo.
+
+### T49 Effects: rainbow, drip, flames, shake, airhorn
+
+**Status: Not now** · Issue: #46  
+Labels: `type:feature` `priority:P3` `size:L`
+
+**Outcome**: Not merged: closed with thanks; the bug fix from #37 lands as T41.
+
+Requested as a joke (https://news.ycombinator.com/item?id=50019128), then built for real in PRs #36 and #37 by @jarombouts, carefully, with tests. Not merged: bigarrow is a pointer an agent uses when it needs a human, and its value is that it is calm, quick to read and the same every time. `--say` and `--color red` already cover urgency. The one real bug fix in #37 is T41.
+
+### T50 iPad and iPhone version
+
+**Status: Not now** · Issue: #47  
+Labels: `type:research` `priority:P3` `size:L`
+
+**Outcome**: Not possible on iOS/iPadOS: no app may draw over other apps.
+
+Asked for helping aging parents (https://news.ycombinator.com/item?id=50019407). iOS and iPadOS do not let one app draw over other apps, so the tool cannot exist there in this form. macOS only.
