@@ -27,7 +27,7 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
 - **"Show me how."** Ask your agent how to do something in Keynote, Blender or System Settings, and it points at each control in turn instead of describing it: `start`, wait until you acted, `stop`, next step. Like a product tour, minus the product.
 - **Helping someone else.** Install it on a parent's Mac, and the agent there can show them how to save a document as PDF. Pointing beats "the button at the top, no, the other top".
-- **Remote help.** "No, the *other* gear icon." Point at it instead of describing it.
+- **Remote help.** "No, the *other* grid icon." Point at it instead of describing it.
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
 - **Debugging coordinates.** Not sure your Accessibility, screenshot or Peekaboo coordinates are right? Point at them and look. `--dry-run --json` tells you where it *would* point without drawing.
 
