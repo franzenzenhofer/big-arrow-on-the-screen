@@ -31,21 +31,6 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
 - **Debugging coordinates.** Not sure your Accessibility, screenshot or Peekaboo coordinates are right? Point at them and look. `--dry-run --json` tells you where it *would* point without drawing.
 
-### Situations we have all been in
-
-Staged with a neutral demo dialog and recorded with the real `bigarrow` on a clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
-
-| | |
-|---|---|
-| ![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png) | ![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png) |
-| `--color green` | `--shape zigzag --color orange` |
-| ![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png) | ![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png) |
-| `--color purple` | `--close-button`, because the human gets the last word |
-| ![Three arrows, one Save button](docs/images/scenes/which-button.png) | ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png) |
-| three `start`s, one button, zero ambiguity | `--style box --corners sharp`, plus a lesson about macOS permissions |
-| ![Software update: Twirl. Then click.](docs/images/scenes/spiral.png) | |
-| `--shape spiral`: once around the sign, then to the button | |
-
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
 ## Install
@@ -106,6 +91,38 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 - Several arrows at once keep their signs out of each other's way
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
+
+## Creative arrows
+
+Staged with a neutral demo dialog and recorded with the real `bigarrow` on a clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
+
+![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png)
+
+`--color green`
+
+![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png)
+
+`--shape zigzag --color orange`: zigzag, for when it is *really* urgent
+
+![Software update: Twirl. Then click.](docs/images/scenes/spiral.png)
+
+`--shape spiral`: once around the sign, then to the button
+
+![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png)
+
+`--color purple`
+
+![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png)
+
+`--close-button`, because the human gets the last word
+
+![Three arrows, one Save button](docs/images/scenes/which-button.png)
+
+three `start`s, one button, zero ambiguity
+
+![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png)
+
+`--style box --corners sharp`, plus a lesson about macOS permissions
 
 ## FAQ
 
