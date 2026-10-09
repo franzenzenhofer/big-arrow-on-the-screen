@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- README hero: a real desktop again (menu bar, Dock, a normal Chrome window with tabs and address bar) with nine arrows on the 2014-06-10 Hacker News front page, every one a different colour, shape or style, from every side, no headline covered. `scripts/hn-scene.sh` records it on the main display, no virtual display.
+- README "Real apps, real use cases": every scene shows other looks (rings, boxes, zigzags, sharp corners, close button, white-black border, hex colours), most with a second or third arrow, and the menu bar is in every shot. `scripts/real-scenes.sh` crops to the main display's size, hides other Finder windows and reads the two version-dependent labels from `SETTINGS_ADD` and `FINDER_ICONS`.
+
 ## [0.4.3] - 2026-10-09
 
 After the [Hacker News thread](https://news.ycombinator.com/item?id=50018817); triage in `docs/feedback/2026-10-09-hacker-news.md`.

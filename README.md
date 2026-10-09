@@ -5,7 +5,7 @@
 [![CI](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml/badge.svg)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Hacker News with five bigarrow arrows: the actual article is in here, finally an arrow bigger than this one, same design since 2007, today's thread already argued in 2014, not a lurker? click login](docs/images/hero-hn.png)
+![A real macOS desktop, Hacker News of 2014-06-10 in Chrome, nine bigarrow arrows in nine colours from every side: same since 2007, already argued in 2014, not a lurker? log in, the article is in here, remember me? (Firefox 30), nothing. nothing changed. (a spiral, going round in circles), 20,000 devs 40,000 opinions, finally a bigger arrow, 12 years later: still no consensus](docs/images/hero-hn.png)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
@@ -35,50 +35,60 @@ What it is not: a screen annotator for humans, a click bot, or a screenshot tool
 
 ## Real apps, real use cases
 
-No fake dialogs this time. Real apps on the test Mac (macOS 27), neutral demo content, a fresh browser profile, and the real `bigarrow`, staged by `scripts/real-scenes.sh`. Every command below is exactly what ran; the script only adds `--no-animation --json` for the screenshot.
+No fake dialogs this time. Real apps on the test Mac (macOS 27), neutral demo content, a fresh browser profile, and the real `bigarrow`, staged by `scripts/real-scenes.sh`. Every command below is exactly what ran; the script only adds `--no-animation --json` for the screenshot. Every scene wears different colours, shapes and styles, because an arrow should match the mood: a green "go ahead", a black "don't", a ring for "this little thing", a box for "this whole thing".
 
-![System Settings, Device Control and Data Access: Franz, switch this on: Terminal may control your Mac](docs/images/real/settings.png)
+![System Settings, Device Control and Data Access: a green arrow with a close button, Franz, switch this on: Terminal may control your Mac, and an orange zigzag ring on the plus button: Not in the list? Plus. Then find it.](docs/images/real/settings.png)
 
 ```bash
 open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
 bigarrow start --element Terminal_Toggle --app "System Settings" \
-  --text "Franz, switch this on: Terminal may control your Mac" --from right
+  --text "Franz, switch this on: Terminal may control your Mac" --from right --color green --close-button
+bigarrow start --element Add --role button --app "System Settings" \
+  --text "Not in the list? Plus. Then find it." --from bottom-right --style ring --color orange --shape zigzag --size S
 ```
 
-Guiding a human through a permission: a deep link opens the exact pane, the arrow finds the one switch, and the sign says what it does. (On macOS 27 the pane is called Device Control and Data Access. Nobody would have found it by the old name.)
+Guiding a human through a permission: a deep link opens the exact pane, the arrow finds the one switch, and the sign says what it does. The second arrow is plan B, in orange, zigzagging, because plan B always is. (On macOS 27 the pane is called Device Control and Data Access. Nobody would have found it by the old name.)
 
-![Keynote: 1. Click Animate, 2. Add an Effect](docs/images/real/keynote.png)
+![Keynote: a purple ring, 1. Click Animate; an orange box, 2. Add an Effect; a teal zigzag on Play, 3. Press play. Bask in the applause.](docs/images/real/keynote.png)
 
 ```bash
-bigarrow start --element Animate --app Keynote --role radiobutton --text "1. Click Animate" --from right
-bigarrow start --element "Add an Effect" --app Keynote --text "2. Add an Effect" --from right
+bigarrow start --element Animate --app Keynote --role radiobutton --text "1. Click Animate" --from right \
+  --style ring --color purple
+bigarrow start --element "Add an Effect" --app Keynote --text "2. Add an Effect" --from right \
+  --style box --corners sharp --color "#FF9F0A" --shape straight
+bigarrow start --element Play --app Keynote --role button --text "3. Press play. Bask in the applause." \
+  --from top --color teal --shape zigzag --size S
 ```
 
-Teaching an app: "Where do I add a transition?" Two numbered steps, both on screen, in a toolbar that has given up on words.
+Teaching an app: "Where do I add a transition?" Three numbered steps, three colours, all on screen at once, in a toolbar that has given up on words.
 
-![TextEdit print dialog: Mom, click PDF, then Save as PDF](docs/images/real/print.png)
+![TextEdit print dialog: a pink arrow, Mom, click PDF, then Save as PDF, and a small black one on Cancel: Not this one, Mom](docs/images/real/print.png)
 
 ```bash
 bigarrow start --element PDF --role button --app TextEdit \
-  --text "Mom, click PDF, then Save as PDF" --from bottom
+  --text "Mom, click PDF, then Save as PDF" --from bottom --color pink --border white-black
+bigarrow start --element Cancel --role button --app TextEdit \
+  --text "Not this one, Mom" --from bottom-right --color black --size S
 ```
 
-Helping a parent over a screen share, without the twenty minutes of "the little button, bottom left, no, left".
+Helping a parent over a screen share, without the twenty minutes of "the little button, bottom left, no, left". The black arrow is for the button Mom clicked last time.
 
-![Chrome, three windows, 14 tabs: It's this tab, not the other 13](docs/images/real/chrome.png)
+![Chrome, three windows, 14 tabs, a big indigo sign: It's this tab, not the other 13](docs/images/real/chrome.png)
 
 ```bash
 bigarrow start --app "Google Chrome:Sourdough" --element "Sourdough - Wikipedia" --role radiobutton \
-  --text "It's this tab, not the other 13" --from top
+  --text "It's this tab, not the other 13" --from top --shape zigzag --color "#5856D6" --size L
 ```
 
 `--app "App:tab title"` brings the right window to the front and selects the tab before it points. The agent knew which tab it meant. Now you do too.
 
-![Finder: No, the other grid icon. This one.](docs/images/real/finder.png)
+![Finder: a black ring on the icon view button, Not this one, and a green box on the Group button: No, the other grid icon. This one.](docs/images/real/finder.png)
 
 ```bash
+bigarrow start --element "icon view" --role radiobutton --app Finder \
+  --text "Not this one" --from top-left --style ring --color black --size S
 bigarrow start --element Group --role menubutton --app Finder \
-  --text "No, the other grid icon. This one." --from top
+  --text "No, the other grid icon. This one." --from top --style box --color green
 ```
 
 Remote help, updated for macOS 27: the gear icon is gone, but there are now two grid icons, and it is always the other one.
