@@ -323,7 +323,8 @@ end tell
 AS
   sleep 1
   arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
-    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom --color blue --size S
+    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --shape bend \
+    --color blue --border-color yellow --text-color yellow
   shoot address "200,330,900,420"
   close_chrome
 }
