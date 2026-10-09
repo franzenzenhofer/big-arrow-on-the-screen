@@ -4,7 +4,8 @@
 # around the app and the arrow. Run on the test Mac (Arthur), never on a desk in use.
 # Other apps are hidden, the Dock and desktop widgets too (restored on exit); demo files live in
 # a temporary folder and Chrome gets a fresh temporary profile, so nothing personal is on screen.
-# Usage: scripts/real-scenes.sh <out-dir> [scene ...]   (scenes: settings keynote print chrome finder)
+# Usage: scripts/real-scenes.sh <out-dir> [scene ...]
+#   scenes: settings keynote print chrome finder (default), terminal and address (copy buttons)
 set -uo pipefail
 OUT="$1"; shift
 SCENES="${*:-settings keynote print chrome finder}"
@@ -19,12 +20,20 @@ SCREEN=$(osascript -e 'tell application "Finder" to get bounds of window of desk
 # Labels that differ between macOS versions; override them per machine.
 SETTINGS_ADD="${SETTINGS_ADD:-Add}"
 FINDER_ICONS="${FINDER_ICONS:-icon view}"
+# Points from the Terminal window's top to its prompt line (title bar plus seven lines).
+TERM_PROMPT_Y="${TERM_PROMPT_Y:-118}"
 DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
 WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
 # What the scenes opened; each close_* closes only that, so a failed scene leaves nothing behind
 # and nothing of the human's (other decks, documents, Chrome windows) is ever touched.
-CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""
+CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""; TERMINAL_TITLE=""
 close_chrome() { [ -n "$CHROME_PID" ] && kill "$CHROME_PID" 2>/dev/null; CHROME_PID=""; }
+close_terminal() {
+  [ -n "$TERMINAL_TITLE" ] || return
+  pkill -f "$WORK/build.command" 2>/dev/null; sleep 1
+  osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
+  TERMINAL_TITLE=""
+}
 close_keynote() {
   [ -n "$KEYNOTE_DOC" ] && osascript -e "tell application \"Keynote Creator Studio\" to close (every document whose id is \"$KEYNOTE_DOC\") saving no" > /dev/null
   KEYNOTE_DOC=""
@@ -52,7 +61,7 @@ AS
 }
 cleanup() {
   $BIN stop --all >/dev/null 2>&1
-  close_chrome; close_keynote; close_textedit; close_finder
+  close_chrome; close_keynote; close_textedit; close_finder; close_terminal
   defaults write com.apple.dock autohide -int "$DOCK_AUTOHIDE"; killall Dock
   defaults write com.apple.WindowManager StandardHideWidgets -int "$WIDGETS_HIDDEN"
 }
@@ -84,10 +93,11 @@ frame() {
 arrow() {
   "$@" --no-animation --json >> "$WORK/arrows.json" || { echo "arrow failed: $*" >&2; exit 1; }
 }
-# shoot <name> <window x,y,w,h>: captures the window plus every sign, 32 pt around them, from
-# the menu bar down, clipped to the main display (1470x956 points on the test Mac).
+# shoot <name> <window x,y,w,h> [seconds]: captures the window plus every sign, 32 pt around
+# them, from the menu bar down, clipped to the main display (1470x956 points on the test Mac),
+# after the given wait (default 1.2 s, for the arrows to settle).
 shoot() {
-  sleep 1.2
+  sleep "${3:-1.2}"
   local region
   region=$(python3 - "$2" "$WORK/arrows.json" "$SCREEN" <<'PY'
 import json, sys
@@ -232,6 +242,58 @@ scene_finder() {
     --text "No, the other grid icon. This one." --from top --style box --color green
   shoot finder "$(frame Finder)"
   close_finder
+}
+
+# Copy buttons, the real case: a build stops because Xcode needs an admin password, which the
+# agent must not type. The sign carries the command; a real click on its chip copies it, Cmd-V
+# pastes it, and the shot is taken while the chip still shows its check.
+scene_terminal() {
+  TERMINAL_TITLE="my-app build"
+  cat > "$WORK/build.command" <<CMD
+#!/bin/zsh -f
+printf '\e]0;$TERMINAL_TITLE\a'; clear; cd /tmp
+print -P '%F{blue}my-app%f %% xcodebuild -scheme MyApp build'
+print 'xcodebuild: error: You have not agreed to the Xcode license agreements. You must agree to both license'
+print 'agreements below in order to use Xcode.'
+print 'Agreeing to the Xcode/iOS license requires admin privileges, please run "sudo xcodebuild -license"'
+print 'and then retry this command.'
+print
+print -nP '%F{blue}my-app%f %% '
+read -r line
+CMD
+  chmod +x "$WORK/build.command"
+  open -a Terminal "$WORK/build.command"; sleep 2.5
+  hide_others Terminal; place Terminal 60 380 820 300
+  local win; win=$(frame Terminal)
+  # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
+  local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
+  arrow $BIN start --rect "$prompt" --app "Terminal:$TERMINAL_TITLE" \
+    --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return" \
+    --from right --color red
+  local chip
+  chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
+c = json.load(sys.stdin)["copyButtons"][0]
+print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
+  sleep 1; $KIT click $chip; sleep 0.2
+  osascript -e 'tell application "System Events" to keystroke "v" using command down'
+  shoot terminal "$win" 0.4
+  close_terminal
+}
+
+# Copy buttons, the small case: a dev server is up; the URL goes into the address bar.
+scene_address() {
+  local profile="$WORK/chrome-address"
+  open -na "Google Chrome" --args --user-data-dir="$profile" --no-first-run --no-default-browser-check \
+    --disable-search-engine-choice-screen --hide-crash-restore-bubble --new-window about:blank; sleep 5
+  CHROME_PID=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile" | head -1)
+  [ -n "$CHROME_PID" ] || { echo "address: the temporary Chrome did not start" >&2; exit 1; }
+  osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
+  osascript -e "tell application \"System Events\" to tell (first process whose unix id is $CHROME_PID) to set {position, size} of window 1 to {{200, 330}, {900, 420}}"
+  sleep 1
+  arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
+    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --color blue --size S
+  shoot address "200,330,900,420"
+  close_chrome
 }
 
 for scene in $SCENES; do "scene_$scene"; done
