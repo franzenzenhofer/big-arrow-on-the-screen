@@ -33,6 +33,56 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
+## Real apps, real use cases
+
+No fake dialogs this time. Real apps on the test Mac (macOS 27), neutral demo content, a fresh browser profile, and the real `bigarrow`, staged by `scripts/real-scenes.sh`. Every command below is exactly what ran; the script only adds `--no-animation --json` for the screenshot.
+
+![System Settings, Device Control and Data Access: Franz, switch this on: Terminal may control your Mac](docs/images/real/settings.png)
+
+```bash
+open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+bigarrow start --element Terminal_Toggle --app "System Settings" \
+  --text "Franz, switch this on: Terminal may control your Mac" --from right
+```
+
+Guiding a human through a permission: a deep link opens the exact pane, the arrow finds the one switch, and the sign says what it does. (On macOS 27 the pane is called Device Control and Data Access. Nobody would have found it by the old name.)
+
+![Keynote: 1. Click Animate, 2. Add an Effect](docs/images/real/keynote.png)
+
+```bash
+bigarrow start --element Animate --app Keynote --role radiobutton --text "1. Click Animate" --from right
+bigarrow start --element "Add an Effect" --app Keynote --text "2. Add an Effect" --from right
+```
+
+Teaching an app: "Where do I add a transition?" Two numbered steps, both on screen, in a toolbar that has given up on words.
+
+![TextEdit print dialog: Mom, click PDF, then Save as PDF](docs/images/real/print.png)
+
+```bash
+bigarrow start --element PDF --role button --app TextEdit \
+  --text "Mom, click PDF, then Save as PDF" --from bottom
+```
+
+Helping a parent over a screen share, without the twenty minutes of "the little button, bottom left, no, left".
+
+![Chrome, three windows, 14 tabs: It's this tab, not the other 13](docs/images/real/chrome.png)
+
+```bash
+bigarrow start --app "Google Chrome:Sourdough" --element "Sourdough - Wikipedia" --role radiobutton \
+  --text "It's this tab, not the other 13" --from top
+```
+
+`--app "App:tab title"` brings the right window to the front and selects the tab before it points. The agent knew which tab it meant. Now you do too.
+
+![Finder: No, the other grid icon. This one.](docs/images/real/finder.png)
+
+```bash
+bigarrow start --element Group --role menubutton --app Finder \
+  --text "No, the other grid icon. This one." --from top
+```
+
+Remote help, updated for macOS 27: the gear icon is gone, but there are now two grid icons, and it is always the other one.
+
 ## Install
 
 ```bash
