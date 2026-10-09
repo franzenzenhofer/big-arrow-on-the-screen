@@ -142,7 +142,7 @@ In Electron apps, yes. In Chrome, only when Chrome runs with `--force-renderer-a
 It could draw over a button, yes. But an agent that runs shell commands as you can already read your files and run any program, so `bigarrow` gives it nothing new. What `bigarrow` itself guarantees, each one checked by a test: boxes and rings are outlines, so the target stays visible; the sign is placed clear of the target whenever there is room around it, and where there is not (a target that fills most of the display), it overlaps the target as little as possible; a click on the sign or shaft removes the arrow; every arrow ends by itself. It never clicks, types or captures anything. And when the agent asks you to approve something, the skill has it say on the sign what the click does, so you decide with the facts in front of you.
 
 **Why a skill? Is that a lot of tokens?**
-The agent always sees only the skill's description, about 270 tokens. The full instructions, about 1,700 tokens (measured with Claude's tokenizer), load only when the agent decides to point. They teach it when to point, how to find the target and what to write on the sign. You can also skip the skill and call `bigarrow` yourself.
+The agent always sees only the skill's description, about 190 tokens. The full instructions, about 2,200 tokens (counted with Anthropic's token-count API for Claude Opus 5.5), load only when the agent decides to point. They teach it when to point, how to find the target and what to write on the sign. You can also skip the skill and call `bigarrow` yourself.
 
 **Why not just use [some screen annotation app]?**
 Those are for humans drawing on screens. This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked before writing a line ([research](docs/research/)). None did this.
@@ -152,7 +152,7 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 
-- 90 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 91 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
 - 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, raising (and `--no-raise`), hiding while covered, selecting a Chrome tab, ending with the owner process, `stop --hook`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
