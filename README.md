@@ -219,7 +219,7 @@ In Electron apps, yes. In Chrome only with `--force-renderer-accessibility` (or 
 An agent that runs shell commands as you can already do far worse, so `bigarrow` gives it nothing new. Still, each checked by a test: boxes and rings are outlines, so the target stays visible; the sign keeps clear of the target (or overlaps it as little as possible); a click on sign or shaft removes the arrow; every arrow ends by itself. And the skill makes the sign say what your click does.
 
 **Why a skill? Is that a lot of tokens?**
-The agent always sees only the skill's description, about 190 tokens. The full instructions, about 2,200 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point.
+The agent always sees only the skill's description, 182 tokens. The instructions, 1,398 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point; pane ids and look flags (1,008 more) only when it needs them.
 
 **Why not just use [some screen annotation app]?**
 Those are for humans drawing on screens. This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked first ([research](docs/research/)). None did this.
