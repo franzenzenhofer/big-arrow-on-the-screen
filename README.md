@@ -21,6 +21,10 @@ One transparent window above everything, on every display and every Space. Drawi
 
 ## Real apps, real use cases
 
+![An agent walks a human through the most complained-about Mac setting since 2023: one click on the wallpaper and every window flees; then 1. The apple. Yes, the fruit. 2. System Settings. Where settings go to hide. 3. Desktop & Dock. Not Wallpaper. Not Displays. This one. 4. Scroll. Further. It's always further. 5. 'Show desktop'. Nothing to do with Stage Manager. 6. 'Only in Stage Manager' means 'off'. Obviously. Then the wallpaper click: Nothing happens. Bliss.](docs/images/real/wallpaper.gif)
+
+Since macOS Sonoma one click on the wallpaper sends every window running for the edges, which iMore called ["the most annoying change in Mac update history"](https://www.imore.com/mac/macos/macos-sonoma-click-to-reveal-desktop-turn-off). The fix hides behind an option named after Stage Manager. Six steps, six arrows, every one a different look, real clicks on a real Mac ([MP4](docs/videos/wallpaper.mp4), recorded by `scripts/wallpaper-video.sh`; the account name in the Apple menu and the desktop widgets are pixelated).
+
 No fake dialogs this time. Real apps on the test Mac (macOS 27), neutral demo content, the real `bigarrow`, staged by `scripts/real-scenes.sh`. Every command is exactly what ran (the script adds `--no-animation --json` for the screenshot). An arrow should match the mood: a green "go ahead", a black "don't", a ring for "this little thing", a box for "this whole thing".
 
 ![System Settings, Device Control and Data Access: a green arrow with a close button, Franz, switch this on: Terminal may control your Mac, and an orange zigzag ring on the plus button: Not in the list? Plus. Then find it.](docs/images/real/settings.png)
@@ -139,7 +143,7 @@ three `start`s, one button, zero ambiguity
 
 ## Starred by
 
-[![GitHub stars](https://img.shields.io/github/stars/franzenzenhofer/big-arrow-on-the-screen?style=social)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers) 361 stars in the first two days, from people whose GitHub profiles list **Apple, NVIDIA, AMD, SAP, Salesforce, Palantir, ServiceNow, Booking.com, Mercedes-Benz, SUSE, Oxide Computer, Posit, CoreWeave, Weights & Biases, OpenRouter, Metabase, InstaDeep, Benchling, Stainless** and **Under Armour**, plus Stanford, Johns Hopkins, KTH and Oak Ridge National Laboratory.
+[![GitHub stars](https://img.shields.io/github/stars/franzenzenhofer/big-arrow-on-the-screen?style=social)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers) Over 360 stars in the first two days, from people whose GitHub profiles list **Apple, NVIDIA, AMD, SAP, Salesforce, Palantir, ServiceNow, Booking.com, Mercedes-Benz, SUSE, Oxide Computer, Posit, CoreWeave, Weights & Biases, OpenRouter, Metabase, InstaDeep, Benchling, Stainless** and **Under Armour**, plus Stanford, Johns Hopkins, KTH and Oak Ridge National Laboratory.
 
 A star is not an endorsement. It is, however, a star, which is basically an arrow that gave up on direction.
 
