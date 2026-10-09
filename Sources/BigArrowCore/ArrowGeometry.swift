@@ -48,7 +48,9 @@ public struct ArrowGeometry: Sendable {
             sign: sign, toward: tip, stroke: metrics.stroke, preferredHalf: metrics.stroke * ArrowRoot.baseFactor
         )
         let tail = Self.tail(of: junction)
-        let (control, joints) = Self.route(style: style, junction: junction, tip: tip, bounds: bounds)
+        let (control, joints) = style.shape == .spiral
+            ? Spiral.route(Spiral.Request(sign: sign.rect, junction: junction, tip: tip, metrics: metrics, bounds: bounds))
+            : Self.route(style: style, junction: junction, tip: tip, bounds: bounds)
         let direction = (tip - control).normalized
         let base = tip - direction * metrics.headLength
         let side = direction.perpendicular * (metrics.headWidth / 2)
@@ -86,6 +88,9 @@ public struct ArrowGeometry: Sendable {
             let inside = bounds.insetBy(dx: metrics.stroke, dy: metrics.stroke)
             return (controlPoint(tail: tail, tip: tip, leaving: junction.normal, bounds: inside), [])
         case .straight:
+            return (tail + (tip - tail) * 0.5, [])
+        case .spiral:
+            // Never reached: the spiral needs the sign's outline, so `init` asks `Spiral.route`.
             return (tail + (tip - tail) * 0.5, [])
         case .zigzag:
             let leadOut = junction.point + junction.normal * (metrics.stroke * zigzagLeadOut)

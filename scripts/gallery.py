@@ -4,7 +4,7 @@ sheets, plus zoomed crops of each sign-to-shaft junction. Nothing is drawn on th
 
 Usage: scripts/gallery.py <bigarrow-binary> <out-dir>
 Writes <out-dir>/gallery.png (full arrows), <out-dir>/junctions.png (zoomed joints) and
-<out-dir>/looks.png (every border style and colour option).
+<out-dir>/looks.png (every border style and colour option) and <out-dir>/spirals.png.
 """
 from __future__ import annotations
 
@@ -57,6 +57,15 @@ def looks() -> list[Case]:
         Case("--color yellow --close-button", ["--color", "yellow", "--close-button"]),
         Case("--style box --border-color black", ["--style", "box", "--color", "orange", "--border-color", "black"]),
         Case("--style ring --border black", ["--style", "ring", "--color", "teal", "--border", "black"]),
+    ]
+
+
+def spirals() -> list[Case]:
+    """`--shape spiral` in a few looks, for the README."""
+    return [
+        Case("--shape spiral", ["--shape", "spiral"]),
+        Case("--shape spiral --color purple --size S", ["--shape", "spiral", "--color", "purple", "--size", "S"]),
+        Case("--shape spiral --color green --border white-black", ["--shape", "spiral", "--color", "green", "--border", "white-black"]),
     ]
 
 
@@ -119,11 +128,17 @@ def main() -> None:
         png = out_dir / f"look-{index:02d}.png"
         render(binary, case, png)
         variants.append((png, case.name))
+    loops: list[tuple[Path, str]] = []
+    for index, case in enumerate(spirals()):
+        png = out_dir / f"spiral-{index:02d}.png"
+        render(binary, case, png)
+        loops.append((png, case.name))
     tool = sheet_tool(out_dir)
     sheet(tool, out_dir / "gallery.png", 4, 520, full)
     sheet(tool, out_dir / "junctions.png", 5, 300, zoomed)
     sheet(tool, out_dir / "looks.png", 3, 600, variants)
-    for name in ("gallery.png", "junctions.png", "looks.png"):
+    sheet(tool, out_dir / "spirals.png", 3, 600, loops)
+    for name in ("gallery.png", "junctions.png", "looks.png", "spirals.png"):
         print(out_dir / name)
 
 

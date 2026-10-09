@@ -65,19 +65,21 @@ public struct OverlayLayout: Sendable {
         let mark = mark(for: local, style: request.style)
         let marked = mark.area ?? CGRect(origin: local.anchor, size: .zero)
         let metrics = request.size.metrics
+        // A spiral's loop is placed as part of the sign, so it stays on screen and clear of the target.
+        let pad = request.shape == .spiral ? Spiral.padding(around: request.signSize, metrics: metrics) : .zero
+        let padded = CGSize(width: request.signSize.width + pad.width * 2, height: request.signSize.height + pad.height * 2)
         let placement = Placement.place(
-            sign: request.signSize, around: marked, in: display.localVisibleBounds,
+            sign: padded, around: marked, in: display.localVisibleBounds,
             reach: metrics.reach, forced: request.forced, avoiding: request.others
         )
-        let tip = tipPoint(local: local, mark: mark, toward: placement.signRect.center)
-        let outline = SignOutline(
-            rect: placement.signRect, cornerRadius: request.corners.radius(height: placement.signRect.height)
-        )
+        let signRect = placement.signRect.insetBy(dx: pad.width, dy: pad.height)
+        let tip = tipPoint(local: local, mark: mark, toward: signRect.center)
+        let outline = SignOutline(rect: signRect, cornerRadius: request.corners.radius(height: signRect.height))
         let arrow = ArrowGeometry(
             tip: tip, sign: outline, bounds: display.localBounds, style: ArrowGeometry.Style(metrics: metrics, shape: request.shape)
         )
         return OverlayLayout(
-            display: display, mark: mark, signRect: placement.signRect,
+            display: display, mark: mark, signRect: signRect,
             direction: placement.direction, arrow: arrow, size: request.size
         )
     }
