@@ -24,7 +24,11 @@ struct TargetOptions: ParsableArguments {
     @Option(help: help("Point at the UI element with this label (needs Accessibility for your terminal).", "label"))
     var element: String?
 
-    @Option(help: help("App for --element (default: the frontmost app).", "name"))
+    @Option(help: help(
+        "The app the target is in, 'App' or 'App:window or tab title'. It comes to the front first, and the arrow "
+            + "hides while another app covers the target. With --element: the app to search (default: the frontmost app).",
+        "app[:title]"
+    ))
     var app: String?
 
     @Option(help: help("Only match --element elements with this role, e.g. button.", "role"))
@@ -42,8 +46,8 @@ struct TargetOptions: ParsableArguments {
     @Option(help: help("With --at or --rect: coordinates are relative to display N (1-based, see 'bigarrow doctor').", "n"))
     var display: Int?
 
-    @Flag(help: "Bring the target's app (and its window) to the front first, so the arrow points at something visible.")
-    var raise = false
+    @Flag(name: .customLong("no-raise"), help: "Leave the windows as they are; by default the target's app and window come to the front.")
+    var noRaise = false
 }
 
 struct LookOptions: ParsableArguments {
@@ -76,7 +80,7 @@ struct LookOptions: ParsableArguments {
 }
 
 struct BehaviourOptions: ParsableArguments {
-    @Option(help: help("Seconds to show the arrow (point: 8, start/--close-button/--until-click: 0). 0 = until stopped.", "seconds"))
+    @Option(help: help("Seconds to show the arrow (point: 8, start/--close-button/--until-click: 300). 0 = until stopped.", "seconds"))
     var duration: Double?
 
     @Flag(help: "Return at once and leave the arrow up in the background; prints the pid.")

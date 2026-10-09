@@ -13,15 +13,6 @@ enum TargetSpec {
     case peekabooElement(id: String, snapshot: Data)
     case peekabooWindow(index: Int, list: Data)
 
-    /// The app `--raise` brings to the front, and the window title to raise with it.
-    var raiseApp: (app: String, windowTitle: String?)? {
-        switch self {
-        case .window(let query, _): (query.app, query.title)
-        case .element(_, let app?): (app, nil)
-        default: nil
-        }
-    }
-
     /// Only targets that can move are re-resolved by `--follow`.
     var isFollowable: Bool {
         switch self {

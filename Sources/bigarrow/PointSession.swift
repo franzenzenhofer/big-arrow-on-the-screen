@@ -4,6 +4,12 @@ import BigArrowOverlay
 import BigArrowTargeting
 import Foundation
 
+/// Why an arrow is hidden without ending.
+enum HideReason {
+    case targetMissing
+    case covered
+}
+
 /// One arrow on screen, from show to dismissal. The process exits when it ends.
 @MainActor
 final class PointSession {
@@ -17,6 +23,10 @@ final class PointSession {
     var clicks: ClickWatcher?
     var follower: Follower?
     var displayWatcher: DisplayWatcher?
+    var binder: HomeBinder?
+    var ownerWatch: OwnerWatch?
+    let owner = ArrowOwner.current
+    private var hiddenBecause: Set<HideReason> = []
     var signalSources: [DispatchSourceSignal] = []
     var finished = false
 
@@ -45,7 +55,27 @@ final class PointSession {
             }
         }
         if config.follow { follower = Follower(session: self) }
+        if let home = config.home { binder = HomeBinder(session: self, app: home.app) }
+        watchOwner()
         if config.say { DispatchQueue.main.async { MainActor.assumeIsolated { self.speak() } } }
+    }
+
+    /// The arrow is hidden while any reason holds, and shown again when none does.
+    func setHidden(_ hidden: Bool, because reason: HideReason) {
+        let wasHidden = !hiddenBecause.isEmpty
+        if hidden { hiddenBecause.insert(reason) } else { hiddenBecause.remove(reason) }
+        guard hiddenBecause.isEmpty == wasHidden else { return }
+        if wasHidden { overlay.unhide() } else { overlay.hide() }
+    }
+
+    /// An owner that is already gone ends the arrow at once.
+    func watchOwner() {
+        guard let pid = owner.pid else { return }
+        guard PidRegistry.isProcessAlive(pid) else {
+            DispatchQueue.main.async { MainActor.assumeIsolated { self.finish(.ownerGone) } }
+            return
+        }
+        ownerWatch = OwnerWatch(pid: pid) { [weak self] in self?.finish(.ownerGone) }
     }
 
     /// Replaces the arrow with a new plan, without the entrance animation.
@@ -70,11 +100,13 @@ final class PointSession {
 
     func writeRecord() throws {
         let display = planned.layout.display
-        try registry.write(ArrowRecord(
+        var record = ArrowRecord(
             pid: getpid(), text: config.text, target: planned.resolved.shape.anchor, display: display.index + 1,
             sign: (planned.layout.signRect.offsetBy(dx: display.frame.minX, dy: display.frame.minY), planned.layout.direction.rawValue),
             startedAt: startedAt
-        ))
+        )
+        record.owner = owner.pid == nil && owner.session == nil ? nil : owner
+        try registry.write(record)
     }
 
     /// Without the permission: exit 4, unless an explicit --duration lets the timer end it instead.
@@ -142,6 +174,8 @@ final class PointSession {
         speech?.terminate()
         clicks?.stop()
         follower?.stop()
+        binder?.stop()
+        ownerWatch?.stop()
         overlay.dismiss {
             self.registry.remove(pid: getpid())
             var result = PointResult(pid: getpid(), resolved: self.planned.resolved, layout: self.planned.layout)

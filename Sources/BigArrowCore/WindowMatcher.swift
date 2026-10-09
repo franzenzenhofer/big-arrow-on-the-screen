@@ -133,4 +133,11 @@ public enum WindowMatcher {
         let names = apps.filter { pids.contains($0.pid) }.compactMap(\.name)
         return Array(Set(names)).sorted()
     }
+
+    /// True when the frontmost normal window under `point` belongs to another app than `pids`.
+    /// Nothing under the point (menu bar, Dock, desktop) does not count as covered.
+    public static func isCovered(_ point: CGPoint, owners pids: Set<Int32>, windows: [WindowInfo]) -> Bool {
+        guard let top = windows.first(where: { $0.isVisibleAppWindow && $0.bounds.contains(point) }) else { return false }
+        return !pids.contains(top.ownerPID)
+    }
 }

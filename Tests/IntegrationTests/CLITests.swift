@@ -131,7 +131,7 @@ struct CLITests {
     }
 
     @Test(
-        "A dry run never raises an app, even with --raise",
+        "A dry run never raises an app, although --window raises by default",
         .enabled(if: ProcessInfo.processInfo.environment["BIGARROW_SCREEN_TESTS"] == "1", "a regression would steal the focus")
     )
     func dryRunDoesNotRaise() async throws {
@@ -143,9 +143,30 @@ struct CLITests {
             print("skipped: no second regular app is running")
             return
         }
-        _ = try BigArrowProcess.run(["point", "--window", name, "--raise", "--text", "x", "--dry-run"])
+        _ = try BigArrowProcess.run(["point", "--window", name, "--text", "x", "--dry-run"])
         let after = await MainActor.run { NSWorkspace.shared.frontmostApplication }
         #expect(after == front)
+    }
+
+    @Test("--window names its own app, so --app next to it is bad input")
+    func windowWithApp() throws {
+        let result = try BigArrowProcess.run(["point", "--window", "Finder", "--app", "Finder", "--text", "x", "--dry-run"])
+        #expect(result.code == 2)
+        #expect(result.stderr.contains("drop --app"))
+    }
+
+    @Test("--app works with coordinate targets and --no-raise is accepted")
+    func appWithCoordinates() throws {
+        let result = try BigArrowProcess.run(["point", "--at", "10,10", "--app", "Finder", "--no-raise", "--text", "x", "--dry-run"])
+        #expect(result.code == 0, "\(result.stderr)")
+    }
+
+    @Test("stop --hook prints nothing and exits 0, also for a session without arrows")
+    func stopHook() throws {
+        let result = try BigArrowProcess.run(["stop", "--hook"], stdin: Data(#"{"session_id":"no-such-session","prompt":"hi"}"#.utf8))
+        #expect(result.code == 0)
+        #expect(result.stdout.isEmpty)
+        #expect(try BigArrowProcess.run(["stop", "--hook"], stdin: Data("not json".utf8)).code == 0)
     }
 
     @Test("doctor reports displays and the permission owner as JSON")

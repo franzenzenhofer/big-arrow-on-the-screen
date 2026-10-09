@@ -5,8 +5,12 @@ import Foundation
 struct ClearCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "clear",
-        abstract: "Remove the newest live arrow (--all: every arrow, --pid: one arrow). Alias: stop.",
-        discussion: "Run it once the human has acted. Arrows fade out and their processes exit 0.",
+        abstract: "Remove the newest live arrow (--all: every arrow, --pid: one, --session: one agent session's). Alias: stop.",
+        discussion: """
+        Run it once the human has acted. Arrows fade out and their processes exit 0.
+        --hook reads a Claude Code hook payload on stdin and silently clears that session's arrows;
+        as a UserPromptSubmit hook, every arrow of a session goes away when the human answers.
+        """,
         aliases: ["stop"]
     )
 
@@ -15,6 +19,12 @@ struct ClearCommand: ParsableCommand {
 
     @Option(help: ArgumentHelp("Remove the arrow with this pid.", valueName: "pid"))
     var pid: Int32?
+
+    @Option(help: ArgumentHelp("Remove every arrow drawn from this agent session.", valueName: "id"))
+    var session: String?
+
+    @Flag(help: "Read {\"session_id\"} from stdin (a Claude Code hook), clear that session's arrows, print nothing.")
+    var hook = false
 
     @Flag(help: "Print a JSON result.")
     var json = false
@@ -28,11 +38,11 @@ struct ClearCommand: ParsableCommand {
     static let pollInterval: useconds_t = 5_000
 
     func run() throws {
-        let live = PidRegistry().live()
-        let chosen = try choose(from: live)
-        chosen.forEach { kill($0.pid, SIGTERM) }
-        waitUntilGone(chosen.map(\.pid))
-        let pids = chosen.map(\.pid)
+        if hook {
+            clear(Self.hookSession().map { session in PidRegistry().live().filter { $0.owner?.session == session } } ?? [])
+            return
+        }
+        let pids = clear(try choose(from: PidRegistry().live()))
         if json {
             Output.json(Result(cleared: pids))
         } else {
@@ -40,7 +50,22 @@ struct ClearCommand: ParsableCommand {
         }
     }
 
+    @discardableResult
+    func clear(_ chosen: [ArrowRecord]) -> [Int32] {
+        chosen.forEach { kill($0.pid, SIGTERM) }
+        waitUntilGone(chosen.map(\.pid))
+        return chosen.map(\.pid)
+    }
+
+    /// The `session_id` of a hook payload on stdin; nil when there is none.
+    static func hookSession() -> String? {
+        let data = FileHandle.standardInput.readDataToEndOfFile()
+        let payload = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+        return (payload?["session_id"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+    }
+
     func choose(from live: [ArrowRecord]) throws -> [ArrowRecord] {
+        if let session { return live.filter { $0.owner?.session == session } }
         if let pid {
             guard let record = live.first(where: { $0.pid == pid }) else {
                 throw BigArrowError.unresolvable("no live arrow with pid \(pid)")

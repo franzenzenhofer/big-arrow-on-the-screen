@@ -11,6 +11,8 @@ enum ClickDismissal: Equatable {
 /// Validated `point` input. Every check that can fail on bad input happens here, before drawing.
 struct PointConfig {
     static let defaultDuration: Double = 8
+    /// Arrows that wait for the human still end by themselves, in case nobody runs `stop`.
+    static let humanWaitDuration: Double = 300
 
     let target: TargetSpec
     let text: String
@@ -28,6 +30,8 @@ struct PointConfig {
     let follow: Bool
     let click: ClickDismissal
     let closeButton: Bool
+    /// The app (and window or tab) the target is in: raised first, and the arrow hides while it is covered.
+    let home: WindowQuery?
     let raise: Bool
     let mode: PointMode
     let json: Bool
@@ -39,7 +43,8 @@ struct PointConfig {
 
     init(target options: TargetOptions, look: LookOptions, behaviour: BehaviourOptions, mode: PointMode) throws {
         self.mode = mode
-        let (target, stdinSnapshot) = try Self.target(options)
+        home = try Self.home(options)
+        let (target, stdinSnapshot) = try Self.target(options, app: home?.app)
         self.target = target
         self.stdinSnapshot = stdinSnapshot
         text = look.text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -55,15 +60,12 @@ struct PointConfig {
         closeButton = behaviour.closeButton
         durationExplicit = behaviour.duration != nil
         let waitsForHuman = click != .off || closeButton || mode == .background
-        duration = behaviour.duration ?? (waitsForHuman ? 0 : Self.defaultDuration)
+        duration = behaviour.duration ?? (waitsForHuman ? Self.humanWaitDuration : Self.defaultDuration)
         guard duration >= 0, duration.isFinite else { throw BigArrowError.badInput("--duration must be 0 or more seconds") }
         (say, voice, json, dryRun) = (behaviour.say, behaviour.voice, behaviour.json, behaviour.dryRun)
         detach = behaviour.detach || mode == .background
         png = behaviour.png
-        raise = options.raise
-        guard !raise || target.raiseApp != nil else {
-            throw BigArrowError.badInput("--raise needs --window App or --element with --app")
-        }
+        raise = home != nil && !options.noRaise
         follow = behaviour.follow
         guard !follow || target.isFollowable else { throw BigArrowError.badInput("--follow works with --window and --element only") }
     }
@@ -77,7 +79,16 @@ struct PointConfig {
         }
     }
 
-    static func target(_ options: TargetOptions) throws -> (TargetSpec, Data?) {
+    /// `--window App[:title]` is its own home; every other target may name one with `--app`.
+    static func home(_ options: TargetOptions) throws -> WindowQuery? {
+        if let window = options.window {
+            guard options.app == nil else { throw BigArrowError.badInput("--window already names the app, drop --app") }
+            return try WindowQuery(window)
+        }
+        return try options.app.map(WindowQuery.init)
+    }
+
+    static func target(_ options: TargetOptions, app: String?) throws -> (TargetSpec, Data?) {
         let given = [
             options.at != nil, options.rect != nil, options.mouse, options.window != nil,
             options.element != nil, options.peekaboo != nil, options.peekabooWindow != nil
@@ -97,7 +108,7 @@ struct PointConfig {
             return (.window(try WindowQuery(window), try WindowAnchor.parse(options.anchor)), nil)
         }
         if let element = options.element {
-            return (.element(try ElementQuery(text: element, role: options.role), app: options.app), nil)
+            return (.element(try ElementQuery(text: element, role: options.role), app: app), nil)
         }
         let (data, fromStdin) = try snapshotData(options.snapshot)
         if let id = options.peekaboo { return (.peekabooElement(id: id, snapshot: data), fromStdin ? data : nil) }

@@ -19,8 +19,8 @@ struct PointRunner {
     func run() throws {
         OverlayApplication.prepare()
         // A dry run or a PNG render changes nothing on screen, so it never raises an app.
-        if config.raise, !config.dryRun, config.png == nil, let raise = config.target.raiseApp {
-            _ = try AppRaiser.raise(app: raise.app, windowTitle: raise.windowTitle, screens: ScreenReader.current())
+        if config.raise, !config.dryRun, config.png == nil, let home = config.home {
+            _ = try AppRaiser.raise(app: home.app, windowTitle: home.title, screens: ScreenReader.current())
         }
         let screens = ScreenReader.current()
         let planned = try plan(config.target.resolve(screens: screens), screens: screens)

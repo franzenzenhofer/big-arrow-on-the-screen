@@ -37,7 +37,7 @@ final class Follower {
         }
         if goneSince != nil {
             goneSince = nil
-            session.overlay.unhide()
+            session.setHidden(false, because: .targetMissing)
         }
         let previous = session.planned.resolved.shape
         guard moved(from: previous, to: resolved.shape) else { return }
@@ -47,7 +47,7 @@ final class Follower {
     func targetMissing(_ session: PointSession) {
         let since = goneSince ?? Date()
         goneSince = since
-        session.overlay.hide()
+        session.setHidden(true, because: .targetMissing)
         if session.config.duration > 0, Date().timeIntervalSince(since) >= Self.goneLimit {
             session.finish(.targetGone)
         }

@@ -44,10 +44,56 @@ check "follow tracked the moved button (window moved down 76 pt)" "python3 -c \"
 "$OUT/backdrop" & BACKDROP=$!
 sleep 2
 
-# --raise brings the target app to the front before pointing.
+# The target's app comes to the front by default; --no-raise leaves it where it is.
 $KIT activate Finder
-$BIN point --window backdrop --raise --text "Raised" --duration 1 --json > "$OUT/raise.json"
-check "raise brought the target app to the front" "[ \"\$($KIT frontmost)\" = backdrop ]"
+$BIN point --window backdrop --no-raise --text "Not raised" --duration 1 > /dev/null
+check "--no-raise leaves the front app alone" "[ \"\$($KIT frontmost)\" = Finder ]"
+$BIN point --window backdrop --text "Raised" --duration 1 --json > "$OUT/raise.json"
+check "the target app comes to the front by default" "[ \"\$($KIT frontmost)\" = backdrop ]"
+
+# Bound to its app: the arrow hides while another app's window covers the target, and returns.
+cp "$OUT/backdrop" "$OUT/coverapp"
+$BIN start --element Allow --app backdrop --text "Bound to backdrop" --color red --no-animation --json > "$OUT/bound.json"
+read -r SX SY < <(python3 -c "import json; s=json.load(open('$OUT/bound.json'))['sign']; print(int(s[0]+14), int(s[1]+s[3]/2))")
+sleep 1; read -r R G B < <($KIT pixel "$SX" "$SY")
+check "a bound arrow shows while its target is visible ($R $G $B)" "[ $R -gt 200 ] && [ $G -lt 120 ]"
+"$OUT/coverapp" --title "Cover" --message "Covers the dialog" & COVER=$!
+sleep 3; screencapture -x "$OUT/bound-covered.png"
+read -r R G B < <($KIT pixel "$SX" "$SY")
+check "the arrow hides while another app covers its target ($R $G $B)" "! { [ $R -gt 200 ] && [ $G -lt 120 ]; }"
+kill $COVER; sleep 2
+read -r R G B < <($KIT pixel "$SX" "$SY")
+check "the arrow returns once the target is visible again ($R $G $B)" "[ $R -gt 200 ] && [ $G -lt 120 ]"
+$BIN stop --all > /dev/null
+
+# An arrow ends when the agent process that drew it exits.
+sleep 60 & OWNER=$!
+BIGARROW_OWNER_PID=$OWNER BIGARROW_SESSION=ci-session $BIN start --at 300,300 --text "Owned" --json > "$OUT/owned.json"
+OWNED=$(field "$OUT/owned.json" "['pid']")
+kill $OWNER; sleep 1.5
+check "the arrow ends when its owner process exits" "! kill -0 $OWNED 2>/dev/null"
+
+# stop --hook clears exactly the arrows of the hook's session, silently.
+BIGARROW_SESSION=mine $BIN start --at 300,300 --text "Mine" --json > "$OUT/mine.json"
+BIGARROW_SESSION=other $BIN start --at 600,300 --text "Other" --json > "$OUT/other.json"
+HOOK_OUT=$(echo '{"session_id":"mine","prompt":"done"}' | $BIN stop --hook)
+check "stop --hook removed the session's arrow" "! kill -0 $(field "$OUT/mine.json" "['pid']") 2>/dev/null"
+check "stop --hook kept another session's arrow" "kill -0 $(field "$OUT/other.json" "['pid']") 2>/dev/null"
+check "stop --hook printed nothing" "[ -z \"$HOOK_OUT\" ]"
+$BIN stop --all > /dev/null
+
+# --app "Google Chrome:<tab title>" selects a background tab and raises its window.
+CHROME_PROFILE=$(mktemp -d)
+open -na "Google Chrome" --args --user-data-dir="$CHROME_PROFILE" --no-first-run --no-default-browser-check \
+  "data:text/html,<title>Alpha tab</title><h1>Alpha</h1>" "data:text/html,<title>Beta tab</title><h1>Beta</h1>"
+sleep 8; $KIT activate Finder
+$BIN point --at 400,300 --app "Google Chrome:Alpha tab" --text "Alpha" --duration 1 --json > "$OUT/tab.json" 2> "$OUT/tab.err"
+$KIT windows "Google Chrome" | tee "$OUT/chrome-windows.txt"
+check "the tab target exits 0 ($(cat "$OUT/tab.err"))" "[ -s $OUT/tab.json ]"
+check "Chrome came to the front" "[ \"\$($KIT frontmost)\" = 'Google Chrome' ]"
+check "the Alpha tab is now the selected tab" "grep -q 'kCGWindowName=Alpha tab' $OUT/chrome-windows.txt"
+screencapture -x "$OUT/chrome-tab.png"
+pkill -f "user-data-dir=$CHROME_PROFILE"
 
 # --say speaks and still exits 0.
 check "say works" "$BIN point --at 300,300 --text 'Hello from bigarrow' --say --duration 2 > /dev/null"
