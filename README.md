@@ -110,12 +110,15 @@ The agent never sees the password, and the human never retypes a command. In thi
 
 ### Chrome: open the preview
 
-![Chrome, a blue arrow at the address bar: Preview is up: paste http://localhost:5173 here, with a copy icon](docs/images/real/copy-address.png)
+![Chrome, a blue bent arrow with a yellow border and yellow text at the address bar: Preview is up: paste http://localhost:5173 here, the URL on a yellow copy button](docs/images/real/copy-address.png)
 
 ```bash
-bigarrow start --element "Address and search bar" --app "Google Chrome" --from bottom --color blue --size S \
+bigarrow start --element "Address and search bar" --app "Google Chrome" --from bottom-right --size S \
+  --color blue --border-color yellow --text-color yellow \
   --text "Preview is up: paste {{http://localhost:5173}} here"
 ```
+
+The chip takes the sign's text colour, so a yellow-on-blue sign gets a yellow button with the URL in blue.
 
 - Several values per sign work: `"User {{franz}}, password {{correct horse}}"`. A value wider than the sign is shortened in the middle on screen; the whole value is copied.
 - A click on the chip copies and keeps the arrow; a click anywhere else on the sign or the shaft still removes it. No permission: the clipboard needs none.
