@@ -20,6 +20,7 @@ final class PointSession {
     let registry = PidRegistry()
     let startedAt = Date()
     var speech: Process?
+    var horn: NSSound?
     var clicks: ClickWatcher?
     var follower: Follower?
     var displayWatcher: DisplayWatcher?
@@ -55,6 +56,7 @@ final class PointSession {
         if config.follow { follower = Follower(session: self) }
         if let home = config.home { binder = HomeBinder(session: self, app: home.app) }
         watchOwner()
+        if config.airhorn { horn = Airhorn.play() }
         if config.say { DispatchQueue.main.async { MainActor.assumeIsolated { self.speak() } } }
     }
 
@@ -170,6 +172,7 @@ final class PointSession {
         guard !finished else { return }
         finished = true
         speech?.terminate()
+        horn?.stop()
         clicks?.stop()
         follower?.stop()
         binder?.stop()

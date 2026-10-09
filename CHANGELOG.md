@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `--airhorn` plays an airhorn once when the arrow shows, at the current output volume. It never touches the system volume or mute. The sound (`skill/big-arrow/sounds/airhorn.wav`, CC0) ships in the skill folder, so Homebrew installs it with the skill.
+
 ## [0.4.2] - 2026-10-09
 
 ### Changed

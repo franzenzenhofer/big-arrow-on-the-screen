@@ -101,7 +101,7 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 - `--border shadow|white-black|black`: the default is a white border (dark on light colours) with a drop shadow; `white-black` puts a thin black edge outside the white border instead of the shadow; `black` is just a thin black outline
 - Every colour is yours: `--border-color`, `--text-color`, `--edge-color`, and for the X `--close-color` and `--close-x-color`. Left out, each picks a readable colour itself
 - `--close-button` puts an X inside the sign's right end (white circle, X in the arrow colour), where it never covers the text or leaves the screen
-- `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
+- `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign, `--airhorn` plays an airhorn at your current volume
 - Several arrows at once keep their signs out of each other's way
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.

@@ -30,6 +30,7 @@ struct PointConfig {
     let tints: [WritableKeyPath<SignAppearance, ArrowColor?>: ArrowColor]
     let say: Bool
     let voice: String?
+    let airhorn: Bool
     let follow: Bool
     let click: ClickDismissal
     let closeButton: Bool
@@ -69,7 +70,7 @@ struct PointConfig {
         guard duration >= 0, duration.isFinite else { throw BigArrowError.badInput("--duration must be 0 or more seconds") }
         (say, voice, json, dryRun) = (behaviour.say, behaviour.voice, behaviour.json, behaviour.dryRun)
         detach = behaviour.detach || mode == .background
-        png = behaviour.png
+        (png, airhorn) = (behaviour.png, behaviour.airhorn)
         raise = home != nil && !options.noRaise
         follow = behaviour.follow
         guard !follow || target.isFollowable else { throw BigArrowError.badInput("--follow works with --window and --element only") }

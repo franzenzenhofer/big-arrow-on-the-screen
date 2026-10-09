@@ -122,6 +122,9 @@ struct BehaviourOptions: ParsableArguments {
     @Option(help: help("Voice for --say (see 'say -v ?').", "voice"))
     var voice: String?
 
+    @Flag(help: "Play an airhorn once when the arrow shows, at the current volume (a muted Mac stays silent).")
+    var airhorn = false
+
     @Flag(help: "Re-resolve --window or --element every 250 ms and move the arrow with it.")
     var follow = false
 
