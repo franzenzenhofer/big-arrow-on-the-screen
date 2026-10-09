@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-09
+
+### Changed
+- The default look is the white border with a drop shadow again, exactly as in 0.1.x.
+- `--border shadow|white-black|black` replaces `--shadow`: `white-black` is the white border with a thin black edge outside it, `black` a thin black outline only.
+- The X of `--close-button` is a white circle with the X in the arrow colour by default.
+
+### Added
+- `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color`: every colour of the arrow can be set; left out, each picks a readable colour.
+- The README shows every border style and colour option (`scripts/gallery.py` writes `looks.png`).
+
+### Fixed
+- The sign's black edge no longer cuts through the white border where the shaft meets the sign: it is drawn below every white border.
+- The drop shadow is never cut off: PNG renders keep a margin wider than the shadow reaches, and signs keep 24 pt from the screen edge (a test fails if the shadow touches the PNG's edge).
+
 ## [0.2.1] - 2026-10-09
 
 ### Fixed

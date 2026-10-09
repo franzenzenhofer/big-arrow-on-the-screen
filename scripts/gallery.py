@@ -3,7 +3,8 @@
 sheets, plus zoomed crops of each sign-to-shaft junction. Nothing is drawn on the screen.
 
 Usage: scripts/gallery.py <bigarrow-binary> <out-dir>
-Writes <out-dir>/gallery.png (full arrows) and <out-dir>/junctions.png (zoomed joints).
+Writes <out-dir>/gallery.png (full arrows), <out-dir>/junctions.png (zoomed joints) and
+<out-dir>/looks.png (every border style and colour option).
 """
 from __future__ import annotations
 
@@ -39,6 +40,24 @@ def cases() -> list[Case]:
         Case("integration test", ["--text", "Integration test", "--at", "680,442"]),
     ]
     return result
+
+
+def looks() -> list[Case]:
+    """Every border style and colour option, for the README's Looks section."""
+    return [
+        Case("default: white border + shadow", []),
+        Case("--border white-black", ["--border", "white-black"]),
+        Case("--border black", ["--border", "black"]),
+        Case("--close-button", ["--close-button"]),
+        Case("--border-color yellow --text-color yellow", ["--color", "blue", "--border-color", "yellow", "--text-color", "yellow"]),
+        Case("--close-color black --close-x-color white", ["--close-button", "--close-color", "black", "--close-x-color", "white"]),
+        Case("--color black --border white-black", ["--color", "black", "--border", "white-black"]),
+        Case("--color white --border black", ["--color", "white", "--border", "black"]),
+        Case("--edge-color purple --border white-black", ["--color", "green", "--border", "white-black", "--edge-color", "purple"]),
+        Case("--color yellow --close-button", ["--color", "yellow", "--close-button"]),
+        Case("--style box --border-color black", ["--style", "box", "--color", "orange", "--border-color", "black"]),
+        Case("--style ring --border black", ["--style", "ring", "--color", "teal", "--border", "black"]),
+    ]
 
 
 def render(binary: str, case: Case, out: Path) -> dict:
@@ -95,11 +114,17 @@ def main() -> None:
         crop(png, result, zoom)
         full.append((png, case.name))
         zoomed.append((zoom, case.name))
+    variants: list[tuple[Path, str]] = []
+    for index, case in enumerate(looks()):
+        png = out_dir / f"look-{index:02d}.png"
+        render(binary, case, png)
+        variants.append((png, case.name))
     tool = sheet_tool(out_dir)
     sheet(tool, out_dir / "gallery.png", 4, 520, full)
     sheet(tool, out_dir / "junctions.png", 5, 300, zoomed)
-    print(out_dir / "gallery.png")
-    print(out_dir / "junctions.png")
+    sheet(tool, out_dir / "looks.png", 3, 600, variants)
+    for name in ("gallery.png", "junctions.png", "looks.png"):
+        print(out_dir / name)
 
 
 if __name__ == "__main__":

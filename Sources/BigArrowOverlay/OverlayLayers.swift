@@ -6,24 +6,29 @@ import BigArrowCore
 ///
 /// The arrow reads as one shape: every contrast border sits below every coloured fill, so the
 /// head and the shaft share one continuous border, and the coloured shaft is drawn over the
-/// sign, so it grows out of the sign without a line across it. Without a shadow a thin black
-/// edge runs outside the border; with `--shadow`, one shadow for the whole thing instead.
+/// sign, so it grows out of the sign without a line across it. By default one drop shadow for
+/// the whole thing; `--border white-black` adds a thin black edge outside the border instead,
+/// and `--border black` replaces the border with a thin black outline.
 @MainActor
 struct OverlayLayers {
     let root = CALayer()
     let shaftLayers: [CAShapeLayer]
     let headLayers: [CAShapeLayer]
     let markGroup = CALayer()
+    let signEdge = CALayer()
     let sign = CALayer()
     let signText = CALayer()
     /// Display-local top-left points to the panel's bottom-left points.
     let flip: CGAffineTransform
 
     static let outlineWidth: CGFloat = 6
-    /// Added outside the border when there is no shadow: 1.5 pt of black on each side.
+    /// The thin black line, added to a stroke's width: 1.5 pt on each side.
     static let edgeWidth: CGFloat = 3
-    static let edgeColor = CGColor(gray: 0, alpha: 1)
     static let markLineWidth: CGFloat = 6
+    static let shadowRadius: CGFloat = 10
+    static let shadowDrop: CGFloat = 3
+    /// How far the shadow reaches past the arrow: Core Animation blurs over about twice its radius.
+    public static let shadowReach: CGFloat = shadowRadius * 2 + shadowDrop
 
     init(layout: OverlayLayout, sign image: SignImage, appearance: SignAppearance) {
         let color = appearance.color
@@ -32,11 +37,10 @@ struct OverlayLayers {
         flip = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: height)
         let (shaft, head) = (Self.transformed(layout.arrow.shaftPath, flip), Self.transformed(layout.arrow.headPath, flip))
         let stroke = layout.size.metrics.stroke
-        let edge = appearance.shadow == .none
         let rootPath = Self.transformed(layout.arrow.root.path, flip)
-        let shaftBorders = Self.borders(color: color, edge: edge) { Self.stroked(shaft, color: $0, width: stroke + $1) }
-        let headBorders = Self.borders(color: color, edge: edge) { Self.filled(head, color: $0, outline: $1) }
-        let rootBorders = Self.borders(color: color, edge: edge) { Self.filled(rootPath, color: $0, outline: $1) }
+        let shaftBorders = Self.borders(appearance) { Self.stroked(shaft, color: $0, width: stroke + $1) }
+        let headBorders = Self.borders(appearance) { Self.filled(head, color: $0, outline: $1) }
+        let rootBorders = Self.borders(appearance) { Self.filled(rootPath, color: $0, outline: $1) }
         let colorShaft = Self.stroked(shaft, color: color.cgColor, width: stroke)
         let colorHead = Self.filled(head, color: color.cgColor, outline: 0)
         let colorRoot = Self.filled(rootPath, color: color.cgColor, outline: 0)
@@ -45,24 +49,28 @@ struct OverlayLayers {
         let tip = layout.arrow.tip.applying(flip)
         for layer in [root, markGroup] + shaftLayers + headLayers { layer.frame = bounds }
         for layer in headLayers { Self.pin(layer, at: tip, in: bounds) }
-        markGroup.sublayers = Self.markLayers(layout.mark, flip: flip, color: color, edge: edge)
+        markGroup.sublayers = Self.markLayers(layout.mark, flip: flip, appearance: appearance)
         let signFrame = Self.flipped(layout.signRect, height: height)
-        for (layer, contents) in [(sign, image.body), (signText, image.text)] {
+        for (layer, contents) in [(signEdge, image.edge), (sign, image.body), (signText, image.text)] {
             layer.contents = contents
             layer.contentsScale = layout.display.scale
             layer.frame = signFrame
         }
-        if !edge { Self.shadow(root) }
-        // Every black edge below every white border, or the flare's edge cuts across the shaft's border.
+        if appearance.border.hasShadow { Self.shadow(root) }
+        // Every black edge (the sign's too) below every white border, or a black line cuts through the white.
         let parts = [shaftBorders, headBorders, rootBorders]
         let edges = parts.flatMap { $0.dropLast() }
-        root.sublayers = [markGroup] + edges + parts.compactMap(\.last) + [sign, colorShaft, colorRoot, colorHead, signText]
+        root.sublayers = [markGroup] + edges + [signEdge] + parts.compactMap(\.last)
+            + [sign, colorShaft, colorRoot, colorHead, signText]
     }
 
-    /// The contrast border of one part, and below it, without a shadow, the black edge.
-    static func borders(color: ArrowColor, edge: Bool, _ make: (CGColor, CGFloat) -> CAShapeLayer) -> [CAShapeLayer] {
-        let border = make(color.contrast.cgColor, outlineWidth)
-        return edge ? [make(edgeColor, outlineWidth + edgeWidth), border] : [border]
+    /// The border layers of one part, outermost first.
+    static func borders(_ look: SignAppearance, _ make: (CGColor, CGFloat) -> CAShapeLayer) -> [CAShapeLayer] {
+        switch look.border {
+        case .shadow: [make(look.borderTint.cgColor, outlineWidth)]
+        case .whiteBlack: [make(look.edgeTint.cgColor, outlineWidth + edgeWidth), make(look.borderTint.cgColor, outlineWidth)]
+        case .black: [make(look.edgeTint.cgColor, edgeWidth)]
+        }
     }
 
     static func transformed(_ path: CGPath, _ transform: CGAffineTransform) -> CGPath {
@@ -102,15 +110,15 @@ struct OverlayLayers {
         return layer
     }
 
-    /// A short, soft drop shadow straight down (the content view is not flipped, so -y is down).
+    /// The drop shadow, straight down (the content view is not flipped, so -y is down).
     static func shadow(_ layer: CALayer) {
         layer.shadowColor = CGColor(gray: 0, alpha: 1)
-        layer.shadowOpacity = 0.3
-        layer.shadowRadius = 5
-        layer.shadowOffset = CGSize(width: 0, height: -2)
+        layer.shadowOpacity = 0.35
+        layer.shadowRadius = shadowRadius
+        layer.shadowOffset = CGSize(width: 0, height: -shadowDrop)
     }
 
-    static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, color: ArrowColor, edge: Bool) -> [CALayer] {
+    static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, appearance: SignAppearance) -> [CALayer] {
         let path: CGPath
         switch mark {
         case .none:
@@ -122,7 +130,7 @@ struct OverlayLayers {
             path = CGPath(ellipseIn: rect, transform: [flip])
         }
         // Border only, no fill: the human must see exactly what is being pointed at.
-        return borders(color: color, edge: edge) { stroked(path, color: $0, width: markLineWidth + $1) }
-            + [stroked(path, color: color.cgColor, width: markLineWidth)]
+        return borders(appearance) { stroked(path, color: $0, width: markLineWidth + $1) }
+            + [stroked(path, color: appearance.color.cgColor, width: markLineWidth)]
     }
 }

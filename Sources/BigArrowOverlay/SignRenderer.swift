@@ -1,11 +1,13 @@
 import AppKit
 import BigArrowCore
 
-/// The sign: a pill (or square) in the arrow colour with a contrast border (and, without a
-/// shadow, a thin black edge outside it), plus heavy rounded
-/// text in the contrast colour, and with `--close-button` an X in its right end. Body and text are separate images so the arrow's root can be
-/// drawn between them: it blends into the body and never covers a letter.
+/// The sign: a pill (or square) in the arrow colour with its border (see `ArrowBorder`), heavy
+/// rounded text, and with `--close-button` an X in its right end. Edge, body and text are separate
+/// images: the thin black edge goes below every white border of the arrow, so it never cuts
+/// through the white where the shaft meets the sign, and the arrow's root is drawn between body
+/// and text, so it blends into the body and never covers a letter.
 public struct SignImage: @unchecked Sendable {
+    public let edge: CGImage
     public let body: CGImage
     public let text: CGImage
     /// Size in points.
@@ -18,8 +20,9 @@ public enum SignRenderer {
     static let paddingX: CGFloat = 30
     static let paddingY: CGFloat = 16
     static let outline: CGFloat = 3.5
-    /// The black edge outside the border when there is no shadow, as wide as the arrow's.
+    /// The thin black line of `--border white-black` and `black`, as wide as the arrow's per side.
     static let edge: CGFloat = 1.5
+    static let seamOverlap: CGFloat = 0.5
     /// The X: its diameter as a share of the font size (at least the minimum, an easy target),
     /// the gap after the text, and its margin to the sign's edge. On a one-line pill it sits
     /// almost concentric with the rounded end.
@@ -30,13 +33,12 @@ public enum SignRenderer {
 
     /// Shrinks the font until the text fits in `maxLines` lines of `maxWidth`, never below the minimum.
     public static func render(text: String, appearance: SignAppearance, display: Display) -> SignImage {
-        let color = appearance.color
         let maxTextWidth = display.frame.width * ArrowMetrics.maximumSignWidthShare - paddingX * 2
         var fontSize = appearance.size.metrics.fontSize
-        var layout = measure(text, fontSize: fontSize, maxWidth: maxTextWidth, color: color)
+        var layout = measure(text, fontSize: fontSize, maxWidth: maxTextWidth, color: appearance.textTint)
         while layout.lines > ArrowMetrics.maximumLines, fontSize > ArrowMetrics.minimumFontSize {
             fontSize = max(fontSize - 2, ArrowMetrics.minimumFontSize)
-            layout = measure(text, fontSize: fontSize, maxWidth: maxTextWidth, color: color)
+            layout = measure(text, fontSize: fontSize, maxWidth: maxTextWidth, color: appearance.textTint)
         }
         let cross = appearance.closeMark == .cross ? max(crossMinimum, (fontSize * crossShare).rounded()) : 0
         let height = ceil(layout.size.height + paddingY * 2)
@@ -48,26 +50,26 @@ public enum SignRenderer {
         )
         let canvas = Canvas(size: pill, scale: display.scale)
         return SignImage(
+            edge: canvas.render { drawEdge(in: $0, pill: pill, appearance: appearance) },
             body: canvas.render { drawBody(in: $0, pill: pill, appearance: appearance) },
             text: canvas.render { context in
                 drawText(layout, in: context, rect: textRect)
                 if cross > 0 {
                     let center = CGPoint(x: pill.width - crossInset, y: pill.height / 2)
-                    drawCross(in: context, center: center, diameter: cross, color: appearance.color)
+                    drawCross(in: context, center: center, diameter: cross, appearance: appearance)
                 }
             },
             size: pill, fontSize: fontSize, lines: layout.lines
         )
     }
 
-    /// A filled circle in the outline colour (black, or white on near-black signs) with the opposite X.
-    static func drawCross(in context: CGContext, center: CGPoint, diameter: CGFloat, color: ArrowColor) {
+    /// The X button: a filled circle with the X on it, colours from `closeTint` and `closeXTint`.
+    static func drawCross(in context: CGContext, center: CGPoint, diameter: CGFloat, appearance: SignAppearance) {
         let circle = CGRect(x: center.x - diameter / 2, y: center.y - diameter / 2, width: diameter, height: diameter)
-        context.setFillColor(color.outline.cgColor)
+        context.setFillColor(appearance.closeTint.cgColor)
         context.fillEllipse(in: circle)
         let arm = diameter * 0.2
-        let lightCircle = color.outline.isLight
-        context.setStrokeColor(CGColor(gray: lightCircle ? 0 : 1, alpha: 1))
+        context.setStrokeColor(appearance.closeXTint.cgColor)
         context.setLineWidth(max(2.5, diameter * 0.11))
         context.setLineCap(.round)
         context.strokeLineSegments(between: [
@@ -95,7 +97,7 @@ public enum SignRenderer {
         let font = font(fontSize)
         let string = NSAttributedString(string: text, attributes: [
             .font: font, .paragraphStyle: paragraph,
-            .foregroundColor: NSColor(srgbRed: color.contrast.red, green: color.contrast.green, blue: color.contrast.blue, alpha: 1)
+            .foregroundColor: NSColor(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1)
         ])
         let bounds = string.boundingRect(
             with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
@@ -107,21 +109,49 @@ public enum SignRenderer {
         return TextLayout(string: string, size: size, lines: lines)
     }
 
+    /// A rounded rect in the sign's corner style.
+    struct Pill {
+        let rect: CGRect
+        let corners: SignCorners
+    }
+
+    /// The thin black line of `--border white-black` and `black`; nothing for the default.
+    static func drawEdge(in context: CGContext, pill: CGSize, appearance: SignAppearance) {
+        let width = edgeWidth(appearance.border)
+        guard width > 0 else { return }
+        let shape = Pill(rect: CGRect(origin: .zero, size: pill), corners: appearance.corners)
+        stroke(shape, in: context, line: (width, appearance.edgeTint), fill: nil)
+    }
+
+    /// Fill and white border, inside the edge. It overlaps the edge by half a point so no seam shows.
     static func drawBody(in context: CGContext, pill: CGSize, appearance: SignAppearance) {
-        let bounds = CGRect(origin: .zero, size: pill)
-        let edgeWidth = appearance.shadow == .none ? edge : 0
-        if edgeWidth > 0 {
-            context.addPath(pillPath(bounds.insetBy(dx: edgeWidth / 2, dy: edgeWidth / 2), corners: appearance.corners))
-            context.setStrokeColor(CGColor(gray: 0, alpha: 1))
-            context.setLineWidth(edgeWidth)
+        let inset = max(0, edgeWidth(appearance.border) - seamOverlap)
+        let shape = Pill(rect: CGRect(origin: .zero, size: pill).insetBy(dx: inset, dy: inset), corners: appearance.corners)
+        if appearance.border == .black {
+            context.addPath(pillPath(shape.rect, corners: shape.corners))
+            context.setFillColor(appearance.color.cgColor)
+            context.fillPath()
+            return
+        }
+        stroke(shape, in: context, line: (outline, appearance.borderTint), fill: appearance.color)
+    }
+
+    static func edgeWidth(_ border: ArrowBorder) -> CGFloat {
+        border == .shadow ? 0 : edge
+    }
+
+    /// Strokes (and optionally fills) the pill with the line fully inside its rect.
+    static func stroke(_ shape: Pill, in context: CGContext, line: (width: CGFloat, color: ArrowColor), fill: ArrowColor?) {
+        let rect = shape.rect.insetBy(dx: line.width / 2, dy: line.width / 2)
+        context.addPath(pillPath(rect, corners: shape.corners))
+        context.setStrokeColor(line.color.cgColor)
+        context.setLineWidth(line.width)
+        if let fill {
+            context.setFillColor(fill.cgColor)
+            context.drawPath(using: .fillStroke)
+        } else {
             context.strokePath()
         }
-        let inset = edgeWidth + outline / 2
-        context.addPath(pillPath(bounds.insetBy(dx: inset, dy: inset), corners: appearance.corners))
-        context.setFillColor(appearance.color.cgColor)
-        context.setStrokeColor(appearance.color.contrast.cgColor)
-        context.setLineWidth(outline)
-        context.drawPath(using: .fillStroke)
     }
 
     static func pillPath(_ rect: CGRect, corners: SignCorners) -> CGPath {

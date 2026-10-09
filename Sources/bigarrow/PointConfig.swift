@@ -25,7 +25,9 @@ struct PointConfig {
     let corners: SignCorners
     let shape: ArrowShape
     let noAnimation: Bool
-    let shadow: ArrowShadow
+    let border: ArrowBorder
+    /// Optional colours of border, text, thin edge and X button; nil picks one automatically.
+    let tints: [WritableKeyPath<SignAppearance, ArrowColor?>: ArrowColor]
     let say: Bool
     let voice: String?
     let follow: Bool
@@ -57,7 +59,8 @@ struct PointConfig {
         corners = try SignCorners.parse(look.corners)
         shape = try ArrowShape.parse(look.shape)
         noAnimation = look.noAnimation
-        shadow = look.shadow ? .soft : .none
+        border = try ArrowBorder.parse(look.border)
+        tints = try Self.tints(look)
         click = try Self.click(behaviour)
         closeButton = behaviour.closeButton
         durationExplicit = behaviour.duration != nil
@@ -74,9 +77,22 @@ struct PointConfig {
 
     var appearance: SignAppearance {
         var appearance = SignAppearance(color: color, size: size, corners: corners)
-        appearance.shadow = shadow
+        appearance.border = border
+        for (path, tint) in tints { appearance[keyPath: path] = tint }
         appearance.closeMark = closeButton ? .cross : .none
         return appearance
+    }
+
+    static func tints(_ look: LookOptions) throws -> [WritableKeyPath<SignAppearance, ArrowColor?>: ArrowColor] {
+        let given: [(WritableKeyPath<SignAppearance, ArrowColor?>, String?)] = [
+            (\.borderColor, look.borderColor), (\.textColor, look.textColor), (\.edgeColor, look.edgeColor),
+            (\.closeColor, look.closeColor), (\.closeXColor, look.closeXColor)
+        ]
+        var tints: [WritableKeyPath<SignAppearance, ArrowColor?>: ArrowColor] = [:]
+        for (path, raw) in given {
+            if let raw { tints[path] = try ArrowColor.parse(raw) }
+        }
+        return tints
     }
 
     static func click(_ behaviour: BehaviourOptions) throws -> ClickDismissal {

@@ -161,6 +161,18 @@ struct CLITests {
         #expect(result.code == 0, "\(result.stderr)")
     }
 
+    @Test("--border and every colour option are accepted; unknown values are bad input")
+    func lookOptions() throws {
+        let base = ["point", "--at", "10,10", "--text", "x", "--dry-run"]
+        let colours = ["--border-color", "red", "--text-color", "#00FF00", "--edge-color", "purple",
+                       "--close-color", "black", "--close-x-color", "white", "--close-button"]
+        for border in ["shadow", "white-black", "black"] {
+            #expect(try BigArrowProcess.run(base + ["--border", border] + colours).code == 0, "--border \(border)")
+        }
+        #expect(try BigArrowProcess.run(base + ["--border", "glow"]).code == 2)
+        #expect(try BigArrowProcess.run(base + ["--text-color", "rainbow"]).code == 2)
+    }
+
     @Test("stop --hook prints nothing and exits 0, also for a session without arrows")
     func stopHook() throws {
         let result = try BigArrowProcess.run(["stop", "--hook"], stdin: Data(#"{"session_id":"no-such-session","prompt":"hi"}"#.utf8))

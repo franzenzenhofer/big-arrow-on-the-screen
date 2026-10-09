@@ -40,8 +40,9 @@ public enum ApproachDirection: String, CaseIterable, Sendable, Codable {
 public enum Placement {
     /// Side of the square zone around the target the sign never covers.
     public static let keepOutSide: CGFloat = 120
-    /// Gap between the sign and the edge of the usable area.
-    public static let margin: CGFloat = 16
+    /// Gap between the sign and the edge of the usable area, wide enough for the drop shadow
+    /// (radius 10, 3 pt down, about 23 pt of blur) to fade out fully before a screen edge.
+    public static let margin: CGFloat = 24
     static let reachScales: [CGFloat] = [1.0, 0.75, 1.4, 0.55, 1.9, 2.5]
     /// Score cost per unit of reach change: a cramped or overlong arrow only wins when the
     /// preferred length does not fit.
