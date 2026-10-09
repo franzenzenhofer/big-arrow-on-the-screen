@@ -99,14 +99,21 @@ Sometimes the human has to paste something: a command the agent may not run, a U
 
 ### Terminal: a sudo command the agent must not type
 
-![Terminal, a failed xcodebuild: You have not agreed to the Xcode license agreements, admin privileges required. A red arrow at the prompt line: Franz, Xcode needs your password once. Copy [sudo xcodebuild -license accept, with a check: just copied] paste it here, press Return. The command is already pasted at the prompt.](docs/images/real/copy-terminal.png)
+**Before the click:** the command on a copy button, the arrow at the prompt.
+
+![Terminal, a failed xcodebuild: You have not agreed to the Xcode license agreements, admin privileges required. A blue arrow with a yellow border at the empty prompt line: Franz, Xcode needs your password once. Copy [sudo xcodebuild -license accept, copy icon] paste it here, press Return.](docs/images/real/copy-terminal.png)
+
+**Just copied:** the icon turns into a check, Cmd-V has pasted the command, the arrow is still there.
+
+![The same Terminal and arrow a moment later: the chip shows a check instead of the copy icon, and sudo xcodebuild -license accept is pasted at the prompt.](docs/images/real/copy-terminal-copied.png)
 
 ```bash
 bigarrow start --rect 424,386,420,20 --app "Terminal:my-app" --from bottom \
+  --color blue --border-color yellow --text-color yellow \
   --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return"
 ```
 
-The agent never sees the password, and the human never retypes a command. In this shot the chip was just clicked (the check) and Cmd-V has pasted it.
+The agent never sees the password, and the human never retypes a command.
 
 ### Chrome: open the preview
 
