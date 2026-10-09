@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.5] - 2026-10-09
+
+### Changed
+- README: a quarter less prose, every section kept, the jokes too. Visuals first: real-app scenes, looks and creative arrows now come right after the hero, before the use-case list and the reference.
+- Docs: the screen-recording guide, the virtual-display README and the verification notes say the same in fewer words.
+
 ## [0.4.4] - 2026-10-09
 
 ### Changed
