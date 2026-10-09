@@ -2,6 +2,9 @@
 # README hero: the Hacker News front page in a visible browser window with arrows that make a
 # point. Run on the test Mac (Arthur) through scripts/arthur-gui.sh, never on a desk in use.
 # A fresh browser profile keeps any signed-in account out of the picture.
+# The page sits in the lower right so every sign has free desktop above or to the left of its
+# target and every shaft reaches it without crossing a headline. The Dock and desktop widgets
+# are hidden for the shot (the sign next to row 12 needs the Dock's space) and restored on exit.
 # Usage: scripts/hn-scene.sh <out.png>
 set -uo pipefail
 OUT="$1"
@@ -10,13 +13,21 @@ AB=/opt/homebrew/bin/agent-browser
 WORK=$(mktemp -d)
 swiftc -O scripts/testkit.swift -o "$WORK/testkit" || exit 1
 KIT="$WORK/testkit"
-cleanup() { $BIN stop --all >/dev/null 2>&1; $AB close >/dev/null 2>&1; }
+DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
+WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
+cleanup() {
+  $BIN stop --all >/dev/null 2>&1; $AB close >/dev/null 2>&1
+  defaults write com.apple.dock autohide -int "$DOCK_AUTOHIDE"; killall Dock
+  defaults write com.apple.WindowManager StandardHideWidgets -int "$WIDGETS_HIDDEN"
+}
 trap cleanup EXIT
+defaults write com.apple.dock autohide -bool true; killall Dock
+defaults write com.apple.WindowManager StandardHideWidgets -bool true
 
 $AB --headed --profile "$WORK/profile" --args "--hide-crash-restore-bubble,--no-first-run,--no-default-browser-check,--force-renderer-accessibility" \
   open https://news.ycombinator.com > /dev/null
 sleep 3
-$KIT move-window frontmost 15 35; $KIT resize-window frontmost 1440 860; sleep 1.5
+$KIT resize-window frontmost 715 680; $KIT move-window frontmost 740 268; sleep 1.5
 BROWSER=$($KIT frontmost)
 RECTS=$($AB eval '(() => {
   const top = window.screenY + (window.outerHeight - window.innerHeight), left = window.screenX;
@@ -63,11 +74,12 @@ point() {
 }
 # By label through Accessibility: Chrome exposes web pages to it when started with
 # --force-renderer-accessibility (or while VoiceOver runs).
-point login --element login --role link --app "$BROWSER" --text "Not a lurker? Click login." --color green
-point comments --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape zigzag
-point past --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight
-point vote --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red
-point logo --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp
+point login --element login --role link --app "$BROWSER" --text "Not a lurker? Click login." --color green --shape straight --from top-left
+point comments --rect "$(rect comments)" --text "The actual article is in here" --color purple --shape straight --from top
+point past --rect "$(rect past)" --text "Today's thread, already argued in 2014" --color teal --shape straight --from top-left
+point vote --rect "$(rect vote)" --text "Finally, an arrow bigger than this one" --color red --shape straight --from left
+point logo --rect "$(rect logo)" --text "Same design since 2007. Still works." --color orange --corners sharp --shape straight --from left
 sleep 2
-screencapture -x "$OUT"
+# The whole display except the menu bar (clock, status icons) at Retina resolution.
+screencapture -x -R 0,40,1470,908 "$OUT"
 echo "wrote $OUT"
