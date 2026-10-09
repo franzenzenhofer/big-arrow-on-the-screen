@@ -5,6 +5,11 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Added
+- `--rainbow`: sign, root and shaft in one continuous rainbow, the shaft carrying on from the sign's hue where it leaves it. Mask-free, so `--png` renders it exactly as the screen.
+- `--drip`: wet paint. Runs hang from the sign's bottom edge and from level stretches of the shaft (never across the shaft or into the sign), in the colour of the paint above them, with their own border, a wet highlight and a drop that falls; they fade in over the paint they leave, so there is no seam.
+- `--flames`: particle fire along the sign's outline, the shaft and the head, behind the arrow. Core Animation emitters: the render server burns, the process stays idle.
+- `--shake 1|2|3|4` or `mild|insistent|angry|topiramate`: the whole arrow vibrates in random jolts, in bursts for 1 and 2, nonstop for 3 and 4; 4 also throbs the sign.
+- Reduce Motion and `--no-animation` keep rainbow and drips still and leave out flames and shake.
 - `--airhorn` plays an airhorn once when the arrow shows, at the current output volume. It never touches the system volume or mute. The sound (`skill/big-arrow/sounds/airhorn.wav`, CC0) ships in the skill folder, so Homebrew installs it with the skill.
 
 ## [0.4.2] - 2026-10-09

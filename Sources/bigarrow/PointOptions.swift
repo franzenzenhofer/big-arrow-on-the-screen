@@ -96,6 +96,18 @@ struct LookOptions: ParsableArguments {
     ))
     var border = "shadow"
 
+    @Flag(help: "Paint the arrow and the sign in a rainbow that flows along the shaft.")
+    var rainbow = false
+
+    @Flag(help: "Wet paint: drops run down from the sign and the shaft.")
+    var drip = false
+
+    @Flag(help: "Set the sign and the arrow on fire.")
+    var flames = false
+
+    @Option(help: help("Shake the arrow around its tip: 1 mild, 2 insistent, 3 angry, 4 topiramate.", "level"))
+    var shake: String?
+
     @Flag(name: .customLong("no-animation"), help: "Show the final frame at once, no draw-on, pulse or fade.")
     var noAnimation = false
 }

@@ -63,6 +63,8 @@ covering, `--size S|M|L`, `--duration N` for a plain timed hint (default 8 s wit
 Default look is a white border with a drop shadow; `--border white-black|black` and
 `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color` change it.
 `--shape bend|straight|zigzag|spiral`: spiral loops once around the sign before it points.
+`--rainbow`, `--drip`, `--flames`, `--shake 1-4` (mild, insistent, angry, topiramate): only when the
+human asks for them, or to escalate after they have missed the same plain arrow twice.
 
 ## Errors
 

@@ -25,6 +25,7 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **"Your turn."** 2FA codes, CAPTCHAs, passkeys, a payment confirmation, a signature, a legal checkbox. The things an agent should never click on its own behalf. It points, you decide, it continues.
 - **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request"`. It even picks the right tab: `--app "Google Chrome:Pull request"`.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
+- **"I have asked you three times."** `--shake angry --flames`. Escalation, but make it visual.
 - **Guided setups and onboarding.** Walk a human through a settings pane step by step: `start`, wait until they acted, `stop`, next step. Like a product tour, minus the product.
 - **Remote help.** "No, the *other* gear icon." Point at it instead of describing it.
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
@@ -103,6 +104,9 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 - `--close-button` puts an X inside the sign's right end (white circle, X in the arrow colour), where it never covers the text or leaves the screen
 - `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign, `--airhorn` plays an airhorn at your current volume
 - Several arrows at once keep their signs out of each other's way
+- Effects, for when a plain arrow is not getting through: `--rainbow` paints sign and arrow in one continuous rainbow, `--drip` turns it into wet paint that runs and drops, `--flames` sets it on fire, `--shake 1|2|3|4` (mild, insistent, angry, topiramate) makes it vibrate. Combine freely. Rainbow and drips render in `--png` too; with Reduce Motion the drips hang still and there are no flames and no shake
+
+![Rainbow, drips, flames](docs/images/effects.png)
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
 

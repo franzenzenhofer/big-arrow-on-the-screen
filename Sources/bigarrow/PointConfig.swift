@@ -25,6 +25,7 @@ struct PointConfig {
     let corners: SignCorners
     let shape: ArrowShape
     let noAnimation: Bool
+    let effects: ArrowEffects
     let border: ArrowBorder
     /// Optional colours of border, text, thin edge and X button; nil picks one automatically.
     let tints: [WritableKeyPath<SignAppearance, ArrowColor?>: ArrowColor]
@@ -59,7 +60,7 @@ struct PointConfig {
         color = try ArrowColor.parse(look.color)
         corners = try SignCorners.parse(look.corners)
         shape = try ArrowShape.parse(look.shape)
-        noAnimation = look.noAnimation
+        (noAnimation, effects) = (look.noAnimation, try Self.effects(look))
         border = try ArrowBorder.parse(look.border)
         tints = try Self.tints(look)
         click = try Self.click(behaviour)
@@ -81,6 +82,7 @@ struct PointConfig {
         appearance.border = border
         for (path, tint) in tints { appearance[keyPath: path] = tint }
         appearance.closeMark = closeButton ? .cross : .none
+        appearance.effects = effects
         return appearance
     }
 
@@ -94,6 +96,13 @@ struct PointConfig {
             if let raw { tints[path] = try ArrowColor.parse(raw) }
         }
         return tints
+    }
+
+    static func effects(_ look: LookOptions) throws -> ArrowEffects {
+        var effects = ArrowEffects()
+        (effects.rainbow, effects.drip, effects.flames) = (look.rainbow, look.drip, look.flames)
+        effects.shake = try look.shake.map(ShakeLevel.parse)
+        return effects
     }
 
     static func click(_ behaviour: BehaviourOptions) throws -> ClickDismissal {

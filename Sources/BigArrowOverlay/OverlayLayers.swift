@@ -14,6 +14,8 @@ struct OverlayLayers {
     let root = CALayer()
     let shaftLayers: [CAShapeLayer]
     let headLayers: [CAShapeLayer]
+    /// The coloured part of the flared root, between the sign and the shaft.
+    let rootFill: CAShapeLayer
     let markGroup = CALayer()
     let signEdge = CALayer()
     let sign = CALayer()
@@ -43,7 +45,7 @@ struct OverlayLayers {
         let rootBorders = Self.borders(appearance) { Self.filled(rootPath, color: $0, outline: $1) }
         let colorShaft = Self.stroked(shaft, color: color.cgColor, width: stroke)
         let colorHead = Self.filled(head, color: color.cgColor, outline: 0)
-        let colorRoot = Self.filled(rootPath, color: color.cgColor, outline: 0)
+        rootFill = Self.filled(rootPath, color: color.cgColor, outline: 0)
         shaftLayers = shaftBorders + [colorShaft]
         headLayers = headBorders + [colorHead]
         let tip = layout.arrow.tip.applying(flip)
@@ -61,7 +63,7 @@ struct OverlayLayers {
         let parts = [shaftBorders, headBorders, rootBorders]
         let edges = parts.flatMap { $0.dropLast() }
         root.sublayers = [markGroup] + edges + [signEdge] + parts.compactMap(\.last)
-            + [sign, colorShaft, colorRoot, colorHead, signText]
+            + [sign, colorShaft, rootFill, colorHead, signText]
     }
 
     /// The border layers of one part, outermost first.

@@ -6,6 +6,8 @@ import BigArrowCore
 public final class OverlayController {
     private var panel: OverlayPanel?
     private var layers: OverlayLayers?
+    /// What is on screen: the arrow, or the effects stage around it.
+    private var stage: CALayer?
     private(set) public var layout: OverlayLayout?
     private let mode: AnimationMode
     private let appearance: SignAppearance
@@ -34,10 +36,11 @@ public final class OverlayController {
         let layers = OverlayLayers(layout: layout, sign: sign, appearance: appearance)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        panel?.contentView?.layer?.sublayers = [layers.root]
+        let stage = Effects.stage(layers, layout: layout, look: appearance, mode: mode)
+        panel?.contentView?.layer?.sublayers = [stage]
         CATransaction.commit()
         if animated { Animator.enter(layers, mode: mode) }
-        self.layers = layers
+        (self.layers, self.stage) = (layers, stage)
         self.layout = layout
         panel?.orderFrontRegardless()
         tracker?.stop()
@@ -69,7 +72,7 @@ public final class OverlayController {
     /// Fades out, closes the panel, then calls `completion`.
     public func dismiss(completion: @escaping @MainActor () -> Void) {
         tracker?.stop()
-        guard let root = layers?.root, mode.fadeOut > 0, panel?.isVisible == true else {
+        guard let root = stage, mode.fadeOut > 0, panel?.isVisible == true else {
             close()
             completion()
             return

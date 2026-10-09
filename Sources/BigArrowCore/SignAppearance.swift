@@ -32,6 +32,7 @@ public struct SignAppearance: Sendable {
     public let corners: SignCorners
     public var border = ArrowBorder.shadow
     public var closeMark = CloseMark.none
+    public var effects = ArrowEffects()
     /// `--border-color`, `--text-color`, `--edge-color`; nil picks a readable colour automatically.
     public var borderColor: ArrowColor?
     public var textColor: ArrowColor?

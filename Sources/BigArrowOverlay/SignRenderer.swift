@@ -53,6 +53,8 @@ public enum SignRenderer {
             edge: canvas.render { drawEdge(in: $0, pill: pill, appearance: appearance) },
             body: canvas.render { drawBody(in: $0, pill: pill, appearance: appearance) },
             text: canvas.render { context in
+                // Text reads on every hue of the rainbow with a dark glow behind it.
+                if appearance.effects.rainbow { context.setShadow(offset: .zero, blur: 4, color: CGColor(gray: 0, alpha: 0.9)) }
                 drawText(layout, in: context, rect: textRect)
                 if cross > 0 {
                     let center = CGPoint(x: pill.width - crossInset, y: pill.height / 2)
@@ -127,13 +129,16 @@ public enum SignRenderer {
     static func drawBody(in context: CGContext, pill: CGSize, appearance: SignAppearance) {
         let inset = max(0, edgeWidth(appearance.border) - seamOverlap)
         let shape = Pill(rect: CGRect(origin: .zero, size: pill).insetBy(dx: inset, dy: inset), corners: appearance.corners)
+        let rainbow = appearance.effects.rainbow
+        if rainbow { Rainbow.fill(pillPath(shape.rect, corners: shape.corners), in: context) }
         if appearance.border == .black {
+            guard !rainbow else { return }
             context.addPath(pillPath(shape.rect, corners: shape.corners))
             context.setFillColor(appearance.color.cgColor)
             context.fillPath()
             return
         }
-        stroke(shape, in: context, line: (outline, appearance.borderTint), fill: appearance.color)
+        stroke(shape, in: context, line: (outline, appearance.borderTint), fill: rainbow ? nil : appearance.color)
     }
 
     static func edgeWidth(_ border: ArrowBorder) -> CGFloat {
