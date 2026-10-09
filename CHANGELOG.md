@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.4] - 2026-10-09
 
 ### Changed
 - README hero: a real desktop again (menu bar, Dock, a normal Chrome window with tabs and address bar) with nine arrows on the 2014-06-10 Hacker News front page, every one a different colour, shape or style, from every side, no headline covered. `scripts/hn-scene.sh` records it on the main display, no virtual display.
