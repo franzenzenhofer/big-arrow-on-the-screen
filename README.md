@@ -7,6 +7,8 @@
 
 ![A real macOS desktop, Hacker News of 2014-06-10 in Chrome, nine bigarrow arrows in nine colours from every side: same since 2007, already argued in 2014, not a lurker? log in, the article is in here, remember me? (Firefox 30), nothing. nothing changed. (a spiral, going round in circles), 20,000 devs 40,000 opinions, finally a bigger arrow, 12 years later: still no consensus](docs/images/hero-hn.png)
 
+[Real apps](#real-apps-real-use-cases) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
+
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
 ![bigarrow pointing at a dialog's Allow button](docs/images/demo.gif)
@@ -134,6 +136,16 @@ three `start`s, one button, zero ambiguity
 ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png)
 
 `--style box --corners sharp`, plus a lesson about macOS permissions
+
+## Starred by
+
+[![GitHub stars](https://img.shields.io/github/stars/franzenzenhofer/big-arrow-on-the-screen?style=social)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers) 361 stars in the first two days (2026-10-08 to 10-09), including people who built things you use every day:
+
+<a href="https://github.com/migueldeicaza"><img src="https://github.com/migueldeicaza.png?size=96" width="48" height="48" alt="Miguel de Icaza"></a> <a href="https://github.com/jacobtomlinson"><img src="https://github.com/jacobtomlinson.png?size=96" width="48" height="48" alt="Jacob Tomlinson"></a> <a href="https://github.com/gaborcsardi"><img src="https://github.com/gaborcsardi.png?size=96" width="48" height="48" alt="Gábor Csárdi"></a> <a href="https://github.com/umaar"><img src="https://github.com/umaar.png?size=96" width="48" height="48" alt="Umar Hansa"></a> <a href="https://github.com/vittorioromeo"><img src="https://github.com/vittorioromeo.png?size=96" width="48" height="48" alt="Vittorio Romeo"></a> <a href="https://github.com/just-be-dev"><img src="https://github.com/just-be-dev.png?size=96" width="48" height="48" alt="Justin Bennett"></a> <a href="https://github.com/anglinb"><img src="https://github.com/anglinb.png?size=96" width="48" height="48" alt="Brian Anglin"></a> <a href="https://github.com/sambarnes"><img src="https://github.com/sambarnes.png?size=96" width="48" height="48" alt="sam"></a> <a href="https://github.com/stefanvanburen"><img src="https://github.com/stefanvanburen.png?size=96" width="48" height="48" alt="Stefan VanBuren"></a> <a href="https://github.com/kidd"><img src="https://github.com/kidd.png?size=96" width="48" height="48" alt="Raimon Grau"></a> <a href="https://github.com/jandubois"><img src="https://github.com/jandubois.png?size=96" width="48" height="48" alt="Jan Dubois"></a> <a href="https://github.com/mattsta"><img src="https://github.com/mattsta.png?size=96" width="48" height="48" alt="Matt Stancliff"></a>
+
+[Miguel de Icaza](https://github.com/migueldeicaza) (GNOME, Mono, Xamarin; now Xibbon) · [Jacob Tomlinson](https://github.com/jacobtomlinson) (NVIDIA: RAPIDS, Dask, OpenClaw) · [Gábor Csárdi](https://github.com/gaborcsardi) (Posit) · [Umar Hansa](https://github.com/umaar) (web developer) · [Vittorio Romeo](https://github.com/vittorioromeo) (C++) · [Justin Bennett](https://github.com/just-be-dev) (devtools.fm, ex Val Town and Oxide) · [Brian Anglin](https://github.com/anglinb) (Superwall, ex GitHub and Snapchat) · [sam](https://github.com/sambarnes) (OpenRouter) · [Stefan VanBuren](https://github.com/stefanvanburen) (CoreWeave / Weights & Biases) · [Raimon Grau](https://github.com/kidd) (Metabase) · [Jan Dubois](https://github.com/jandubois) (Rancher at SUSE) · [Matt Stancliff](https://github.com/mattsta), and [349 more](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers).
+
+Companies as on their public GitHub profiles. A star is not an endorsement. It is, however, a star, which is basically an arrow that gave up on direction.
 
 ## What is this actually for?
 
