@@ -21,11 +21,15 @@ One transparent window above everything, on every display and every Space. Drawi
 
 ## Real apps, real use cases
 
+Real apps on a real Mac (macOS 27), the real `bigarrow`, staged by `scripts/real-scenes.sh`.
+
+### macOS Desktop & Dock: stop "click wallpaper to show desktop"
+
 ![An agent walks a human through the most complained-about Mac setting since 2023: one click on the wallpaper and every window flees; then 1. The apple. Yes, the fruit. 2. System Settings. Where settings go to hide. 3. Desktop & Dock. Not Wallpaper. Not Displays. This one. 4. Scroll. Further. It's always further. 5. 'Show desktop'. Nothing to do with Stage Manager. 6. 'Only in Stage Manager' means 'off'. Obviously. Then the wallpaper click: Nothing happens. Bliss.](docs/images/real/wallpaper.gif)
 
-Since macOS Sonoma one click on the wallpaper sends every window running for the edges, which iMore called ["the most annoying change in Mac update history"](https://www.imore.com/mac/macos/macos-sonoma-click-to-reveal-desktop-turn-off). The fix hides behind an option named after Stage Manager. Six steps, six arrows, every one a different look, real clicks on a real Mac ([MP4](docs/videos/wallpaper.mp4), recorded by `scripts/wallpaper-video.sh`; the account name in the Apple menu and the desktop widgets are pixelated).
+["The most annoying change in Mac update history"](https://www.imore.com/mac/macos/macos-sonoma-click-to-reveal-desktop-turn-off), fixed in six arrows ([MP4](docs/videos/wallpaper.mp4)).
 
-No fake dialogs this time. Real apps on the test Mac (macOS 27), neutral demo content, the real `bigarrow`, staged by `scripts/real-scenes.sh`. Every command is exactly what ran (the script adds `--no-animation --json` for the screenshot). An arrow should match the mood: a green "go ahead", a black "don't", a ring for "this little thing", a box for "this whole thing".
+### System Settings: grant a permission
 
 ![System Settings, Device Control and Data Access: a green arrow with a close button, Franz, switch this on: Terminal may control your Mac, and an orange zigzag ring on the plus button: Not in the list? Plus. Then find it.](docs/images/real/settings.png)
 
@@ -37,7 +41,7 @@ bigarrow start --element Add --role button --app "System Settings" \
   --text "Not in the list? Plus. Then find it." --from bottom-right --style ring --color orange --shape zigzag --size S
 ```
 
-A deep link opens the exact pane, the arrow finds the one switch. Plan B is orange and zigzagging, because plan B always is. (On macOS 27 the pane is called Device Control and Data Access. Nobody would have found it by the old name.)
+### Keynote: a three-step how-to
 
 ![Keynote: a purple ring, 1. Click Animate; an orange box, 2. Add an Effect; a teal zigzag on Play, 3. Press play. Bask in the applause.](docs/images/real/keynote.png)
 
@@ -50,7 +54,7 @@ bigarrow start --element Play --app Keynote --role button --text "3. Press play.
   --from top --color teal --shape zigzag --size S
 ```
 
-"Where do I add a transition?" Three steps, all on screen at once, in a toolbar that has given up on words.
+### Print dialog: helping Mom save a PDF
 
 ![TextEdit print dialog: a pink arrow, Mom, click PDF, then Save as PDF, and a small black one on Cancel: Not this one, Mom](docs/images/real/print.png)
 
@@ -61,7 +65,7 @@ bigarrow start --element Cancel --role button --app TextEdit \
   --text "Not this one, Mom" --from bottom-right --color black --size S
 ```
 
-Helping a parent over a screen share, minus twenty minutes of "the little button, bottom left, no, left". The black arrow is for the button Mom clicked last time.
+### Chrome: the right tab out of 14
 
 ![Chrome, three windows, 14 tabs, a big indigo sign: It's this tab, not the other 13](docs/images/real/chrome.png)
 
@@ -70,7 +74,9 @@ bigarrow start --app "Google Chrome:Sourdough" --element "Sourdough - Wikipedia"
   --text "It's this tab, not the other 13" --from top --shape zigzag --color "#5856D6" --size L
 ```
 
-`--app "App:tab title"` raises the right window and selects the tab first. The agent knew which tab it meant. Now you do too.
+`--app "App:tab title"` raises the window and selects the tab first.
+
+### Finder: "no, the other grid icon"
 
 ![Finder: a black ring on the icon view button, Not this one, and a green box on the Group button: No, the other grid icon. This one.](docs/images/real/finder.png)
 
@@ -81,9 +87,9 @@ bigarrow start --element Group --role menubutton --app Finder \
   --text "No, the other grid icon. This one." --from top --style box --color green
 ```
 
-macOS 27 removed the gear icon but added a second grid icon. It is always the other one.
+### A real guide: allow screen recording
 
-Not a joke app: [How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md), a real guide whose every screenshot is an arrow an agent drew.
+[How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md): every screenshot is an arrow an agent drew.
 
 ## Looks
 
