@@ -113,10 +113,30 @@ public struct ArrowColor: Equatable, Sendable, Codable {
 
     public var isLight: Bool { luminance > Self.lightThreshold }
 
-    /// Outline and sign text colour: white on dark arrows, near-black on light ones (yellow, white).
+    /// Sign text colour: white on dark arrows, near-black on light ones (yellow, white).
     public var contrast: ArrowColor {
         isLight ? ArrowColor(red: 0.11, green: 0.11, blue: 0.12) : ArrowColor(red: 1, green: 1, blue: 1)
     }
+
+    /// Below this luminance a black outline would vanish into the arrow, so it turns white.
+    static let darkThreshold: CGFloat = 0.2
+
+    /// The thin outline around arrow, sign and close mark: black, white only on near-black arrows.
+    public var outline: ArrowColor {
+        luminance < Self.darkThreshold ? ArrowColor(red: 1, green: 1, blue: 1) : ArrowColor(red: 0, green: 0, blue: 0)
+    }
+}
+
+/// `--shadow`: no shadow by default; a soft one lifts the arrow off busy backgrounds.
+public enum ArrowShadow: Sendable, Equatable {
+    case none
+    case soft
+}
+
+/// `--close-button`: an X drawn inside the sign's right end, so it never covers text or leaves the screen.
+public enum CloseMark: Sendable, Equatable {
+    case none
+    case cross
 }
 
 /// The sign's corners.
@@ -145,6 +165,8 @@ public struct SignAppearance: Sendable {
     public let color: ArrowColor
     public let size: ArrowSize
     public let corners: SignCorners
+    public var shadow = ArrowShadow.none
+    public var closeMark = CloseMark.none
 
     public init(color: ArrowColor, size: ArrowSize, corners: SignCorners) {
         self.color = color

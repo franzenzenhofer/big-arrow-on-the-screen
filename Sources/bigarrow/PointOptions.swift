@@ -24,7 +24,11 @@ struct TargetOptions: ParsableArguments {
     @Option(help: help("Point at the UI element with this label (needs Accessibility for your terminal).", "label"))
     var element: String?
 
-    @Option(help: help("App for --element (default: the frontmost app).", "name"))
+    @Option(help: help(
+        "The app the target is in, 'App' or 'App:window or tab title'. It comes to the front first, and the arrow "
+            + "hides while another app covers the target. With --element: the app to search (default: the frontmost app).",
+        "app[:title]"
+    ))
     var app: String?
 
     @Option(help: help("Only match --element elements with this role, e.g. button.", "role"))
@@ -42,8 +46,8 @@ struct TargetOptions: ParsableArguments {
     @Option(help: help("With --at or --rect: coordinates are relative to display N (1-based, see 'bigarrow doctor').", "n"))
     var display: Int?
 
-    @Flag(help: "Bring the target's app (and its window) to the front first, so the arrow points at something visible.")
-    var raise = false
+    @Flag(name: .customLong("no-raise"), help: "Leave the windows as they are; by default the target's app and window come to the front.")
+    var noRaise = false
 }
 
 struct LookOptions: ParsableArguments {
@@ -71,18 +75,21 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("Sign corners: round or sharp.", "corners"))
     var corners = "round"
 
+    @Flag(help: "Add a soft drop shadow (default: none, just a thin outline).")
+    var shadow = false
+
     @Flag(name: .customLong("no-animation"), help: "Show the final frame at once, no draw-on, pulse or fade.")
     var noAnimation = false
 }
 
 struct BehaviourOptions: ParsableArguments {
-    @Option(help: help("Seconds to show the arrow (point: 8, start/--close-button/--until-click: 0). 0 = until stopped.", "seconds"))
+    @Option(help: help("Seconds to show the arrow (point: 8, start/--close-button/--until-click: 300). 0 = until stopped.", "seconds"))
     var duration: Double?
 
     @Flag(help: "Return at once and leave the arrow up in the background; prints the pid.")
     var detach = false
 
-    @Flag(name: .customLong("close-button"), help: "Put a clickable X on the sign; the human closes the arrow with it.")
+    @Flag(name: .customLong("close-button"), help: "Show an X in the sign. A click on the sign or the shaft always removes the arrow.")
     var closeButton = false
 
     @Flag(name: .customLong("until-click"), help: "Dismiss when the human clicks the target (needs Accessibility).")

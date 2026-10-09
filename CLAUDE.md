@@ -4,7 +4,7 @@ macOS CLI (`bigarrow`) plus an agent skill (`big-arrow`, Claude Code and Codex) 
 
 ## State
 
-Released 0.1.1 on 2026-10-08 (Homebrew `franzenzenhofer/tap/bigarrow`): everything in `docs/plan/PLAN.md` plus T31-T40, see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
+Released 0.2.0 on 2026-10-09 (Homebrew `franzenzenhofer/tap/bigarrow`): everything in `docs/plan/PLAN.md` plus T31-T40, then bound and self-ending arrows (owner process, `stop --hook`, 300 s default, raise by default, tab selection), see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
 
 ## Rules
 
@@ -12,7 +12,8 @@ Released 0.1.1 on 2026-10-08 (Homebrew `franzenzenhofer/tap/bigarrow`): everythi
 - Files target 200 lines, hard max 450. Functions under 30 lines, at most 4 parameters. No boolean parameters, no TODO comments, no commented-out code. `.swiftlint.yml` enforces this.
 - No mocks. Tests hit the real window server and real Accessibility; skip with a printed reason when a permission is missing.
 - Input coordinates are global top-left logical points. Flip against `NSScreen.screens[0].frame.height`, never `NSScreen.main`.
-- The drawing path must never require a TCC permission. Only `--element`, `elements`, `--until-click` and `front --window` may need Accessibility, and the error must name the responsible app (terminal or IDE).
+- The drawing path must never require a TCC permission. Only `--element`, `elements`, `--until-click`, `front --window` and an `--app`/`--window` title (raising a window or selecting a tab) may need Accessibility, and the error must name the responsible app (terminal or IDE).
+- Every arrow must end by itself (time limit, owner exit, `stop`); never add a lifetime that can outlive the agent session by default.
 - Never call `NSApplication.run()`: its `finishLaunching()` activates a detached process and steals the focus. Use `OverlayApplication.runWithoutActivating()`.
 - Gates before every commit: `swiftlint lint --strict`, `swift build -c release`, `swift test`. All green or no commit.
 - Every image committed to the repo has C2PA metadata stripped and shows no personal content.
@@ -30,5 +31,5 @@ Released 0.1.1 on 2026-10-08 (Homebrew `franzenzenhofer/tap/bigarrow`): everythi
 ```bash
 swiftlint lint --strict && swift build -c release && swift test
 swift run bigarrow point --at 760,500 --text "Franz, click HERE" --png /tmp/arrow.png   # offscreen
-scripts/release.sh 0.1.1          # bump, tag, release workflow, Homebrew tap formula
+scripts/release.sh 0.2.0          # bump, tag, release workflow, Homebrew tap formula
 ```

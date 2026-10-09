@@ -3,7 +3,7 @@ import Foundation
 
 /// Why an arrow went away.
 public enum DismissReason: String, Codable, Sendable {
-    case timeout, signal, clicked, closed, targetGone, displayGone
+    case timeout, signal, clicked, closed, targetGone, displayGone, ownerGone
 }
 
 /// The `--json` result of `bigarrow point`.

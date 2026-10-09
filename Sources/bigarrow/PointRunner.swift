@@ -19,14 +19,15 @@ struct PointRunner {
     func run() throws {
         OverlayApplication.prepare()
         // A dry run or a PNG render changes nothing on screen, so it never raises an app.
-        if config.raise, !config.dryRun, config.png == nil, let raise = config.target.raiseApp {
-            _ = try AppRaiser.raise(app: raise.app, windowTitle: raise.windowTitle, screens: ScreenReader.current())
+        if config.raise, !config.dryRun, config.png == nil, let home = config.home {
+            _ = try AppRaiser.raise(app: home.app, windowTitle: home.title, screens: ScreenReader.current())
         }
         let screens = ScreenReader.current()
         let planned = try plan(config.target.resolve(screens: screens), screens: screens)
         if let png = config.png {
             var result = PointResult(pid: getpid(), resolved: planned.resolved, layout: planned.layout)
-            result.image = try PNGExporter.write(planned.layout, sign: planned.sign, color: config.color, to: URL(fileURLWithPath: png))
+            let file = URL(fileURLWithPath: png)
+            result.image = try PNGExporter.write(planned.layout, sign: planned.sign, appearance: config.appearance, to: file)
             Output.print(config.json ? JSONOutput.encode(result) : "bigarrow: wrote \(png)")
             exit(0)
         }
@@ -51,8 +52,7 @@ struct PointRunner {
 
     func plan(_ resolved: ResolvedTarget, screens: ScreenSpace) throws -> PlannedArrow {
         let display = try screens.display(containing: resolved.shape.anchor)
-        let appearance = SignAppearance(color: config.color, size: config.size, corners: config.corners)
-        let sign = SignRenderer.render(text: config.text, appearance: appearance, display: display)
+        let sign = SignRenderer.render(text: config.text, appearance: config.appearance, display: display)
         let request = OverlayLayout.Request(
             target: resolved.shape, display: display, signSize: sign.size,
             style: config.style, size: config.size, forced: config.forced, corners: config.corners, shape: config.shape,

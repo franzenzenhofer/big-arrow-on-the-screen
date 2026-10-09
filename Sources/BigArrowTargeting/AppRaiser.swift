@@ -47,21 +47,25 @@ public enum AppRaiser {
     }
 
     /// Unminimizes and raises the first window whose title contains `title`, and makes it main.
+    /// No window title matches: selects the tab with that title (Chrome, Safari) and raises its window.
     static func raiseWindow(pid: pid_t, title: String) throws -> String {
         let app = AXUIElementCreateApplication(pid)
-        var value: CFTypeRef?
-        AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &value)
-        let windows = value as? [AXUIElement] ?? []
+        AXUIElementSetMessagingTimeout(app, TabSelector.messagingTimeout * 4)
+        let windows: [AXUIElement] = TabSelector.attribute(app, kAXWindowsAttribute) ?? []
+        windows.forEach { AXUIElementSetMessagingTimeout($0, TabSelector.messagingTimeout * 4) }
         let needle = title.lowercased()
-        for window in windows {
-            var titleValue: CFTypeRef?
-            AXUIElementCopyAttributeValue(window, kAXTitleAttribute as CFString, &titleValue)
-            guard let windowTitle = titleValue as? String, windowTitle.lowercased().contains(needle) else { continue }
-            AXUIElementSetAttributeValue(window, kAXMinimizedAttribute as CFString, kCFBooleanFalse)
-            AXUIElementSetAttributeValue(window, kAXMainAttribute as CFString, kCFBooleanTrue)
-            AXUIElementPerformAction(window, kAXRaiseAction as CFString)
-            return windowTitle
+        let window = windows.first { windowTitle($0)?.lowercased().contains(needle) ?? false }
+            ?? TabSelector.select(in: windows, title: title)
+        guard let window else {
+            throw BigArrowError.unresolvable("no window or tab of pid \(pid) has a title containing '\(title)'")
         }
-        throw BigArrowError.unresolvable("no window of pid \(pid) has a title containing '\(title)'")
+        AXUIElementSetAttributeValue(window, kAXMinimizedAttribute as CFString, kCFBooleanFalse)
+        AXUIElementSetAttributeValue(window, kAXMainAttribute as CFString, kCFBooleanTrue)
+        AXUIElementPerformAction(window, kAXRaiseAction as CFString)
+        return windowTitle(window) ?? title
+    }
+
+    static func windowTitle(_ window: AXUIElement) -> String? {
+        TabSelector.attribute(window, kAXTitleAttribute)
     }
 }

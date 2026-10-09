@@ -1,8 +1,8 @@
 import AppKit
 import BigArrowCore
 
-/// The sign: a pill (or square) in the arrow colour with a contrast outline, plus heavy rounded
-/// text in the contrast colour. Body and text are separate images so the arrow's root can be
+/// The sign: a pill (or square) in the arrow colour with a thin outline, plus heavy rounded
+/// text in the contrast colour, and with `--close-button` an X in its right end. Body and text are separate images so the arrow's root can be
 /// drawn between them: it blends into the body and never covers a letter.
 public struct SignImage: @unchecked Sendable {
     public let body: CGImage
@@ -16,7 +16,14 @@ public struct SignImage: @unchecked Sendable {
 public enum SignRenderer {
     static let paddingX: CGFloat = 30
     static let paddingY: CGFloat = 16
-    static let outline: CGFloat = 3.5
+    static let outline: CGFloat = 2
+    /// The X: its diameter as a share of the font size (at least the minimum, an easy target),
+    /// the gap after the text, and its margin to the sign's edge. On a one-line pill it sits
+    /// almost concentric with the rounded end.
+    static let crossShare: CGFloat = 0.8
+    static let crossMinimum: CGFloat = 26
+    static let crossGap: CGFloat = 12
+    static let crossMargin: CGFloat = 20
 
     /// Shrinks the font until the text fits in `maxLines` lines of `maxWidth`, never below the minimum.
     public static func render(text: String, appearance: SignAppearance, display: Display) -> SignImage {
@@ -28,15 +35,42 @@ public enum SignRenderer {
             fontSize = max(fontSize - 2, ArrowMetrics.minimumFontSize)
             layout = measure(text, fontSize: fontSize, maxWidth: maxTextWidth, color: color)
         }
-        let pill = CGSize(
-            width: ceil(layout.size.width + paddingX * 2), height: ceil(layout.size.height + paddingY * 2)
+        let cross = appearance.closeMark == .cross ? max(crossMinimum, (fontSize * crossShare).rounded()) : 0
+        let height = ceil(layout.size.height + paddingY * 2)
+        let crossInset = min(height / 2, cross / 2 + crossMargin)
+        let trailing = cross > 0 ? crossGap + cross / 2 + crossInset : paddingX
+        let pill = CGSize(width: ceil(paddingX + layout.size.width + trailing), height: height)
+        let textRect = CGRect(
+            x: paddingX, y: (pill.height - layout.size.height) / 2, width: layout.size.width, height: layout.size.height
         )
         let canvas = Canvas(size: pill, scale: display.scale)
         return SignImage(
             body: canvas.render { drawBody(in: $0, pill: pill, appearance: appearance) },
-            text: canvas.render { drawText(layout, in: $0, pill: pill) },
+            text: canvas.render { context in
+                drawText(layout, in: context, rect: textRect)
+                if cross > 0 {
+                    let center = CGPoint(x: pill.width - crossInset, y: pill.height / 2)
+                    drawCross(in: context, center: center, diameter: cross, color: appearance.color)
+                }
+            },
             size: pill, fontSize: fontSize, lines: layout.lines
         )
+    }
+
+    /// A filled circle in the outline colour (black, or white on near-black signs) with the opposite X.
+    static func drawCross(in context: CGContext, center: CGPoint, diameter: CGFloat, color: ArrowColor) {
+        let circle = CGRect(x: center.x - diameter / 2, y: center.y - diameter / 2, width: diameter, height: diameter)
+        context.setFillColor(color.outline.cgColor)
+        context.fillEllipse(in: circle)
+        let arm = diameter * 0.2
+        let lightCircle = color.outline.isLight
+        context.setStrokeColor(CGColor(gray: lightCircle ? 0 : 1, alpha: 1))
+        context.setLineWidth(max(2.5, diameter * 0.11))
+        context.setLineCap(.round)
+        context.strokeLineSegments(between: [
+            CGPoint(x: center.x - arm, y: center.y - arm), CGPoint(x: center.x + arm, y: center.y + arm),
+            CGPoint(x: center.x - arm, y: center.y + arm), CGPoint(x: center.x + arm, y: center.y - arm)
+        ])
     }
 
     struct TextLayout {
@@ -75,18 +109,14 @@ public enum SignRenderer {
         let corner = appearance.corners.radius(height: rect.height)
         context.addPath(CGPath(roundedRect: rect, cornerWidth: corner, cornerHeight: corner, transform: nil))
         context.setFillColor(appearance.color.cgColor)
-        context.setStrokeColor(appearance.color.contrast.cgColor)
+        context.setStrokeColor(appearance.color.outline.cgColor)
         context.setLineWidth(outline)
         context.drawPath(using: .fillStroke)
     }
 
-    static func drawText(_ text: TextLayout, in context: CGContext, pill: CGSize) {
+    static func drawText(_ text: TextLayout, in context: CGContext, rect textRect: CGRect) {
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
-        let textRect = CGRect(
-            x: (pill.width - text.size.width) / 2, y: (pill.height - text.size.height) / 2,
-            width: text.size.width, height: text.size.height
-        )
         text.string.draw(with: textRect, options: [.usesLineFragmentOrigin, .usesFontLeading])
         NSGraphicsContext.restoreGraphicsState()
     }

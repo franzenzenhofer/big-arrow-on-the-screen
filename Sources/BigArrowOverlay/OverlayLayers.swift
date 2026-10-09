@@ -4,9 +4,9 @@ import BigArrowCore
 /// The finished layer tree for one layout. Paths come in display-local top-left points and
 /// are flipped once here into the bottom-left space of the panel's content view.
 ///
-/// The arrow reads as one shape: every contrast outline sits below every coloured fill, so the
-/// head and the shaft share one continuous outline, and the coloured shaft is drawn over the
-/// sign, so it grows out of the sign without a line across it. One shadow for the whole thing.
+/// The arrow reads as one shape: every outline sits below every coloured fill, so the head and
+/// the shaft share one continuous thin outline, and the coloured shaft is drawn over the sign,
+/// so it grows out of the sign without a line across it. With `--shadow`, one shadow for all.
 @MainActor
 struct OverlayLayers {
     let root = CALayer()
@@ -15,23 +15,26 @@ struct OverlayLayers {
     let markGroup = CALayer()
     let sign = CALayer()
     let signText = CALayer()
+    /// Display-local top-left points to the panel's bottom-left points.
+    let flip: CGAffineTransform
 
-    static let outlineWidth: CGFloat = 6
+    /// Added to a stroke's width, so 1.5 pt of outline shows on each side.
+    static let outlineWidth: CGFloat = 3
     static let markLineWidth: CGFloat = 6
 
-    init(layout: OverlayLayout, sign image: SignImage, color: ArrowColor) {
+    init(layout: OverlayLayout, sign image: SignImage, appearance: SignAppearance) {
+        let color = appearance.color
         let height = layout.display.frame.height
         let bounds = CGRect(origin: .zero, size: layout.display.frame.size)
-        let flip = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: height)
-        let shaft = Self.transformed(layout.arrow.shaftPath, flip)
-        let head = Self.transformed(layout.arrow.headPath, flip)
+        flip = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: height)
+        let (shaft, head) = (Self.transformed(layout.arrow.shaftPath, flip), Self.transformed(layout.arrow.headPath, flip))
         let stroke = layout.size.metrics.stroke
-        let outlineShaft = Self.stroked(shaft, color: color.contrast.cgColor, width: stroke + Self.outlineWidth)
+        let outlineShaft = Self.stroked(shaft, color: color.outline.cgColor, width: stroke + Self.outlineWidth)
         let colorShaft = Self.stroked(shaft, color: color.cgColor, width: stroke)
-        let outlineHead = Self.filled(head, color: color.contrast.cgColor, outline: Self.outlineWidth)
+        let outlineHead = Self.filled(head, color: color.outline.cgColor, outline: Self.outlineWidth)
         let colorHead = Self.filled(head, color: color.cgColor, outline: 0)
         let rootPath = Self.transformed(layout.arrow.root.path, flip)
-        let outlineRoot = Self.filled(rootPath, color: color.contrast.cgColor, outline: Self.outlineWidth)
+        let outlineRoot = Self.filled(rootPath, color: color.outline.cgColor, outline: Self.outlineWidth)
         let colorRoot = Self.filled(rootPath, color: color.cgColor, outline: 0)
         shaftLayers = [outlineShaft, colorShaft]
         headLayers = [outlineHead, colorHead]
@@ -45,7 +48,7 @@ struct OverlayLayers {
             layer.contentsScale = layout.display.scale
             layer.frame = signFrame
         }
-        Self.shadow(root)
+        if appearance.shadow == .soft { Self.shadow(root) }
         root.sublayers = [
             markGroup, outlineShaft, outlineHead, outlineRoot, sign, colorShaft, colorRoot, colorHead, signText
         ]
@@ -88,11 +91,12 @@ struct OverlayLayers {
         return layer
     }
 
+    /// A short, soft drop shadow straight down (the content view is not flipped, so -y is down).
     static func shadow(_ layer: CALayer) {
         layer.shadowColor = CGColor(gray: 0, alpha: 1)
-        layer.shadowOpacity = 0.35
-        layer.shadowRadius = 10
-        layer.shadowOffset = CGSize(width: 0, height: -3)
+        layer.shadowOpacity = 0.3
+        layer.shadowRadius = 5
+        layer.shadowOffset = CGSize(width: 0, height: -2)
     }
 
     static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, color: ArrowColor) -> [CALayer] {
@@ -108,7 +112,7 @@ struct OverlayLayers {
         }
         // Border only, no fill: the human must see exactly what is being pointed at.
         return [
-            stroked(path, color: color.contrast.cgColor, width: markLineWidth + outlineWidth),
+            stroked(path, color: color.outline.cgColor, width: markLineWidth + outlineWidth),
             stroked(path, color: color.cgColor, width: markLineWidth)
         ]
     }

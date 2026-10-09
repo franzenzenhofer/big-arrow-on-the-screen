@@ -29,6 +29,8 @@ struct Detacher {
     func childArguments(executable: String) throws -> [String] {
         var arguments = [executable, "point"] + Self.optionsWithoutDuration(CommandLine.arguments.dropFirst(2))
         arguments += ["--duration", String(config.duration)]
+        // The parent already raised the target's app; raising twice only costs time.
+        if !arguments.contains("--no-raise") { arguments.append("--no-raise") }
         if let data = config.stdinSnapshot {
             let file = PidRegistry().directory.appendingPathComponent("\(Self.snapshotPrefix)\(UUID().uuidString).json")
             try FileManager.default.createDirectory(at: PidRegistry().directory, withIntermediateDirectories: true)

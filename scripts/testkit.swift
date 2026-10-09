@@ -19,7 +19,11 @@ func app(named name: String) -> NSRunningApplication {
     return app
 }
 
+/// Moves the pointer first and pauses like a hand would, then clicks: bigarrow makes its sign
+/// clickable only while the pointer is over it.
 func click(_ point: CGPoint) {
+    CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+    usleep(150_000)
     for type in [CGEventType.leftMouseDown, .leftMouseUp] {
         CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
         usleep(80_000)

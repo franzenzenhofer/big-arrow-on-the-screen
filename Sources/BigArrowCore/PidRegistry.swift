@@ -11,6 +11,8 @@ public struct ArrowRecord: Codable, Equatable, Sendable {
     public let signFrame: [Double]
     public let direction: String
     public let startedAt: Date
+    /// The agent session that drew the arrow, if it was started from one.
+    public var owner: ArrowOwner?
 
     public init(pid: Int32, text: String, target: CGPoint, display: Int, sign: (frame: CGRect, direction: String), startedAt: Date) {
         self.pid = pid
@@ -72,9 +74,14 @@ public struct PidRegistry: Sendable {
         return records.sorted { $0.startedAt < $1.startedAt }
     }
 
+    /// Any process with this pid exists.
+    public static func isProcessAlive(_ pid: Int32) -> Bool {
+        pid > 0 && (kill(pid, 0) == 0 || errno == EPERM)
+    }
+
     /// The pid exists and still runs a `bigarrow` executable.
     public static func isAlive(_ pid: Int32) -> Bool {
-        guard pid > 0, kill(pid, 0) == 0 || errno == EPERM else { return false }
+        guard isProcessAlive(pid) else { return false }
         var buffer = [UInt8](repeating: 0, count: 256)
         let length = proc_name(pid, &buffer, UInt32(buffer.count))
         guard length > 0 else { return false }
