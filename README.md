@@ -116,7 +116,7 @@ Drawing needs nothing. Some ways of finding the target do:
 |---|---|
 | `--at`, `--rect`, `--mouse`, `--window App`, `--peekaboo`, `--app App` | none |
 | `--element`, `elements`, `--until-click`, `--app App:title` (raise a window or select a tab) | Accessibility |
-| `--window App:title` (macOS 26 hides window titles) | Screen Recording |
+| `--window App:title` (macOS 26 hides window titles) | Screen Recording, plus Accessibility to raise the window (not with `--no-raise`) |
 
 macOS gives these permissions to the app that started `bigarrow`, which is your terminal or IDE (Terminal, iTerm2, Ghostty, VS Code, Claude), never to `bigarrow` itself. So that is the app you switch on in System Settings. `bigarrow doctor` tells you which app it is, and when a permission is missing the command exits with code 4 and names the app and the settings pane.
 
@@ -139,7 +139,7 @@ Yes, yes, yes, yes. Displays left of or above the main one (negative coordinates
 In Electron apps, yes. In Chrome, only when Chrome runs with `--force-renderer-accessibility` (or VoiceOver is on); Chrome ignores the usual request to expose page content, verified on Chrome in October 2026. Chrome's own toolbar always works. Otherwise point at the page's coordinates, which the skill explains.
 
 **Could an agent use this to trick me, say by covering the Decline button?**
-It could draw over a button, yes. But an agent that runs shell commands as you can already read your files and run any program, so `bigarrow` gives it nothing new. What `bigarrow` itself guarantees, each one checked by a test: boxes and rings are outlines, so the target stays visible; the sign is placed clear of the target (only a sign too big for the display overlaps it, as little as possible); a click on the sign or shaft removes the arrow; every arrow ends by itself. It never clicks, types or captures anything. And when the agent asks you to approve something, the skill has it say on the sign what the click does, so you decide with the facts in front of you.
+It could draw over a button, yes. But an agent that runs shell commands as you can already read your files and run any program, so `bigarrow` gives it nothing new. What `bigarrow` itself guarantees, each one checked by a test: boxes and rings are outlines, so the target stays visible; the sign is placed clear of the target whenever there is room around it, and where there is not (a target that fills most of the display), it overlaps the target as little as possible; a click on the sign or shaft removes the arrow; every arrow ends by itself. It never clicks, types or captures anything. And when the agent asks you to approve something, the skill has it say on the sign what the click does, so you decide with the facts in front of you.
 
 **Why a skill? Is that a lot of tokens?**
 The agent always sees only the skill's description, about 270 tokens. The full instructions, about 1,700 tokens (measured with Claude's tokenizer), load only when the agent decides to point. They teach it when to point, how to find the target and what to write on the sign. You can also skip the skill and call `bigarrow` yourself.

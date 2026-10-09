@@ -38,6 +38,7 @@ struct MarkTests {
         let before = layers.markGroup.convert(centre, to: layers.root)
         layers.markGroup.transform = CATransform3DMakeScale(Animator.pulseScale, Animator.pulseScale, 1)
         let after = layers.markGroup.convert(centre, to: layers.root)
-        #expect(hypot(after.x - before.x, after.y - before.y) < 0.5)
+        #expect(hypot(before.x - centre.x, before.y - centre.y) < 0.5)
+        #expect(hypot(after.x - centre.x, after.y - centre.y) < 0.5)
     }
 }

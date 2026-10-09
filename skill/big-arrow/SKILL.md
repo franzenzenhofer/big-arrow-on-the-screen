@@ -70,9 +70,10 @@ Default look is a white border with a drop shadow; `--border white-black|black` 
 ## Errors
 
 Exit 2 bad input, 3 target not found (the message lists what exists), 4 permission missing.
-On 4 run `bigarrow doctor`: Accessibility (for `--element`, `App:title`, `--until-click`) belongs
-to the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and
-the pane: System Settings > Privacy & Security > Accessibility.
+On 4 run `bigarrow doctor` and read which permission the message names. Accessibility (for
+`--element`, `App:title`, `--until-click`) and Screen Recording (for `--window App:title`) belong to
+the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and the
+pane: System Settings > Privacy & Security > Accessibility, or > Screen & System Audio Recording.
 
 ## Setup once: clear arrows when the human answers
 
