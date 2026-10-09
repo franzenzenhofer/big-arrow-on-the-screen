@@ -7,7 +7,7 @@
 
 ![A real macOS desktop, Hacker News of 2014-06-10 in Chrome, nine bigarrow arrows in nine colours from every side: same since 2007, already argued in 2014, not a lurker? log in, the article is in here, remember me? (Firefox 30), nothing. nothing changed. (a spiral, going round in circles), 20,000 devs 40,000 opinions, finally a bigger arrow, 12 years later: still no consensus](docs/images/hero-hn.png)
 
-[Real apps](#real-apps-real-use-cases) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
+[Real apps](#real-apps-real-use-cases) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
@@ -91,79 +91,15 @@ bigarrow start --element Group --role menubutton --app Finder \
 
 [How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md): every screenshot is an arrow an agent drew.
 
-## Looks
-
-It is an arrow, so we spent an unreasonable amount of time on how it looks.
-
-![Big arrows with signs: click here, sign here, over here, you are here, type your name, read this first, no the other one, click Allow](docs/images/hero.png)
-
-![every border style and colour option: default white border with shadow, white-black, black, close button, custom border and text colours](docs/images/looks.png)
-
-Six looks over white, macOS grey, dark, black, red and a busy web page:
-
-![default, white-black, black, close button, custom colours and a black arrow, each over six backgrounds](docs/images/backgrounds.png)
-
-![every style, shape, size and colour](docs/images/gallery.png)
-
-- `--shape bend|straight|zigzag|spiral`: zigzag for when it is *really* urgent; spiral loops once around the sign, for when it must be impossible to miss
-- `--style arrow|ring|box` (rings and boxes are outlines, the target stays visible), `--size S|M|L`, `--corners round|sharp`
-- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`
-- `--border shadow|white-black|black`: white border with drop shadow (default), a thin black edge instead of the shadow, or just a thin black outline
-- `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color`; left out, each picks a readable colour
-- `--close-button` puts an X inside the sign's right end; `--follow` moves with a window or element; `--until-click` ends on a click on the target; `--say` speaks the sign
-- Several arrows at once keep their signs out of each other's way
-
-`scripts/gallery.py` renders every combination and zooms into every sign-to-shaft joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
-
-## Creative arrows
-
-Fake dialogs, real `bigarrow`, clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
-
-![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png)
-
-`--color green`
-
-![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png)
-
-`--shape zigzag --color orange`: zigzag, for when it is *really* urgent
-
-![Software update: Twirl. Then click.](docs/images/scenes/spiral.png)
-
-`--shape spiral`: once around the sign, then to the button
-
-![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png)
-
-`--color purple`
-
-![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png)
-
-`--close-button`, because the human gets the last word
-
-![Three arrows, one Save button](docs/images/scenes/which-button.png)
-
-three `start`s, one button, zero ambiguity
-
-![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png)
-
-`--style box --corners sharp`, plus a lesson about macOS permissions
-
-## Starred by
-
-[![GitHub stars](https://img.shields.io/github/stars/franzenzenhofer/big-arrow-on-the-screen?style=social)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers) Over 360 stars in the first two days, from people whose GitHub profiles list **Apple, NVIDIA, AMD, SAP, Salesforce, Palantir, ServiceNow, Booking.com, Mercedes-Benz, SUSE, Oxide Computer, Posit, CoreWeave, Weights & Biases, OpenRouter, Metabase, InstaDeep, Benchling, Stainless** and **Under Armour**, plus Stanford, Johns Hopkins, KTH and Oak Ridge National Laboratory.
-
-A star is not an endorsement. It is, however, a star, which is basically an arrow that gave up on direction.
-
 ## What is this actually for?
 
 Fair question. Arrows have existed since roughly the Paleolithic. What changed: agents now do real work on your Mac, and sooner or later hit a step **only a human may do**, or one the human wants to learn.
 
 - **"Click Allow."** Permission prompts, OAuth consent, "Open with...?". The agent finds the button but must not, or cannot, press it. It can point.
 - **"Your turn."** 2FA, CAPTCHAs, passkeys, payments, signatures. It points, you decide, it continues.
-- **"It's this window, not that one."** 14 Chrome windows? `--app "Google Chrome:Pull request"` picks the window and the tab.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
-- **"Show me how."** Ask how to do something in Keynote, Blender or System Settings, and the agent points at each control in turn: `start`, wait, `stop`, next. A product tour, minus the product.
-- **Helping someone else.** On a parent's Mac, pointing beats "the button at the top, no, the other top".
-- **Remote help.** "No, the *other* grid icon."
+- **"Show me how."** Ask how to do something in Blender, and the agent points at each control in turn. A product tour, minus the product.
+- **Helping someone else.** On a parent's Mac or over a screen share, pointing beats "the button at the top, no, the other top".
 - **Demos and docs.** Highlight while recording, or render straight to a PNG with `--png`.
 - **Debugging coordinates.** Point at your Accessibility or Peekaboo coordinates and look. `--dry-run --json` says where it *would* point.
 
@@ -201,6 +137,80 @@ Targets: `--at X,Y`, `--rect X,Y,W,H`, `--mouse`, `--window App[:title]`, `--ele
 `--app App[:window or tab title]` (or `--window`) first brings that app, window or Chrome/Safari tab to the front, because pointing at a window hidden behind your terminal is a special kind of unhelpful. If another app covers the target later, the arrow hides until it is visible again. `--no-raise` opts out. `bigarrow elements --app X` lists what `--element` can match; `bigarrow doctor` shows permissions and displays.
 
 Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found, 4 permission missing. Agents love exit codes. Humans tolerate them.
+
+## Looks
+
+It is an arrow, so we spent an unreasonable amount of time on how it looks.
+
+![Big arrows with signs: click here, sign here, over here, you are here, type your name, read this first, no the other one, click Allow](docs/images/hero.png)
+
+![every border style and colour option: default white border with shadow, white-black, black, close button, custom border and text colours](docs/images/looks.png)
+
+Six looks over white, macOS grey, dark, black, red and a busy web page:
+
+![default, white-black, black, close button, custom colours and a black arrow, each over six backgrounds](docs/images/backgrounds.png)
+
+![every style, shape, size and colour](docs/images/gallery.png)
+
+- `--shape bend|straight|zigzag|spiral`: zigzag for when it is *really* urgent; spiral loops once around the sign, for when it must be impossible to miss
+- `--style arrow|ring|box` (rings and boxes are outlines, the target stays visible), `--size S|M|L`, `--corners round|sharp`
+- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`
+- `--border shadow|white-black|black`: white border with drop shadow (default), a thin black edge instead of the shadow, or just a thin black outline
+- `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color`; left out, each picks a readable colour
+- `--close-button` puts an X inside the sign's right end; `--follow` moves with a window or element; `--until-click` ends on a click on the target; `--say` speaks the sign
+- Several arrows at once keep their signs out of each other's way
+
+`scripts/gallery.py` renders every combination and zooms into every sign-to-shaft joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
+
+## Creative arrows
+
+Fake dialogs, real `bigarrow`, clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
+
+### Delete node_modules: the easiest yes of your life
+
+![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png)
+
+`--color green`, because some decisions are easy
+
+### Cookie banner: the zigzag of mild urgency
+
+![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png)
+
+`--shape zigzag --color orange`
+
+### Software update: one lap of honour
+
+![Software update: Twirl. Then click.](docs/images/scenes/spiral.png)
+
+`--shape spiral`: once around the sign, then to the button
+
+### 2FA: find your phone
+
+![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png)
+
+`--color purple`
+
+### Friday deploy: the agent votes Cancel
+
+![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png)
+
+`--close-button`, because the human gets the last word
+
+### Save: three arrows, one button
+
+![Three arrows, one Save button](docs/images/scenes/which-button.png)
+
+three `start`s, one button, zero ambiguity
+
+### Permissions: Terminal, not bigarrow
+
+![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png)
+
+`--style box --corners sharp`, plus a lesson about macOS permissions
+
+## Starred by
+
+[![GitHub stars](https://img.shields.io/github/stars/franzenzenhofer/big-arrow-on-the-screen?style=social)](https://github.com/franzenzenhofer/big-arrow-on-the-screen/stargazers) Nearly 400 stars in the first two days, from people whose GitHub profiles list **Apple, NVIDIA, AMD, SAP, Salesforce, ServiceNow, Booking.com, Mercedes-Benz, SUSE, Oxide Computer, Posit, CoreWeave, Weights & Biases, OpenRouter, Metabase, InstaDeep, Benchling, Stainless** and **Under Armour**, plus Stanford, Johns Hopkins, KTH and Oak Ridge National Laboratory.
 
 ## FAQ
 
@@ -248,7 +258,7 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 ## How we know it works
 
 - 91 automated tests: geometry, placement, joints, a golden image, recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
-- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU. 
+- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
 ## For agents (and the humans who configure them)
