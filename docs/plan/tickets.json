@@ -722,8 +722,8 @@
         "size:S"
       ],
       "body": "The mark layer covers the whole display, so the pulse scales it around the display's centre and a box away from the centre swims by up to 8 % of that distance every 0.9 s. Pulse each mark around its own centre. Found and fixed by @jarombouts in PR #37 (commit 5d1d1c4); take that fix with credit, without the effects.\n\n**Acceptance criteria**\n- A unit test proves every mark layer's anchor is the target's centre.\n- A real screen check on the test Mac shows the box still while it pulses.",
-      "status": "later",
-      "outcome": "Open.",
+      "status": "done",
+      "outcome": "Mark group pinned to the mark's centre (MarkTests: 55 pt drift before, under 0.5 pt after); found by @jarombouts in #37.",
       "issue": "#38"
     },
     {
@@ -736,8 +736,8 @@
         "size:M"
       ],
       "body": "Commenters could not parse the permissions FAQ (https://news.ycombinator.com/item?id=50019459) and found the tagline empty (https://news.ycombinator.com/item?id=50020886); one asked how an arrow without focus can be in front at all (https://news.ycombinator.com/item?id=50018945), one why this needs a skill and how many tokens it costs (https://news.ycombinator.com/item?id=50019964). Keep the jokes and the voice. Replace vague or stacked phrases with concrete sentences: what it draws, where, for how long, what it needs.\n\n**Acceptance criteria**\n- Tagline says what the tool does in plain words.\n- Permissions FAQ answers in a table: feature, permission, who grants it.\n- New FAQ entries: 'How is it in front without taking the focus?' and 'Why a skill?' with the measured SKILL.md token count.",
-      "status": "later",
-      "outcome": "Open.",
+      "status": "done",
+      "outcome": "Tagline, intro, permissions table and new FAQ entries rewritten in plain sentences; jokes kept. Facts checked by a Codex review.",
       "issue": "#39"
     },
     {
@@ -778,8 +778,8 @@
         "size:S"
       ],
       "body": "'An arrow on the screen solves where do I click; it doesn't solve should this happen' (https://news.ycombinator.com/item?id=50020731, https://news.ycombinator.com/item?id=50019401). Fair. The skill must make the agent name the consequence: 'Franz, click Allow: Terminal gets Accessibility', not just 'click Allow'.\n\n**Acceptance criteria**\n- SKILL.md rule plus examples; README examples follow it.",
-      "status": "later",
-      "outcome": "Open.",
+      "status": "done",
+      "outcome": "SKILL.md rule plus examples; README hero command names the consequence.",
       "issue": "#42"
     },
     {
@@ -806,8 +806,8 @@
         "size:S"
       ],
       "body": "'What's stopping it from drawing a box that hides the decline button?' (https://news.ycombinator.com/item?id=50019459, https://news.ycombinator.com/item?id=50019723). Answer honestly: nothing the agent could not already do, since it runs code as you (https://news.ycombinator.com/item?id=50020728); what bigarrow guarantees: boxes and rings are border-only, the sign is placed off the target, every arrow ends by itself, a click on it removes it.\n\n**Acceptance criteria**\n- Every guarantee in the answer is backed by a named test.",
-      "status": "later",
-      "outcome": "Open.",
+      "status": "done",
+      "outcome": "FAQ answer; guarantees backed by MarkTests (outline only), PlacementTests (clear of the target), behaviour checks (click removes, ends by itself).",
       "issue": "#44"
     },
     {
@@ -820,8 +820,8 @@
         "size:S"
       ],
       "body": "'Does one need 4 programming languages to draw something on a mac?' (https://news.ycombinator.com/item?id=50019011). It does not: Shell, Python and Objective-C are screenshot and test tooling under `scripts/`. Mark them as non-detectable for GitHub's language stats.\n\n**Acceptance criteria**\n- GitHub's language bar shows Swift only; the scripts stay in the repo.",
-      "status": "later",
-      "outcome": "Open.",
+      "status": "done",
+      "outcome": "`.gitattributes` marks scripts/ non-detectable.",
       "issue": "#45"
     },
     {

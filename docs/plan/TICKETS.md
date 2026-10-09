@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 39 done, 3 not now, 8 later.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 44 done, 3 not now, 3 later.
 
 ## M0 Skeleton and proof
 
@@ -525,10 +525,10 @@ The real criticism and the real use cases from the Hacker News thread (https://n
 
 ### T41 Fix: the box or ring around the target drifts while it pulses
 
-**Status: Later** · Issue: #38  
+**Status: Done** · Issue: #38  
 Labels: `bug` `priority:P1` `size:S`
 
-**Outcome**: Open.
+**Outcome**: Mark group pinned to the mark's centre (MarkTests: 55 pt drift before, under 0.5 pt after); found by @jarombouts in #37.
 
 The mark layer covers the whole display, so the pulse scales it around the display's centre and a box away from the centre swims by up to 8 % of that distance every 0.9 s. Pulse each mark around its own centre. Found and fixed by @jarombouts in PR #37 (commit 5d1d1c4); take that fix with credit, without the effects.
 
@@ -538,10 +538,10 @@ The mark layer covers the whole display, so the pulse scales it around the displ
 
 ### T42 README: rewrite the passages that read like generated text, keep the tone
 
-**Status: Later** · Issue: #39  
+**Status: Done** · Issue: #39  
 Labels: `type:docs` `priority:P1` `size:M`
 
-**Outcome**: Open.
+**Outcome**: Tagline, intro, permissions table and new FAQ entries rewritten in plain sentences; jokes kept. Facts checked by a Codex review.
 
 Commenters could not parse the permissions FAQ (https://news.ycombinator.com/item?id=50019459) and found the tagline empty (https://news.ycombinator.com/item?id=50020886); one asked how an arrow without focus can be in front at all (https://news.ycombinator.com/item?id=50018945), one why this needs a skill and how many tokens it costs (https://news.ycombinator.com/item?id=50019964). Keep the jokes and the voice. Replace vague or stacked phrases with concrete sentences: what it draws, where, for how long, what it needs.
 
@@ -577,10 +577,10 @@ Labels: `type:docs` `priority:P2` `size:S`
 
 ### T45 Skill: on approvals the sign says what the click does
 
-**Status: Later** · Issue: #42  
+**Status: Done** · Issue: #42  
 Labels: `type:docs` `priority:P1` `size:S`
 
-**Outcome**: Open.
+**Outcome**: SKILL.md rule plus examples; README hero command names the consequence.
 
 'An arrow on the screen solves where do I click; it doesn't solve should this happen' (https://news.ycombinator.com/item?id=50020731, https://news.ycombinator.com/item?id=50019401). Fair. The skill must make the agent name the consequence: 'Franz, click Allow: Terminal gets Accessibility', not just 'click Allow'.
 
@@ -601,10 +601,10 @@ Labels: `type:docs` `priority:P2` `size:S`
 
 ### T47 FAQ: could an agent use the overlay to trick me?
 
-**Status: Later** · Issue: #44  
+**Status: Done** · Issue: #44  
 Labels: `type:docs` `priority:P2` `size:S`
 
-**Outcome**: Open.
+**Outcome**: FAQ answer; guarantees backed by MarkTests (outline only), PlacementTests (clear of the target), behaviour checks (click removes, ends by itself).
 
 'What's stopping it from drawing a box that hides the decline button?' (https://news.ycombinator.com/item?id=50019459, https://news.ycombinator.com/item?id=50019723). Answer honestly: nothing the agent could not already do, since it runs code as you (https://news.ycombinator.com/item?id=50020728); what bigarrow guarantees: boxes and rings are border-only, the sign is placed off the target, every arrow ends by itself, a click on it removes it.
 
@@ -613,10 +613,10 @@ Labels: `type:docs` `priority:P2` `size:S`
 
 ### T48 Language bar: the shipped binary is Swift only
 
-**Status: Later** · Issue: #45  
+**Status: Done** · Issue: #45  
 Labels: `type:infra` `priority:P3` `size:S`
 
-**Outcome**: Open.
+**Outcome**: `.gitattributes` marks scripts/ non-detectable.
 
 'Does one need 4 programming languages to draw something on a mac?' (https://news.ycombinator.com/item?id=50019011). It does not: Shell, Python and Objective-C are screenshot and test tooling under `scripts/`. Mark them as non-detectable for GitHub's language stats.
 
