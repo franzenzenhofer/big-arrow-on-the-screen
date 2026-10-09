@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 44 done, 3 not now, 3 later.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 47 done, 3 not now.
 
 ## M0 Skeleton and proof
 
@@ -528,7 +528,7 @@ The real criticism and the real use cases from the Hacker News thread (https://n
 **Status: Done** · Issue: #38  
 Labels: `bug` `priority:P1` `size:S`
 
-**Outcome**: Mark group pinned to the mark's centre (MarkTests: 55 pt drift before, under 0.5 pt after); found by @jarombouts in #37.
+**Outcome**: Mark group pinned to the mark's centre. MarkTests: 55 pt drift before, under 0.5 pt after; on Arthur Mac's real screen the box centre moves at most 1 pt across 8 pulse frames. Found by @jarombouts in #37.
 
 The mark layer covers the whole display, so the pulse scales it around the display's centre and a box away from the centre swims by up to 8 % of that distance every 0.9 s. Pulse each mark around its own centre. Found and fixed by @jarombouts in PR #37 (commit 5d1d1c4); take that fix with credit, without the effects.
 
@@ -552,10 +552,10 @@ Commenters could not parse the permissions FAQ (https://news.ycombinator.com/ite
 
 ### T43 README: real apps, real use cases, big screenshots from the test Mac
 
-**Status: Later** · Issue: #40  
+**Status: Done** · Issue: #40  
 Labels: `type:docs` `priority:P1` `size:M`
 
-**Outcome**: Open.
+**Outcome**: scripts/real-scenes.sh records five real-app scenes on macOS 27 (System Settings, Keynote, TextEdit print, Chrome tabs, Finder), shown one per row in "Real apps, real use cases"; plus the guide docs/guides/allow-screen-recording/ (six steps, real password sheet). Recorded by Arthur.
 
 The strongest reactions were about guiding, not doing: a tutorial in a complicated app (https://news.ycombinator.com/item?id=50019008, https://news.ycombinator.com/item?id=50020002), docs where the screenshot still makes you search (https://news.ycombinator.com/item?id=50019113), helping a parent over the phone (https://news.ycombinator.com/item?id=50019233, https://news.ycombinator.com/item?id=50019407, https://news.ycombinator.com/item?id=50020456). The README only shows staged dialogs and a joke HN page. Record real apps on the test Mac (System Settings, Keynote, Chrome, Finder) with real bigarrow commands, nothing personal on screen, C2PA stripped, and show them big further down the README.
 
@@ -565,10 +565,10 @@ The strongest reactions were about guiding, not doing: a tutorial in a complicat
 
 ### T44 Hero: re-stage the arrows on short, clean paths
 
-**Status: Later** · Issue: #41  
+**Status: Done** · Issue: #41  
 Labels: `type:docs` `priority:P2` `size:S`
 
-**Outcome**: Open.
+**Outcome**: Re-staged on the 2014-06-10 front page in a Chrome app window; five short straight arrows, none crosses a headline. scripts/hn-scene.sh reproduces it.
 
 'Even the example arrows in the first screenshot are wonky' (https://news.ycombinator.com/item?id=50020187). The long orange arc crosses six headlines and the red one hooks back on itself. Keep the scene and the jokes; pick sources and shapes so no shaft crosses text. No rendering change.
 
@@ -589,10 +589,10 @@ Labels: `type:docs` `priority:P1` `size:S`
 
 ### T46 Skill: deep-link first, point second
 
-**Status: Later** · Issue: #43  
+**Status: Done** · Issue: #43  
 Labels: `type:docs` `priority:P2` `size:S`
 
-**Outcome**: Open.
+**Outcome**: SKILL.md "Open the place first, then point" with deep links verified on macOS 27 (docs/research/2026-10-09-system-settings-deep-links.md); permission errors name the macOS 27 pane "Device Control and Data Access".
 
 'Have we thought about using hyperlinks?' (https://news.ycombinator.com/item?id=50020859). For System Settings the agent should open the exact pane with its `x-apple.systempreferences:` URL, then point at the one control, instead of pointing through five clicks.
 

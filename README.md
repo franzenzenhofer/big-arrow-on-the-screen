@@ -25,26 +25,11 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **"Your turn."** 2FA codes, CAPTCHAs, passkeys, a payment confirmation, a signature, a legal checkbox. The things an agent should never click on its own behalf. It points, you decide, it continues.
 - **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request"`. It even picks the right tab: `--app "Google Chrome:Pull request"`.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
-- **"Show me how."** Ask your agent how to do something in Keynote, Blender or System Settings, and it points at each control in turn instead of describing it: `start`, wait until you acted, `stop`, next step. Like a product tour, minus the product.
+- **"Show me how."** Ask your agent how to do something in Keynote, Blender or System Settings, and it points at each control in turn instead of describing it: `start`, wait until you acted, `stop`, next step. Like a product tour, minus the product. A full example: [How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md), every screenshot an arrow an agent drew.
 - **Helping someone else.** Install it on a parent's Mac, and the agent there can show them how to save a document as PDF. Pointing beats "the button at the top, no, the other top".
-- **Remote help.** "No, the *other* gear icon." Point at it instead of describing it.
+- **Remote help.** "No, the *other* grid icon." Point at it instead of describing it.
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.
 - **Debugging coordinates.** Not sure your Accessibility, screenshot or Peekaboo coordinates are right? Point at them and look. `--dry-run --json` tells you where it *would* point without drawing.
-
-### Situations we have all been in
-
-Staged with a neutral demo dialog and recorded with the real `bigarrow` on a clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
-
-| | |
-|---|---|
-| ![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png) | ![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png) |
-| `--color green` | `--shape zigzag --color orange` |
-| ![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png) | ![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png) |
-| `--color purple` | `--close-button`, because the human gets the last word |
-| ![Three arrows, one Save button](docs/images/scenes/which-button.png) | ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png) |
-| three `start`s, one button, zero ambiguity | `--style box --corners sharp`, plus a lesson about macOS permissions |
-| ![Software update: Twirl. Then click.](docs/images/scenes/spiral.png) | |
-| `--shape spiral`: once around the sign, then to the button | |
 
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
@@ -158,6 +143,38 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 - Several arrows at once keep their signs out of each other's way
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
+
+## Creative arrows
+
+Staged with a neutral demo dialog and recorded with the real `bigarrow` on a clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
+
+![Delete node_modules? Yes. Obviously.](docs/images/scenes/node-modules.png)
+
+`--color green`
+
+![Cookie banner: Franz, nobody reads these either](docs/images/scenes/cookies.png)
+
+`--shape zigzag --color orange`: zigzag, for when it is *really* urgent
+
+![Software update: Twirl. Then click.](docs/images/scenes/spiral.png)
+
+`--shape spiral`: once around the sign, then to the button
+
+![2FA: This is where you sigh and find your phone](docs/images/scenes/two-factor.png)
+
+`--color purple`
+
+![Friday deploy: the agent strongly suggests Cancel](docs/images/scenes/agent-needs-you.png)
+
+`--close-button`, because the human gets the last word
+
+![Three arrows, one Save button](docs/images/scenes/which-button.png)
+
+three `start`s, one button, zero ambiguity
+
+![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png)
+
+`--style box --corners sharp`, plus a lesson about macOS permissions
 
 ## FAQ
 
