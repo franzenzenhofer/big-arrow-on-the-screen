@@ -53,6 +53,9 @@ struct PointRunner {
             let child = try Detacher(config: config).spawn()
             var result = planned.result(pid: child.pid)
             result.detached = true
+            // The child placed the sign itself; its copy chips moved with it.
+            let (dx, dy) = (child.signFrame[0] - result.sign[0], child.signFrame[1] - result.sign[1])
+            result.copyButtons = result.copyButtons?.map { [$0[0] + dx, $0[1] + dy, $0[2], $0[3]] }
             result.sign = child.signFrame
             result.direction = child.direction
             report(result)
