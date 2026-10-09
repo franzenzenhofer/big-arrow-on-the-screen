@@ -12,10 +12,12 @@ ID="bigarrow-$(date +%s)-$$"
 ssh "$HOST" "mkdir -p /tmp/$ID && cat > /tmp/$ID/run.sh" <<SCRIPT
 #!/bin/zsh -l
 cd ~/dev/big-arrow-on-the-screen
-{ $COMMAND ; } > /tmp/$ID/out.log 2>&1
+(
+$COMMAND
+) > /tmp/$ID/out.log 2>&1
 echo \$? > /tmp/$ID/exit
 SCRIPT
-ssh "$HOST" "chmod +x /tmp/$ID/run.sh && open -na Ghostty.app --args --quit-after-last-window-closed=true -e /tmp/$ID/run.sh"
+ssh "$HOST" "chmod +x /tmp/$ID/run.sh && open -na Ghostty.app --args --quit-after-last-window-closed=true --command=/tmp/$ID/run.sh"
 for _ in $(seq "$TIMEOUT"); do
   if ssh "$HOST" "test -f /tmp/$ID/exit"; then
     ssh "$HOST" "cat /tmp/$ID/out.log"
