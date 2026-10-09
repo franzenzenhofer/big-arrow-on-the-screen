@@ -58,7 +58,17 @@ enum Animator {
             fade(layer, from: 0, to: 1, duration: 0.18)
         }
         fade(layers.markGroup, from: 0, to: 1, duration: 0.25)
+        pinToMark(layers.markGroup)
         pulse(layers.markGroup, begin: now + drawOn + 0.5)
+    }
+
+    /// The mark's layer covers the whole display, so it would pulse around the display's centre
+    /// and the box or ring would swim off its target. Pinned to the mark's own centre it stays put.
+    private static func pinToMark(_ group: CALayer) {
+        let boxes = (group.sublayers ?? []).compactMap { ($0 as? CAShapeLayer)?.path?.boundingBoxOfPath }
+        guard let first = boxes.first else { return }
+        let mark = boxes.dropFirst().reduce(first) { $0.union($1) }
+        OverlayLayers.pin(group, at: CGPoint(x: mark.midX, y: mark.midY), in: group.bounds)
     }
 
     private static func spring(_ layer: CALayer, from scale: CGFloat, begin: CFTimeInterval) {
