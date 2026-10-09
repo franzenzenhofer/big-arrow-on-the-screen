@@ -32,7 +32,12 @@ close_terminal() {
   [ -n "$TERMINAL_TITLE" ] || return
   # An interactive zsh ignores SIGTERM; without KILL, closing the window asks "Terminate?".
   # (macOS pgrep -t does not match "ttys008"; ps -t does.)
-  [ -n "$TERMINAL_TTY" ] && ps -t "${TERMINAL_TTY#/dev/}" -o pid= | xargs kill -KILL 2>/dev/null; sleep 1
+  local tty="${TERMINAL_TTY#/dev/}" _
+  if [ -n "$tty" ]; then
+    ps -t "$tty" -o pid= | xargs kill -KILL 2>/dev/null
+    # Closing while the shell is still there asks "Terminate?" and leaves the window behind.
+    for _ in $(seq 50); do [ -z "$(ps -t "$tty" -o pid=)" ] && break; sleep 0.1; done
+  fi
   osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
   TERMINAL_TITLE=""
 }
