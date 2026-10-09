@@ -16,6 +16,11 @@ public enum Spiral {
     static let runIn: CGFloat = 1.2
     /// The leg to the target starts along the loop's tangent for this share of its length.
     static let legTangent: CGFloat = 0.45
+    /// The shaft curves into the loop over this many loop samples, with the corner it would
+    /// otherwise turn as the curve's control point, so it never turns a right angle there.
+    static let entrySamples = 8
+    /// The straight stub out of the sign before that curve, in strokes.
+    static let entryStub: CGFloat = 1
 
     public struct Request: Sendable {
         public let sign: CGRect
@@ -59,12 +64,16 @@ public enum Spiral {
         let radii = CGSize(width: request.sign.width / 2 * 2.squareRoot() + gap, height: request.sign.height / 2 * 2.squareRoot() + gap)
         let offset = request.junction.point - center
         let start = atan2(offset.y / radii.height, offset.x / radii.width)
-        return (0...loopSamples).map { index in
+        let ring = (0...loopSamples).map { index in
             let share = CGFloat(index) / CGFloat(loopSamples)
             let angle = start + turn * 2 * .pi * share
             let grown = growth * share
             return center + CGPoint(x: (radii.width + grown) * cos(angle), y: (radii.height + grown) * sin(angle))
         }
+        let stub = request.junction.point + request.junction.normal * (request.metrics.stroke * entryStub)
+        let entry = QuadCurve(start: stub, control: ring[0], end: ring[entrySamples])
+        let blend = (0..<entrySamples).map { entry.point(CGFloat($0) / CGFloat(entrySamples)) }
+        return blend + ring.dropFirst(entrySamples)
     }
 
     /// How well the loop's last step points at the target: 1 straight at it, -1 away from it.
