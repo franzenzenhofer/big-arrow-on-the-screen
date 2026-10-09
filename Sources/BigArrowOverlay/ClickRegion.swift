@@ -51,7 +51,7 @@ struct ClickRegion {
 final class ClickTracker {
     static let interval: TimeInterval = 1.0 / 60
     /// The arrow dims slightly under the pointer to show that a click removes it.
-    static let hoverOpacity: Float = 0.82
+    static let hoverOpacity: Float = 0.92
 
     private weak var panel: NSPanel?
     private let root: CALayer

@@ -32,7 +32,7 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 
 ### Situations we have all been in
 
-Staged with a neutral demo dialog and recorded with the real `bigarrow` on a test Mac (`scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
+Staged with a neutral demo dialog and recorded with the real `bigarrow` on a clean CI runner (`BACKDROP_ARGS=--cover scripts/funny-scenes.sh`). The dialogs are fake. The feelings are real.
 
 | | |
 |---|---|
@@ -89,9 +89,11 @@ It is an arrow, so we spent an unreasonable amount of time on how it looks.
 - `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
 - `--style arrow|ring|box`; rings and boxes are border-only, so you still see what is under them
 - `--size S|M|L`, `--corners round|sharp`
-- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; light colours automatically get a dark outline and text
+- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; every arrow gets a thin black outline (white on near-black arrows), light colours get dark text
+- No drop shadow by default; `--shadow` adds a short, soft one for busy backgrounds
+- `--close-button` puts an X inside the sign's right end, where it never covers the text or leaves the screen
 - `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
-- Several arrows at once keep their signs out of each other's way (the HN shot above is five independent `bigarrow start` calls)
+- Several arrows at once keep their signs out of each other's way
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
 
@@ -104,7 +106,7 @@ Drawing needs neither. `--element`, `elements`, `--until-click` and `front --win
 No. That was the hardest bug in the project: `NSApplication.run()` quietly activates a process that has no terminal, so detached arrows grabbed the focus. `bigarrow` pumps events itself instead, and the tests check that the frontmost app never changes.
 
 **Can I click through it?**
-Yes, everywhere except the optional X, which is its own tiny panel that also never takes the focus.
+Yes, everywhere except the sign and the shaft: a click there removes the arrow (it dims slightly under the pointer to say so). A click on the target, or anywhere near the arrow's head, goes straight through to the app. Clicking the arrow never takes the focus.
 
 **Multiple displays? Full-screen apps? Stage Manager? Spaces?**
 Yes, yes, yes, yes. Displays left of or above the main one (negative coordinates) included. Unplug a display while an arrow is on it and the arrow politely leaves. See the [verification matrix](docs/verification/multi-display.md).
@@ -123,7 +125,7 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 
-- 82 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 84 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
 - 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, raising (and `--no-raise`), hiding while covered, selecting a Chrome tab, ending with the owner process, `stop --hook`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 

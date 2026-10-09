@@ -9,10 +9,14 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - A bound arrow (`--app` or `--window`) hides while another app's window covers its target and comes back when the target is visible again.
 - An arrow ends when the agent process that drew it exits (`CLAUDE_PID`, or `BIGARROW_OWNER_PID`); new dismissal reason `ownerGone`.
 - `bigarrow stop --session ID` and `bigarrow stop --hook` (Claude Code hook payload on stdin, silent) clear the arrows of one agent session.
+- A click on the sign or the shaft removes the arrow (it dims slightly under the pointer); clicks near the head and on the target pass through. No permission needed.
+- `--shadow`: an optional short, soft drop shadow.
 
 ### Changed
 - The target's app, window or tab comes to the front by default; `--no-raise` opts out. `--raise` is gone.
 - `start`, `--close-button` and `--until-click` arrows end after 300 s unless `--duration` says otherwise; `--duration 0` is the only way to keep one up indefinitely.
+- Look: a 1.5 pt black outline (white on near-black arrows) replaces the white contrast outline, and there is no drop shadow by default.
+- `--close-button` draws the X inside the sign's right end instead of a separate panel on its corner, so it never covers text or hangs off the screen.
 - Skill: one pattern (`start`, watch, `stop`), no close button by default, `--app` on every in-app target, the hook setup, about a third shorter.
 
 ## [0.1.2] - 2026-10-08

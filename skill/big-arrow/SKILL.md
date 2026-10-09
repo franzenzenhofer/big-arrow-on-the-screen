@@ -25,8 +25,9 @@ and the arrow hides while another app covers the target and returns when it is v
 It also ends by itself: after 300 s, when your agent session exits, and (with the hook below)
 when the human answers you. Still always `stop` it yourself the moment the step is done.
 
-Do not add `--close-button`; the human should not have to close anything. Use it only when the
-human asked to dismiss arrows themselves.
+The human can click the sign or the shaft to remove the arrow; clicks on the target pass
+through. So skip `--close-button` (it only adds an X to the sign) unless the human asks for one.
+A removed arrow means the human saw it: check the result, do not draw it again.
 
 ## Targets
 
@@ -58,7 +59,8 @@ Say what and by when. One arrow per step: `stop` before pointing at the next thi
 
 Full short sentence ("Franz, click Allow", not "here"). `--say` speaks it. `--color` red, orange,
 yellow, green, teal, blue, purple, pink, black, white or #hex. `--style box|ring` marks without
-covering, `--size S|M|L`, `--duration N` for a plain timed hint (default 8 s with `point`).
+covering, `--size S|M|L`, `--shadow` on busy backgrounds, `--duration N` for a plain timed hint
+(default 8 s with `point`).
 
 ## Errors
 
