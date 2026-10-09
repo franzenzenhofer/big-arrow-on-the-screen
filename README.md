@@ -86,6 +86,10 @@ It is an arrow, so we spent an unreasonable amount of time on how it looks.
 
 ![every border style and colour option: default white border with shadow, white-black, black, close button, custom border and text colours](docs/images/looks.png)
 
+Real screenshots on a clean test machine, six looks over white, macOS grey, dark, black, red and a busy web page:
+
+![default, white-black, black, close button, custom colours and a black arrow, each over six backgrounds](docs/images/backgrounds.png)
+
 ![every style, shape, size and colour](docs/images/gallery.png)
 
 - `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
