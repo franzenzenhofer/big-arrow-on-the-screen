@@ -25,7 +25,7 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 - **"Your turn."** 2FA codes, CAPTCHAs, passkeys, a payment confirmation, a signature, a legal checkbox. The things an agent should never click on its own behalf. It points, you decide, it continues.
 - **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request"`. It even picks the right tab: `--app "Google Chrome:Pull request"`.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
-- **"Show me how."** Ask your agent how to do something in Keynote, Blender or System Settings, and it points at each control in turn instead of describing it: `start`, wait until you acted, `stop`, next step. Like a product tour, minus the product.
+- **"Show me how."** Ask your agent how to do something in Keynote, Blender or System Settings, and it points at each control in turn instead of describing it: `start`, wait until you acted, `stop`, next step. Like a product tour, minus the product. A full example: [How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md), every screenshot an arrow an agent drew.
 - **Helping someone else.** Install it on a parent's Mac, and the agent there can show them how to save a document as PDF. Pointing beats "the button at the top, no, the other top".
 - **Remote help.** "No, the *other* grid icon." Point at it instead of describing it.
 - **Demos, screencasts, docs.** Highlight what matters while recording, or render the arrow straight into a PNG with `--png` for documentation.

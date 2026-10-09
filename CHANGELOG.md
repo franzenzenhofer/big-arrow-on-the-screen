@@ -15,6 +15,7 @@ After the [Hacker News thread](https://news.ycombinator.com/item?id=50018817); t
 - Skill: open the exact System Settings pane or page first, then point; deep links verified on macOS 27 (#43, research in `docs/research/2026-10-09-system-settings-deep-links.md`).
 - Permission errors name the pane macOS shows: on macOS 27 the Accessibility list is titled "Device Control and Data Access".
 - README: plain-language tagline and permissions FAQ, new FAQ entries on focus, trust and token cost, use cases that lead with guiding and helping (#39, #44).
+- New guide, `docs/guides/allow-screen-recording/`: how to allow screen recording on a Mac, six steps along Apple's own path, every screenshot a real arrow drawn by an agent on macOS 27, including the real password sheet.
 - GitHub's language stats ignore `scripts/`; the binary is Swift only (#45).
 - README: "Real apps, real use cases" with five real-app scenes recorded on macOS 27 by `scripts/real-scenes.sh` (System Settings, Keynote, TextEdit, Chrome, Finder) (#40); the hero is re-staged on a 2014 front page with short arrows that cross no headline (#41); the staged dialogs moved further down into "Creative arrows", one image per row.
 
