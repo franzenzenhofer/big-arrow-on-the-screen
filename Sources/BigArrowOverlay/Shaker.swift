@@ -9,7 +9,8 @@ enum Shaker {
     static let jolts = 40
     static let burst = 10
 
-    static func shake(_ stage: CALayer, layers: OverlayLayers, level: ShakeLevel) {
+    /// Adds the same jolts to every layer in `targets`, in one transaction, so they move as one.
+    static func shake(_ targets: [CALayer], layers: OverlayLayers, level: ShakeLevel) {
         let count = level.period > 0 ? burst : jolts
         let offsets = (0..<count).map { index -> CGPoint in
             let angle = PathSampler.jitter(index, salt: 7) * 2 * .pi
@@ -29,7 +30,7 @@ enum Shaker {
         group.animations = [x, y]
         group.duration = duration
         group.repeatCount = .infinity
-        stage.add(group, forKey: "shake")
+        for target in targets { target.add(group, forKey: "shake") }
         if level == .topiramate { throb([layers.signEdge, layers.sign, layers.signText]) }
     }
 
