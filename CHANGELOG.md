@@ -7,6 +7,8 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ### Changed
 - README: a one-line table of contents under the hero, and "Starred by": the companies and universities on the stargazers' public GitHub profiles, no names, no pictures.
 - `main` is protected by a ruleset: no force pushes, no deletion.
+- README: a video leads "Real apps, real use cases": an agent walks a human through "Click wallpaper to show desktop" in Desktop & Dock, six funny arrows, real clicks on macOS 27, recorded by `scripts/wallpaper-video.sh` (the Apple menu's account name and the desktop widgets pixelated).
+- `scripts/testkit.swift`: `glide` (a hand-like pointer move) and `scroll` (wheel lines) for recordings.
 
 ## [0.4.5] - 2026-10-09
 

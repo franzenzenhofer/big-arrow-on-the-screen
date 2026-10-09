@@ -1,5 +1,7 @@
 // Test helper for scripts/behaviour-check.sh, run only on a disposable machine (CI runner):
 //   testkit click X Y                posts a left click at global top-left point X,Y
+//   testkit glide X Y SECONDS        moves the pointer there smoothly, like a hand (for recordings)
+//   testkit scroll X Y LINES         scrolls the wheel over X,Y, LINES > 0 scrolls the content down
 //   testkit move-window APP X Y      moves APP's first window to X,Y via Accessibility (APP may be 'frontmost')
 //   testkit resize-window APP W H    resizes APP's first window via Accessibility
 //   testkit frontmost                prints the frontmost app's name
@@ -30,6 +32,27 @@ func click(_ point: CGPoint) {
     }
 }
 
+/// Eases the pointer from where it is to the point in 60 steps per second.
+func glide(to point: CGPoint, seconds: Double) {
+    let start = CGEvent(source: nil)?.location ?? point
+    let steps = max(Int(seconds * 60), 1)
+    for step in 1...steps {
+        let t = Double(step) / Double(steps), eased = t * t * (3 - 2 * t)
+        let at = CGPoint(x: start.x + (point.x - start.x) * eased, y: start.y + (point.y - start.y) * eased)
+        CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: at, mouseButton: .left)?.post(tap: .cghidEventTap)
+        usleep(useconds_t(seconds / Double(steps) * 1_000_000))
+    }
+}
+
+/// One wheel line at a time, so the list moves visibly instead of jumping.
+func scroll(at point: CGPoint, lines: Int) {
+    CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+    for _ in 0..<abs(lines) {
+        CGEvent(scrollWheelEvent2Source: nil, units: .line, wheelCount: 1, wheel1: lines > 0 ? -1 : 1, wheel2: 0, wheel3: 0)?.post(tap: .cghidEventTap)
+        usleep(60_000)
+    }
+}
+
 func firstWindow(of name: String) -> AXUIElement {
     let element = AXUIElementCreateApplication(app(named: name).processIdentifier)
     var windows: CFTypeRef?
@@ -53,6 +76,8 @@ func resizeWindow(of name: String, to size: CGSize) {
 let args = CommandLine.arguments
 switch args.dropFirst().first {
 case "click": click(CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0))
+case "glide": glide(to: CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0), seconds: Double(args[4]) ?? 0.8)
+case "scroll": scroll(at: CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0), lines: Int(args[4]) ?? 3)
 case "move-window": moveWindow(of: args[2], to: CGPoint(x: Double(args[3]) ?? 0, y: Double(args[4]) ?? 0))
 case "windows":
     let pid = app(named: args[2]).processIdentifier
