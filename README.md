@@ -89,7 +89,9 @@ bigarrow start --element Group --role menubutton --app Finder \
 
 ### A real guide: allow screen recording
 
-[How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md): every screenshot is an arrow an agent drew.
+<a href="docs/guides/allow-screen-recording/how-to-allow-screen-recording-on-a-mac.pdf"><img src="docs/images/guide-pdf-preview.png" width="600" alt="The guide as a 6-page PDF: page thumbnails on the left, page 1 large on the right, How to allow screen recording on a Mac, step 1 with an arrow at Privacy &amp; Security"></a>
+
+The whole guide as a 6-page PDF, every screenshot an arrow an agent drew. [Download the PDF](docs/guides/allow-screen-recording/how-to-allow-screen-recording-on-a-mac.pdf) or [read it here](docs/guides/allow-screen-recording/README.md).
 
 ## What is this actually for?
 
@@ -214,8 +216,11 @@ three `start`s, one button, zero ambiguity
 
 ## FAQ
 
-**Does it need Screen Recording or Accessibility?**
-Drawing needs nothing. Some ways of finding the target do:
+[Permissions?](#does-it-need-screen-recording-or-accessibility) · [In front without focus?](#it-never-takes-the-focus-how-is-it-in-front) · [Steals my typing?](#will-it-steal-my-focus-while-im-typing) · [Click through?](#can-i-click-through-it) · [Displays and Spaces?](#multiple-displays-full-screen-apps-stage-manager-spaces) · [CPU?](#how-much-cpu-does-a-pulsing-arrow-cost) · [Web pages?](#does---element-work-inside-web-pages) · [Can it trick me?](#could-an-agent-use-this-to-trick-me) · [Token cost?](#why-a-skill-is-that-a-lot-of-tokens) · [Why not an annotation app?](#why-not-just-use-a-screen-annotation-app) · [Is it AI?](#is-it-ai)
+
+### Does it need Screen Recording or Accessibility?
+
+**Drawing: no.** Some ways of finding the target do:
 
 | You use | Permission |
 |---|---|
@@ -225,35 +230,45 @@ Drawing needs nothing. Some ways of finding the target do:
 
 macOS grants these to the app that started `bigarrow` (Terminal, iTerm2, Ghostty, VS Code, Claude), never to `bigarrow` itself, so switch on that app. `bigarrow doctor` names it; a missing permission exits with code 4 and names the app and the settings pane.
 
-**It never takes the focus. How is it in front?**
-On top and focused are separate things on macOS. The arrow sits at screen-saver level, above windows, dialogs and full-screen apps, but never becomes the active window.
+### It never takes the focus. How is it in front?
 
-**Will it steal my focus while I'm typing?**
-No. That was the hardest bug in the project: `NSApplication.run()` quietly activates a process without a terminal. `bigarrow` pumps events itself, and the tests check that the frontmost app never changes.
+**On top and focused are two different things on macOS.** The arrow sits at screen-saver level, above windows, dialogs and full-screen apps, but never becomes the active window.
 
-**Can I click through it?**
-Yes, everywhere except the sign and the shaft: a click there removes the arrow (it dims under the pointer to say so). Clicks on the target or near the head go straight to the app, without taking the focus.
+### Will it steal my focus while I'm typing?
 
-**Multiple displays? Full-screen apps? Stage Manager? Spaces?**
-Yes, yes, yes, yes. Negative coordinates included. Unplug a display while an arrow is on it and the arrow politely leaves. See the [verification matrix](docs/verification/multi-display.md).
+**No.** That was the hardest bug in the project: `NSApplication.run()` quietly activates a process without a terminal. `bigarrow` pumps events itself, and the tests check that the frontmost app never changes.
 
-**How much CPU does a pulsing arrow cost?**
-1.4 % on a CI runner. Core Animation does the work in the render server.
+### Can I click through it?
 
-**Does `--element` work inside web pages?**
-In Electron apps, yes. In Chrome only with `--force-renderer-accessibility` (or VoiceOver on); Chrome ignores the usual request (verified October 2026). Chrome's own toolbar always works. Otherwise point at page coordinates, which the skill explains.
+**Yes, everywhere except the sign and the shaft.** A click there removes the arrow (it dims under the pointer to say so). Clicks on the target or near the head go straight to the app, without taking the focus.
 
-**Could an agent use this to trick me, say by covering the Decline button?**
-An agent that runs shell commands as you can already do far worse, so `bigarrow` gives it nothing new. Still, each checked by a test: boxes and rings are outlines, so the target stays visible; the sign keeps clear of the target (or overlaps it as little as possible); a click on sign or shaft removes the arrow; every arrow ends by itself. And the skill makes the sign say what your click does.
+### Multiple displays? Full-screen apps? Stage Manager? Spaces?
 
-**Why a skill? Is that a lot of tokens?**
-The agent always sees only the skill's description, 182 tokens. The instructions, 1,398 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point; pane ids and look flags (1,008 more) only when it needs them.
+**Yes, yes, yes, yes.** Negative coordinates included. Unplug a display while an arrow is on it and the arrow politely leaves. See the [verification matrix](docs/verification/multi-display.md).
 
-**Why not just use [some screen annotation app]?**
-Those are for humans drawing on screens. This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked first ([research](docs/research/)). None did this.
+### How much CPU does a pulsing arrow cost?
 
-**Is it AI?**
-No. It is the least intelligent part of your AI stack, and proud of it.
+**1.4 % on a CI runner.** Core Animation does the work in the render server.
+
+### Does `--element` work inside web pages?
+
+**In Electron apps, yes. In Chrome, only with help.** Chrome needs `--force-renderer-accessibility` (or VoiceOver on); it ignores the usual request (verified October 2026). Chrome's own toolbar always works. Otherwise point at page coordinates, which the skill explains.
+
+### Could an agent use this to trick me?
+
+Say, by covering the Decline button? **Not beyond what it can already do.** An agent that runs shell commands as you can do far worse, so `bigarrow` gives it nothing new. Still, each checked by a test: boxes and rings are outlines, so the target stays visible; the sign keeps clear of the target (or overlaps it as little as possible); a click on sign or shaft removes the arrow; every arrow ends by itself. And the skill makes the sign say what your click does.
+
+### Why a skill? Is that a lot of tokens?
+
+**182 tokens, most of the time.** That is the skill's description, the only part the agent always sees. The instructions, 1,398 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point; pane ids and look flags (1,008 more) only when it needs them.
+
+### Why not just use a screen annotation app?
+
+**Those are for humans drawing on screens.** This is for programs pointing at things, from a shell, with exit codes. Twenty-six tools were checked first ([research](docs/research/)). None did this.
+
+### Is it AI?
+
+**No.** It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 

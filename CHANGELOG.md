@@ -8,6 +8,8 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 - README: a one-line table of contents under the hero, and "Starred by": the companies and universities on the stargazers' public GitHub profiles, no names, no pictures.
 - `main` is protected by a ruleset: no force pushes, no deletion.
 - README: a video leads "Real apps, real use cases": an agent walks a human through "Click wallpaper to show desktop" in Desktop & Dock, six funny arrows, real clicks on macOS 27, recorded by `scripts/wallpaper-video.sh` (the Apple menu's account name and the desktop widgets pixelated).
+- README: one subheadline per real-app shot (app and use case) and per creative scene, prose cut to a line; Install moves up under "What is it for?"; the FAQ is real questions and answers, one heading each, with a question index.
+- The screen-recording guide also comes as a 6-page PDF (`scripts/guide-pdf.sh`, styled by `docs/guides/guide.css`); the README shows it as a viewer with page thumbnails, rendered offscreen by `scripts/pdf-preview.swift`.
 - `scripts/testkit.swift`: `glide` (a hand-like pointer move) and `scroll` (wheel lines) for recordings.
 
 ## [0.4.5] - 2026-10-09
