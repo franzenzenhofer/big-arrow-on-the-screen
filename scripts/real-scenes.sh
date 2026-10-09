@@ -14,6 +14,11 @@ WORK=$(cd "$(mktemp -d /tmp/real-scenes.XXXXXX)" && pwd -P)
 mkdir -p "$OUT"
 swiftc -O scripts/testkit.swift -o "$WORK/testkit" || exit 1
 KIT="$WORK/testkit"
+# The main display's size in points, e.g. 1470,956.
+SCREEN=$(osascript -e 'tell application "Finder" to get bounds of window of desktop' | awk -F', ' '{print $3 "," $4}')
+# Labels that differ between macOS versions; override them per machine.
+SETTINGS_ADD="${SETTINGS_ADD:-Add}"
+FINDER_ICONS="${FINDER_ICONS:-icon view}"
 DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
 WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
 # What the scenes opened; each close_* closes only that, so a failed scene leaves nothing behind
@@ -79,12 +84,12 @@ frame() {
 arrow() {
   "$@" --no-animation --json >> "$WORK/arrows.json" || { echo "arrow failed: $*" >&2; exit 1; }
 }
-# shoot <name> <window x,y,w,h>: captures the window plus every sign, 32 pt around them, never
-# the menu bar, clipped to the test Mac's 1470x956 point display.
+# shoot <name> <window x,y,w,h>: captures the window plus every sign, 32 pt around them, from
+# the menu bar down, clipped to the main display (1470x956 points on the test Mac).
 shoot() {
   sleep 1.2
   local region
-  region=$(python3 - "$2" "$WORK/arrows.json" <<'PY'
+  region=$(python3 - "$2" "$WORK/arrows.json" "$SCREEN" <<'PY'
 import json, sys
 x, y, w, h = (float(v) for v in sys.argv[1].split(","))
 rects = [(x, y, x + w, y + h)]
@@ -93,9 +98,12 @@ for line in open(sys.argv[2]):
     rects.append((sx, sy, sx + sw, sy + sh))
 pad = 32
 left = max(min(r[0] for r in rects) - pad, 0)
-top = max(min(r[1] for r in rects) - pad, 34)
-right = min(max(r[2] for r in rects) + pad, 1470)
-bottom = min(max(r[3] for r in rects) + pad, 956)
+left = 0 if left < 450 else left  # near an edge: take the whole menu bar
+top = 0  # the menu bar stays in: a real desktop, not a cut-out
+screen_w, screen_h = (float(v) for v in sys.argv[3].split(','))
+right = min(max(r[2] for r in rects) + pad, screen_w)
+bottom = min(max(r[3] for r in rects) + pad, screen_h)
+right = screen_w if screen_w - right < 300 else right
 print(f"{left:.0f},{top:.0f},{right - left:.0f},{bottom - top:.0f}")
 PY
 )
@@ -110,7 +118,9 @@ scene_settings() {
   # The sidebar (it shows the Apple Account name) sits off the left edge of the screen.
   hide_others "System Settings"; place "System Settings" -250 160
   arrow $BIN start --element Terminal_Toggle --app "System Settings" \
-    --text "Franz, switch this on: Terminal may control your Mac" --from right
+    --text "Franz, switch this on: Terminal may control your Mac" --from right --color green --close-button
+  arrow $BIN start --element "$SETTINGS_ADD" --role button --app "System Settings" \
+    --text "Not in the list? Plus. Then find it." --from bottom-right --style ring --color orange --shape zigzag --size S
   shoot settings "$(frame "System Settings")"
 }
 
@@ -137,13 +147,17 @@ end tell
 AS
 ) && [ -n "$KEYNOTE_DOC" ] || { echo "keynote: could not create the demo deck" >&2; exit 1; }
   sleep 1.5
-  hide_others Keynote; place Keynote 20 130 900 740
+  hide_others Keynote; place Keynote 20 320 900 740
   local win; win=$(frame Keynote)
   # Open the Animate inspector so step 2 has its button on screen.
   click_element Keynote Animate
   sleep 1
-  arrow $BIN start --element Animate --app Keynote --role radiobutton --text "1. Click Animate" --from right
-  arrow $BIN start --element "Add an Effect" --app Keynote --text "2. Add an Effect" --from right
+  arrow $BIN start --element Animate --app Keynote --role radiobutton --text "1. Click Animate" --from right \
+    --style ring --color purple
+  arrow $BIN start --element "Add an Effect" --app Keynote --text "2. Add an Effect" --from right \
+    --style box --corners sharp --color "#FF9F0A" --shape straight
+  arrow $BIN start --element Play --app Keynote --role button --text "3. Press play. Bask in the applause." \
+    --from top --color teal --shape zigzag --size S
   shoot keynote "$win"
   close_keynote
 }
@@ -158,7 +172,10 @@ scene_print() {
   PRINT_SHEET=1
   osascript -e 'tell application "TextEdit" to activate' -e 'tell application "System Events" to keystroke "p" using command down'
   sleep 2.5
-  arrow $BIN start --element PDF --role button --app TextEdit --text "Mom, click PDF, then Save as PDF" --from bottom
+  arrow $BIN start --element PDF --role button --app TextEdit --text "Mom, click PDF, then Save as PDF" --from bottom \
+    --color pink --border white-black
+  arrow $BIN start --element Cancel --role button --app TextEdit --text "Not this one, Mom" --from bottom-right \
+    --color black --size S
   shoot print "$win"
   close_textedit
 }
@@ -188,7 +205,7 @@ end tell
 AS
   sleep 1
   arrow $BIN start --app "Google Chrome:Sourdough" --element "Sourdough - Wikipedia" --role radiobutton \
-    --text "It's this tab, not the other 13" --from top
+    --text "It's this tab, not the other 13" --from top --shape zigzag --color "#5856D6" --size L
   shoot chrome "60,330,1340,580"
   close_chrome
 }
@@ -203,12 +220,16 @@ scene_finder() {
   done
   FINDER_FOLDER="$folder"
   open "$folder"; sleep 2
+  # Other Finder windows (somebody's Downloads, say) are minimized, never closed.
+  osascript -e 'tell application "System Events" to tell process "Finder" to set value of attribute "AXMinimized" of (every window whose name is not "Family Recipes") to true' > /dev/null 2>&1
   osascript -e 'tell application "Finder" to set sidebar width of front window to 0' \
     -e 'tell application "Finder" to set current view of front window to icon view' \
     -e 'tell application "Finder" to set bounds of front window to {300, 330, 1100, 790}' > /dev/null
   hide_others Finder; sleep 1
+  arrow $BIN start --element "$FINDER_ICONS" --role radiobutton --app Finder --text "Not this one" --from top-left \
+    --style ring --color black --size S
   arrow $BIN start --element Group --role menubutton --app Finder \
-    --text "No, the other grid icon. This one." --from top
+    --text "No, the other grid icon. This one." --from top --style box --color green
   shoot finder "$(frame Finder)"
   close_finder
 }
