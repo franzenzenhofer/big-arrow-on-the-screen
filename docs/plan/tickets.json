@@ -870,7 +870,7 @@
       ],
       "body": "The human often has to paste something the agent may not type: a `sudo` command, a URL, a code. `{{value}}` in `--text` puts the value on the sign with a copy button; one click copies it and the arrow keeps pointing where it goes. Plan: `docs/plan/2026-10-09-copy-button.md`.\n\n**Acceptance criteria**\n- A real click on the chip puts the value on the clipboard and keeps the arrow; a click elsewhere on the sign still ends it.\n- No permission needed; icon from an MIT library with its licence in the repo.\n- README section with a real use case and a small one.",
       "status": "done",
-      "outcome": "`{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section with Terminal and Chrome scenes."
+      "outcome": "`{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section \"Copy & paste\": a made-up PIN, before and after the click."
     }
   ]
 }

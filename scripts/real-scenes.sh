@@ -5,7 +5,7 @@
 # Other apps are hidden, the Dock and desktop widgets too (restored on exit); demo files live in
 # a temporary folder and Chrome gets a fresh temporary profile, so nothing personal is on screen.
 # Usage: scripts/real-scenes.sh <out-dir> [scene ...]
-#   scenes: settings keynote print chrome finder (default), terminal and address (copy buttons)
+#   scenes: settings keynote print chrome finder (default), pin (copy & paste)
 set -uo pipefail
 OUT="$1"; shift
 SCENES="${*:-settings keynote print chrome finder}"
@@ -20,27 +20,12 @@ SCREEN=$(osascript -e 'tell application "Finder" to get bounds of window of desk
 # Labels that differ between macOS versions; override them per machine.
 SETTINGS_ADD="${SETTINGS_ADD:-Add}"
 FINDER_ICONS="${FINDER_ICONS:-icon view}"
-# Points from the Terminal window's top to its prompt line (title bar plus seven lines).
-TERM_PROMPT_Y="${TERM_PROMPT_Y:-126}"
 DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
 WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
 # What the scenes opened; each close_* closes only that, so a failed scene leaves nothing behind
 # and nothing of the human's (other decks, documents, Chrome windows) is ever touched.
-CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""; TERMINAL_TITLE=""; TERMINAL_TTY=""
+CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""
 close_chrome() { [ -n "$CHROME_PID" ] && kill "$CHROME_PID" 2>/dev/null; CHROME_PID=""; }
-close_terminal() {
-  [ -n "$TERMINAL_TITLE" ] || return
-  # An interactive zsh ignores SIGTERM; without KILL, closing the window asks "Terminate?".
-  # (macOS pgrep -t does not match "ttys008"; ps -t does.)
-  local tty="${TERMINAL_TTY#/dev/}" _
-  if [ -n "$tty" ]; then
-    ps -t "$tty" -o pid= | xargs kill -KILL 2>/dev/null
-    # Closing while the shell is still there asks "Terminate?" and leaves the window behind.
-    for _ in $(seq 50); do [ -z "$(ps -t "$tty" -o pid= 2>/dev/null)" ] && break; sleep 0.1; done
-  fi
-  osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
-  TERMINAL_TITLE=""
-}
 close_keynote() {
   [ -n "$KEYNOTE_DOC" ] && osascript -e "tell application \"Keynote Creator Studio\" to close (every document whose id is \"$KEYNOTE_DOC\") saving no" > /dev/null
   KEYNOTE_DOC=""
@@ -68,7 +53,7 @@ AS
 }
 cleanup() {
   $BIN stop --all >/dev/null 2>&1
-  close_chrome; close_keynote; close_textedit; close_finder; close_terminal
+  close_chrome; close_keynote; close_textedit; close_finder
   defaults write com.apple.dock autohide -int "$DOCK_AUTOHIDE"; killall Dock
   defaults write com.apple.WindowManager StandardHideWidgets -int "$WIDGETS_HIDDEN"
 }
@@ -106,6 +91,12 @@ arrow() {
 # them, from the menu bar down, clipped to the main display (1470x956 points on the test Mac),
 # after the given wait (default 1.2 s, for the arrows to settle).
 shoot() {
+  capture "$@"
+  $BIN stop --all > /dev/null
+  : > "$WORK/arrows.json"
+}
+# capture: shoot without ending the arrows, for a scene shown in two states.
+capture() {
   sleep "${3:-1.2}"
   local region
   region=$(python3 - "$2" "$WORK/arrows.json" "$SCREEN" <<'PY'
@@ -127,9 +118,8 @@ print(f"{left:.0f},{top:.0f},{right - left:.0f},{bottom - top:.0f}")
 PY
 )
   screencapture -x -R "$region" "$OUT/$1.png"
+  echo "$OUT/$1.png" >> "$WORK/shots.txt"
   echo "$1: $region"
-  $BIN stop --all > /dev/null
-  : > "$WORK/arrows.json"
 }
 
 scene_settings() {
@@ -253,86 +243,53 @@ scene_finder() {
   close_finder
 }
 
-# Copy buttons, the real case: a build stops because Xcode needs an admin password, which the
-# agent must not type. The sign carries the command; a real click on its chip copies it, Cmd-V
-# pastes it, and the shot is taken while the chip still shows its check.
-scene_terminal() {
-  TERMINAL_TITLE="my-app build"
-  # A plain interactive zsh in a folder called my-app, so the title bar reads "my-app" and
-  # "-zsh" like any Terminal window; the scene's .zshrc prints the failed build and the prompt.
-  mkdir -p "$WORK/my-app" "$WORK/zdot"
-  cat > "$WORK/zdot/.zshrc" <<'RC'
-sleep 3; clear
-PROMPT='%F{blue}my-app%f %% '
-print -P '%F{blue}my-app%f %% xcodebuild -scheme MyApp build'
-print 'xcodebuild: error: You have not agreed to the Xcode license agreements. You must agree to both license'
-print 'agreements below in order to use Xcode.'
-print 'Agreeing to the Xcode/iOS license requires admin privileges, please run "sudo xcodebuild -license"'
-print 'and then retry this command.'
-print
-RC
-  printf '#!/bin/zsh -f\ncd "%s"\nZDOTDIR="%s" exec -a -zsh /bin/zsh -i\n' "$WORK/my-app" "$WORK/zdot" > "$WORK/build.command"
-  chmod +x "$WORK/build.command"
-  open -a Terminal "$WORK/build.command"; sleep 1
+# Copy & paste: a made-up sign-in page asks for a PIN. Two shots: the copy button, then, after
+# a real click on it and Cmd-V, the pasted PIN while the chip still shows its check.
+scene_pin() {
+  local profile="$WORK/chrome-pin"
+  cat > "$WORK/pin.html" <<'HTML'
+<!doctype html><meta charset="utf-8"><title>Acme sign-in</title>
+<style>
+  body { margin: 0; height: 100vh; display: grid; place-items: center; background: #f3f4f6;
+         font: 18px -apple-system, sans-serif; color: #111; }
+  main { background: #fff; padding: 36px 44px; border-radius: 16px; box-shadow: 0 6px 24px #0002; text-align: center; }
+  h1 { font-size: 26px; margin: 0 0 6px; } p { margin: 0 0 22px; color: #555; }
+  input { font: 600 34px ui-monospace, monospace; letter-spacing: 10px; width: 250px; padding: 10px 14px;
+          border: 2px solid #ccc; border-radius: 10px; text-align: center; }
+</style>
+<main><h1>Acme</h1><p>Enter the PIN we sent you</p><input aria-label="PIN code" autofocus></main>
+HTML
+  open -na "Google Chrome" --args --user-data-dir="$profile" --no-first-run --no-default-browser-check \
+    --disable-search-engine-choice-screen --hide-crash-restore-bubble --force-renderer-accessibility \
+    --app="file://$WORK/pin.html"; sleep 5
+  CHROME_PID=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile" | head -1)
+  [ -n "$CHROME_PID" ] || { echo "pin: the temporary Chrome did not start" >&2; exit 1; }
+  osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
   osascript > /dev/null <<AS
-tell application "Terminal" to tell selected tab of front window
-  set custom title to "$TERMINAL_TITLE"
-  set title displays custom title to true
-  set title displays device name to false
-  set title displays shell path to false
-  set title displays window size to false
+tell application "System Events" to tell (first process whose unix id is $CHROME_PID)
+  set position of window 1 to {40, 260}
+  set size of window 1 to {640, 400}
 end tell
 AS
-  TERMINAL_TTY=$(osascript -e 'tell application "Terminal" to get tty of selected tab of front window')
-  # Other Terminal windows are minimized, never closed.
-  osascript -e "tell application \"System Events\" to tell process \"Terminal\" to set value of attribute \"AXMinimized\" of (every window whose name does not contain \"$TERMINAL_TITLE\") to true" > /dev/null 2>&1
-  hide_others Terminal; place Terminal 420 260 820 300
-  sleep 3
-  # Again, before any arrow (hiding bigarrow would hide its arrow): windows that appeared since,
-  # like the runner's own terminal, go too.
-  hide_others Terminal
-  local win; win=$(frame Terminal)
-  # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
-  local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
-  arrow $BIN start --rect "$prompt" --app "Terminal:$TERMINAL_TITLE" \
-    --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return" \
-    --from bottom --color red
+  sleep 1
+  arrow $BIN start --element "PIN code" --role textfield --app "Google Chrome:Acme sign-in" --from right \
+    --color blue --border-color yellow --text-color yellow --text "Franz, copy & paste the PIN {{482913}} here"
+  capture pin "40,260,640,400"
   local chip
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
 print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
-  sleep 1; $KIT click $chip; sleep 0.2
+  $KIT click $chip; sleep 0.2
   osascript -e 'tell application "System Events" to keystroke "v" using command down'
-  shoot terminal "$win" 0.4
-  close_terminal
-}
-
-# Copy buttons, the small case: a dev server is up; the URL goes into the address bar.
-scene_address() {
-  local profile="$WORK/chrome-address"
-  open -na "Google Chrome" --args --user-data-dir="$profile" --no-first-run --no-default-browser-check \
-    --disable-search-engine-choice-screen --hide-crash-restore-bubble --new-window about:blank; sleep 5
-  CHROME_PID=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile" | head -1)
-  [ -n "$CHROME_PID" ] || { echo "address: the temporary Chrome did not start" >&2; exit 1; }
-  osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
-  osascript > /dev/null <<AS
-tell application "System Events" to tell (first process whose unix id is $CHROME_PID)
-  set position of window 1 to {40, 330}
-  set size of window 1 to {720, 420}
-end tell
-AS
-  sleep 1
-  arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
-    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --shape bend --size S \
-    --color blue --border-color yellow --text-color yellow
-  shoot address "40,330,720,420"
+  shoot pin-copied "40,260,640,400" 0.4
   close_chrome
 }
 
 for scene in $SCENES; do "scene_$scene"; done
 # README size: 256 colours, then smaller until each file is under 700 KB.
-for scene in $SCENES; do
-  python3 - "$OUT/$scene.png" <<'PY'
+# Only this run's shots.
+while read -r shot; do
+  python3 - "$shot" <<'PY'
 import os, sys
 from PIL import Image
 path = sys.argv[1]
@@ -343,5 +300,5 @@ while True:
         break
     image = image.resize((int(image.width * 0.85), int(image.height * 0.85)), Image.LANCZOS)
 PY
-done
+done < "$WORK/shots.txt"
 ls -la "$OUT"
