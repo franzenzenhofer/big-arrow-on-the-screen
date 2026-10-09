@@ -83,6 +83,8 @@ bigarrow start --element Group --role menubutton --app Finder \
 
 Remote help, updated for macOS 27: the gear icon is gone, but there are now two grid icons, and it is always the other one.
 
+Not a joke app: [How to allow screen recording on a Mac](docs/guides/allow-screen-recording/README.md), a real step-by-step guide whose every screenshot is an arrow an agent drew with bigarrow.
+
 ## Install
 
 ```bash
