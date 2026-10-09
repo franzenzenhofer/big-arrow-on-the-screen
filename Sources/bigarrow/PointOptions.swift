@@ -51,7 +51,7 @@ struct TargetOptions: ParsableArguments {
 }
 
 struct LookOptions: ParsableArguments {
-    @Option(help: help("The sign. Write a full sentence: 'Franz, click Allow'.", "text"))
+    @Option(help: help("The sign. Write a full sentence: 'Franz, click Allow'. {{value}} shows value with a copy button.", "text"))
     var text: String
 
     @Option(help: help(

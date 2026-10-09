@@ -53,10 +53,7 @@ struct PointRunner {
             let child = try Detacher(config: config).spawn()
             var result = planned.result(pid: child.pid)
             result.detached = true
-            // The child placed the sign itself; its copy chips moved with it.
-            let (dx, dy) = (child.signFrame[0] - result.sign[0], child.signFrame[1] - result.sign[1])
-            result.copyButtons = result.copyButtons?.map { [$0[0] + dx, $0[1] + dy, $0[2], $0[3]] }
-            result.sign = child.signFrame
+            result.moveSign(to: child.signFrame)
             result.direction = child.direction
             report(result)
             exit(0)
@@ -101,5 +98,14 @@ struct PointRunner {
             let copied = result.copied.map { ", value copied \($0)x" } ?? ""
             Output.print("bigarrow: pointed at \(target) for \(after) s, dismissed by \(reason)\(copied)")
         }
+    }
+}
+
+extension PointResult {
+    /// The detached child placed the sign itself; its copy chips move with it.
+    mutating func moveSign(to frame: [Double]) {
+        let (dx, dy) = (frame[0] - sign[0], frame[1] - sign[1])
+        copyButtons = copyButtons?.map { [$0[0] + dx, $0[1] + dy, $0[2], $0[3]] }
+        sign = frame
     }
 }
