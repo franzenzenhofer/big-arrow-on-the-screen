@@ -288,6 +288,9 @@ AS
   osascript -e "tell application \"System Events\" to tell process \"Terminal\" to set value of attribute \"AXMinimized\" of (every window whose name does not contain \"$TERMINAL_TITLE\") to true" > /dev/null 2>&1
   hide_others Terminal; place Terminal 420 260 820 300
   sleep 3
+  # Again, before any arrow (hiding bigarrow would hide its arrow): windows that appeared since,
+  # like the runner's own terminal, go too.
+  hide_others Terminal
   local win; win=$(frame Terminal)
   # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
   local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
@@ -298,8 +301,6 @@ AS
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
 print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
-  # Windows that appeared since (the runner's own terminal, Finder) go too.
-  hide_others Terminal
   sleep 1; $KIT click $chip; sleep 0.2
   osascript -e 'tell application "System Events" to keystroke "v" using command down'
   shoot terminal "$win" 0.4
