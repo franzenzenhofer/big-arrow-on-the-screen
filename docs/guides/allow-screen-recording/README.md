@@ -2,48 +2,71 @@
 
 This guide shows how to let an app record your screen on macOS: Google Chrome here, and the same steps work for Zoom, Microsoft Teams, TeamViewer or any other app that shares or records your screen. Every screenshot is a real arrow, drawn by an agent with [bigarrow](../../../README.md) on macOS 27.0.1 (build 26A434).
 
-## 1. Open Screen & System Audio Recording
+## 1. Open Privacy & Security
 
-Open **System Settings > Privacy & Security > Screen & System Audio Recording**.
+Choose Apple menu > **System Settings**, then click **Privacy & Security** in the sidebar (scroll the sidebar down if you do not see it).
 
-![System Settings, Screen & System Audio Recording, with an arrow at the pane title: You are in the right place](1-open-pane.png)
+![System Settings on the General pane, with an arrow at Privacy & Security in the sidebar: 1. Click Privacy & Security](1-privacy-security.png)
+
+```bash
+bigarrow start --app "System Settings" --text "1. Click Privacy & Security" \
+  --element "Privacy & Security" --role button --from left
+```
+
+## 2. Open Screen & System Audio Recording
+
+On the Privacy & Security page, scroll down and click **Screen & System Audio Recording**.
+
+![The Privacy & Security page, with an arrow at the Screen & System Audio Recording row: 2. Click Screen & System Audio Recording](2-screen-recording.png)
+
+```bash
+bigarrow start --app "System Settings" --text "2. Click Screen & System Audio Recording" \
+  --element "Screen & System Audio Recording" --role button --from right
+```
+
+The shortcut an agent uses: one deep link opens this page directly, so steps 1 and 2 happen by themselves.
 
 ```bash
 open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
-bigarrow start --app "System Settings" --text "You are in the right place: Screen & System Audio Recording" \
-  --element "Screen & System Audio Recording" --role statictext --from right
 ```
 
-## 2. Find the app and switch it on
+## 3. Find the app and switch it on
 
 Find the app in the list and turn on its switch. On: the app may record your screen. Off: it may not. (On this Mac, Chrome's switch is already on.)
 
-![The switch next to Google Chrome, with an arrow: on means Chrome may record your screen](2-switch-on.png)
+![The switch next to Google Chrome, with an arrow: on means Chrome may record your screen](3-switch-on.png)
 
 ```bash
 bigarrow start --app "System Settings" --text "Chrome's switch: on means Chrome may record your screen" \
   --element "Google Chrome_Toggle" --from right
 ```
 
-## 3. App not in the list? Click +
+## 4. App not in the list? Click +
 
 Apps usually add themselves to the list the first time they try to record. If yours is missing, click **+** under the list and pick the app in Applications.
 
-![The + button under the list, with an arrow: Chrome missing? Click +](3-add-app.png)
+![The + button under the list, with an arrow: Chrome missing? Click +](4-add-app.png)
 
 ```bash
 bigarrow start --app "System Settings" --text "Chrome missing? Click +" --element Add --from bottom
 ```
 
-## 4. Confirm with your password or Touch ID
+## 5. Confirm with your Mac password
 
-macOS asks for your login password or Touch ID before it changes the setting. That proves it is you, not an app, flipping the switch.
+When you turn a switch on, macOS shows a sheet: "Privacy & Security is trying to unlock system settings. Enter your password to continue with Privacy & Security." Your user name is already filled in. Type your Mac login password in the Password field and click **Unlock**. If you click **Cancel**, the switch stays off.
 
-## 5. Quit & Reopen
+![The password sheet, with an arrow at the Password field: Your Mac password here](5-password.png)
+
+```bash
+bigarrow start --app "System Settings" --text "Your Mac password here" --at <x,y low in the Password field> \
+  --from left --size S --shape straight
+```
+
+The shot starts below the user-name field, so no name is in it. To take it, the script pressed the switch of an entry that was off (python3.14), photographed the sheet, clicked Cancel and checked that the switch was off again. No password was typed and no permission was changed.
+
+## 6. Quit & Reopen
 
 macOS then tells you the app needs to restart before it can record. Click **Quit & Reopen**. After that the app can share or record your screen.
-
-Steps 4 and 5 are text only: we only point on our test Mac, and we never grant or revoke a permission there.
 
 ## Let your agent do it
 
@@ -53,7 +76,7 @@ The five lines an agent runs to walk a human through this:
 open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
 bigarrow elements --app "System Settings" --match Chrome --json      # the switch's id: "Google Chrome_Toggle"
 bigarrow start --element "Google Chrome_Toggle" --app "System Settings" --text "Switch this on: Chrome may record your screen" --until-click
-bigarrow start --element Add --app "System Settings" --text "Chrome missing? Click +" --until-click
+bigarrow start --element Password --role textfield --app "System Settings" --text "Your Mac password here" --until-click
 bigarrow stop --all
 ```
 
