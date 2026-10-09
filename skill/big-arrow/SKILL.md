@@ -47,6 +47,24 @@ A removed arrow means the human saw it: check the result, do not draw it again.
   (source width / output width). `--display N` makes them relative to display N.
 - Unsure? `bigarrow elements --app X --match "allow"`, or append `--dry-run` (draws nothing).
 
+## Open the place first, then point
+
+Never walk a human through menus you can open yourself. Open the exact pane or page, then point
+at the one control left to click:
+
+```bash
+open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
+bigarrow start --element "<control>" --app "System Settings" --text "Franz, switch this on: <app> may record your screen"
+```
+
+System Settings links verified on macOS 27, all `x-apple.systempreferences:` + one of:
+`com.apple.preference.security?Privacy_` + `Accessibility` (titled "Device Control and Data
+Access" on 27), `ScreenCapture`, `AllFiles`, `Automation`, `Camera`, `Microphone`, `ListenEvent`;
+`com.apple.LoginItems-Settings.extension`, `com.apple.preference.notifications`, `.displays`,
+`.keyboard`, `.network`, `.dock`, `.sound`, `com.apple.preferences.Bluetooth`,
+`com.apple.preferences.softwareupdate`. A wrong id does nothing and still exits 0, so check the
+window title. Web pages: open the URL itself, not the site's start page.
+
 ## Time-critical (code expires, page times out, job waits)
 
 ```bash
@@ -73,7 +91,8 @@ Exit 2 bad input, 3 target not found (the message lists what exists), 4 permissi
 On 4 run `bigarrow doctor` and read which permission the message names. Accessibility (for
 `--element`, `App:title`, `--until-click`) and Screen Recording (for `--window App:title`) belong to
 the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and the
-pane: System Settings > Privacy & Security > Accessibility, or > Screen & System Audio Recording.
+pane the error names (on macOS 27 the Accessibility list is titled "Device Control and Data
+Access"), then open it for the human and point, as below.
 
 ## Setup once: clear arrows when the human answers
 

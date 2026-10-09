@@ -12,6 +12,8 @@ After the [Hacker News thread](https://news.ycombinator.com/item?id=50018817); t
 
 ### Changed
 - Skill: when a click approves, grants, pays, signs, sends or deletes something, the sign says what happens (#42).
+- Skill: open the exact System Settings pane or page first, then point; deep links verified on macOS 27 (#43, research in `docs/research/2026-10-09-system-settings-deep-links.md`).
+- Permission errors name the pane macOS shows: on macOS 27 the Accessibility list is titled "Device Control and Data Access".
 - README: plain-language tagline and permissions FAQ, new FAQ entries on focus, trust and token cost, use cases that lead with guiding and helping (#39, #44).
 - GitHub's language stats ignore `scripts/`; the binary is Swift only (#45).
 

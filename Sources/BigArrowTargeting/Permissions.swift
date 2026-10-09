@@ -1,6 +1,7 @@
 import ApplicationServices
 import BigArrowCore
 import CoreGraphics
+import Foundation
 
 /// The privacy permissions some targets need. Drawing needs none of them.
 public enum Permission: String, CaseIterable, Sendable, Codable {
@@ -16,7 +17,9 @@ public enum Permission: String, CaseIterable, Sendable, Codable {
 
     public var settingsPane: String {
         switch self {
-        case .accessibility: "System Settings > Privacy & Security > Accessibility"
+        case .accessibility:
+            "System Settings > Privacy & Security > "
+                + SettingsPane.accessibilityTitle(macOSMajor: ProcessInfo.processInfo.operatingSystemVersion.majorVersion)
         case .screenRecording: "System Settings > Privacy & Security > Screen & System Audio Recording"
         }
     }
