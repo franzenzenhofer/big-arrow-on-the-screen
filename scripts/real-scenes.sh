@@ -267,21 +267,21 @@ HTML
   osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
   osascript > /dev/null <<AS
 tell application "System Events" to tell (first process whose unix id is $CHROME_PID)
-  set position of window 1 to {300, 260}
+  set position of window 1 to {40, 260}
   set size of window 1 to {640, 400}
 end tell
 AS
   sleep 1
-  arrow $BIN start --element "PIN code" --role textfield --app "Google Chrome:Acme sign-in" --from bottom-right \
+  arrow $BIN start --element "PIN code" --role textfield --app "Google Chrome:Acme sign-in" --from right \
     --color blue --border-color yellow --text-color yellow --text "Franz, copy & paste the PIN {{482913}} here"
-  capture pin "300,260,640,400"
+  capture pin "40,260,640,400"
   local chip
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
 print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
   $KIT click $chip; sleep 0.2
   osascript -e 'tell application "System Events" to keystroke "v" using command down'
-  shoot pin-copied "300,260,640,400" 0.4
+  shoot pin-copied "40,260,640,400" 0.4
   close_chrome
 }
 
