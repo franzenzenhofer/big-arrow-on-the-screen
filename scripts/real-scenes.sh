@@ -26,11 +26,11 @@ DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
 WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
 # What the scenes opened; each close_* closes only that, so a failed scene leaves nothing behind
 # and nothing of the human's (other decks, documents, Chrome windows) is ever touched.
-CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""; TERMINAL_TITLE=""
+CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""; TERMINAL_TITLE=""; TERMINAL_TTY=""
 close_chrome() { [ -n "$CHROME_PID" ] && kill "$CHROME_PID" 2>/dev/null; CHROME_PID=""; }
 close_terminal() {
   [ -n "$TERMINAL_TITLE" ] || return
-  pkill -f "$WORK/build.command" 2>/dev/null; sleep 1
+  [ -n "$TERMINAL_TTY" ] && pkill -t "${TERMINAL_TTY#/dev/}" 2>/dev/null; sleep 1
   osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
   TERMINAL_TITLE=""
 }
@@ -251,23 +251,22 @@ scene_finder() {
 # pastes it, and the shot is taken while the chip still shows its check.
 scene_terminal() {
   TERMINAL_TITLE="my-app build"
-  cat > "$WORK/build.command" <<CMD
-#!/bin/zsh -f
-# Waits until the scene has placed and titled the window, so nothing printed is lost to the resize.
-sleep 3; clear; cd /tmp
+  # A plain interactive zsh in a folder called my-app, so the title bar reads "my-app" and
+  # "-zsh" like any Terminal window; the scene's .zshrc prints the failed build and the prompt.
+  mkdir -p "$WORK/my-app" "$WORK/zdot"
+  cat > "$WORK/zdot/.zshrc" <<'RC'
+sleep 3; clear
+PROMPT='%F{blue}my-app%f %% '
 print -P '%F{blue}my-app%f %% xcodebuild -scheme MyApp build'
 print 'xcodebuild: error: You have not agreed to the Xcode license agreements. You must agree to both license'
 print 'agreements below in order to use Xcode.'
 print 'Agreeing to the Xcode/iOS license requires admin privileges, please run "sudo xcodebuild -license"'
 print 'and then retry this command.'
 print
-print -nP '%F{blue}my-app%f %% '
-read -r line
-CMD
+RC
+  printf '#!/bin/zsh -f\ncd "%s"\nZDOTDIR="%s" exec -a -zsh /bin/zsh -i\n' "$WORK/my-app" "$WORK/zdot" > "$WORK/build.command"
   chmod +x "$WORK/build.command"
   open -a Terminal "$WORK/build.command"; sleep 1
-  # Only the project name in the title bar (no account name, path or size); other Terminal
-  # windows are minimized, never closed.
   osascript > /dev/null <<AS
 tell application "Terminal" to tell selected tab of front window
   set custom title to "$TERMINAL_TITLE"
@@ -275,18 +274,19 @@ tell application "Terminal" to tell selected tab of front window
   set title displays device name to false
   set title displays shell path to false
   set title displays window size to false
-  set title displays settings name to false
 end tell
 AS
+  TERMINAL_TTY=$(osascript -e 'tell application "Terminal" to get tty of selected tab of front window')
+  # Other Terminal windows are minimized, never closed.
   osascript -e "tell application \"System Events\" to tell process \"Terminal\" to set value of attribute \"AXMinimized\" of (every window whose name does not contain \"$TERMINAL_TITLE\") to true" > /dev/null 2>&1
-  hide_others Terminal; place Terminal 60 380 820 300
+  hide_others Terminal; place Terminal 60 300 820 300
   sleep 3
   local win; win=$(frame Terminal)
   # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
   local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
   arrow $BIN start --rect "$prompt" --app "Terminal:$TERMINAL_TITLE" \
     --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return" \
-    --from right --color red
+    --from bottom --color red
   local chip
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
@@ -313,7 +313,7 @@ end tell
 AS
   sleep 1
   arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
-    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --color blue --size S
+    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom --color blue --size S
   shoot address "200,330,900,420"
   close_chrome
 }
