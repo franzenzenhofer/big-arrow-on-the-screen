@@ -30,7 +30,8 @@ CHROME_PID=""; KEYNOTE_DOC=""; TEXTEDIT_DOC=""; PRINT_SHEET=""; FINDER_FOLDER=""
 close_chrome() { [ -n "$CHROME_PID" ] && kill "$CHROME_PID" 2>/dev/null; CHROME_PID=""; }
 close_terminal() {
   [ -n "$TERMINAL_TITLE" ] || return
-  [ -n "$TERMINAL_TTY" ] && pkill -t "${TERMINAL_TTY#/dev/}" 2>/dev/null; sleep 1
+  # An interactive zsh ignores SIGTERM; without KILL, closing the window asks "Terminate?".
+  [ -n "$TERMINAL_TTY" ] && pkill -KILL -t "${TERMINAL_TTY#/dev/}" 2>/dev/null; sleep 1
   osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
   TERMINAL_TITLE=""
 }
@@ -279,7 +280,7 @@ AS
   TERMINAL_TTY=$(osascript -e 'tell application "Terminal" to get tty of selected tab of front window')
   # Other Terminal windows are minimized, never closed.
   osascript -e "tell application \"System Events\" to tell process \"Terminal\" to set value of attribute \"AXMinimized\" of (every window whose name does not contain \"$TERMINAL_TITLE\") to true" > /dev/null 2>&1
-  hide_others Terminal; place Terminal 60 300 820 300
+  hide_others Terminal; place Terminal 420 260 820 300
   sleep 3
   local win; win=$(frame Terminal)
   # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
