@@ -92,7 +92,7 @@ On 4 run `bigarrow doctor` and read which permission the message names. Accessib
 `--element`, `App:title`, `--until-click`) and Screen Recording (for `--window App:title`) belong to
 the app running your shell (Terminal, Ghostty, VS Code), not to bigarrow. Name that app and the
 pane the error names (on macOS 27 the Accessibility list is titled "Device Control and Data
-Access"), then open it for the human and point, as below.
+Access"), then open it for the human and point at the switch (see "Open the place first").
 
 ## Setup once: clear arrows when the human answers
 
