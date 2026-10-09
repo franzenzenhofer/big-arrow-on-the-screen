@@ -65,6 +65,8 @@ public struct ArrowColor: Equatable, Sendable, Codable {
         self.blue = blue
     }
 
+    public static let black = ArrowColor(red: 0, green: 0, blue: 0)
+
     public static let presets: [(name: String, hex: String)] = [
         ("red", "FF3B1F"), ("orange", "FF8A00"), ("yellow", "FFD60A"), ("green", "21B24B"),
         ("teal", "00B5AD"), ("blue", "0A84FF"), ("purple", "8E44FF"), ("pink", "FF2D78"),
@@ -121,22 +123,10 @@ public struct ArrowColor: Equatable, Sendable, Codable {
     /// Below this luminance a black outline would vanish into the arrow, so it turns white.
     static let darkThreshold: CGFloat = 0.2
 
-    /// The close mark's circle: black, white only on near-black signs.
+    /// The thin outline of `--border black`: black, white on near-black arrows.
     public var outline: ArrowColor {
         luminance < Self.darkThreshold ? ArrowColor(red: 1, green: 1, blue: 1) : ArrowColor(red: 0, green: 0, blue: 0)
     }
-}
-
-/// `--shadow`: by default a thin black edge outside the white border; with it, a soft shadow instead.
-public enum ArrowShadow: Sendable, Equatable {
-    case none
-    case soft
-}
-
-/// `--close-button`: an X drawn inside the sign's right end, so it never covers text or leaves the screen.
-public enum CloseMark: Sendable, Equatable {
-    case none
-    case cross
 }
 
 /// The sign's corners.
@@ -157,20 +147,5 @@ public enum SignCorners: String, CaseIterable, Sendable, Codable {
             throw BigArrowError.badInput("corners '\(raw)' is not one of round, sharp")
         }
         return corners
-    }
-}
-
-/// Everything about how the sign looks, besides its text.
-public struct SignAppearance: Sendable {
-    public let color: ArrowColor
-    public let size: ArrowSize
-    public let corners: SignCorners
-    public var shadow = ArrowShadow.none
-    public var closeMark = CloseMark.none
-
-    public init(color: ArrowColor, size: ArrowSize, corners: SignCorners) {
-        self.color = color
-        self.size = size
-        self.corners = corners
     }
 }

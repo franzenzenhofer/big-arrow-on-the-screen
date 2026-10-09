@@ -84,14 +84,17 @@ It is an arrow, so we spent an unreasonable amount of time on how it looks.
 
 ![Big arrows with signs: click here, sign here, over here, you are here, type your name, read this first, no the other one, click Allow](docs/images/hero.png)
 
+![every border style and colour option: default white border with shadow, white-black, black, close button, custom border and text colours](docs/images/looks.png)
+
 ![every style, shape, size and colour](docs/images/gallery.png)
 
 - `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
 - `--style arrow|ring|box`; rings and boxes are border-only, so you still see what is under them
 - `--size S|M|L`, `--corners round|sharp`
-- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; every arrow has a white border (dark on light colours) with a thin black edge outside it, so it reads on white, black and busy screens alike
-- No drop shadow by default; `--shadow` swaps the black edge for a short, soft shadow
-- `--close-button` puts an X inside the sign's right end, where it never covers the text or leaves the screen
+- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`
+- `--border shadow|white-black|black`: the default is a white border (dark on light colours) with a drop shadow; `white-black` puts a thin black edge outside the white border instead of the shadow; `black` is just a thin black outline
+- Every colour is yours: `--border-color`, `--text-color`, `--edge-color`, and for the X `--close-color` and `--close-x-color`. Left out, each picks a readable colour itself
+- `--close-button` puts an X inside the sign's right end (white circle, X in the arrow colour), where it never covers the text or leaves the screen
 - `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
 - Several arrows at once keep their signs out of each other's way
 
@@ -125,7 +128,7 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 
-- 84 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 86 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
 - 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, raising (and `--no-raise`), hiding while covered, selecting a Chrome tab, ending with the owner process, `stop --hook`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 

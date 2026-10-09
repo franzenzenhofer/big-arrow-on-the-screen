@@ -8,7 +8,8 @@ import UniformTypeIdentifiers
 @MainActor
 public enum PNGExporter {
     /// The rendered region: the arrow's bounding box plus this margin, on a transparent background.
-    static let margin: CGFloat = 40
+    /// Wider than the shadow reaches, so the shadow is never cut off.
+    static let margin: CGFloat = max(40, OverlayLayers.shadowReach + 12)
 
     /// Writes the PNG and returns its top-left corner in global points and its pixels per point.
     @discardableResult

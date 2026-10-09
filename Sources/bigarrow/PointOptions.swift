@@ -69,14 +69,32 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("red, orange, yellow, green, teal, blue, purple, pink, black, white, or hex like #FF3B1F / #F31.", "colour"))
     var color = "red"
 
+    @Option(name: .customLong("border-color"), help: help("Border colour (default: white, dark on light arrows).", "colour"))
+    var borderColor: String?
+
+    @Option(name: .customLong("text-color"), help: help("Sign text colour (default: white, dark on light arrows).", "colour"))
+    var textColor: String?
+
+    @Option(name: .customLong("edge-color"), help: help("Thin line colour of --border white-black and black (default: black).", "colour"))
+    var edgeColor: String?
+
+    @Option(name: .customLong("close-color"), help: help("Circle of the --close-button X (default: the border colour).", "colour"))
+    var closeColor: String?
+
+    @Option(name: .customLong("close-x-color"), help: help("The X itself (default: the arrow colour).", "colour"))
+    var closeXColor: String?
+
     @Option(help: help("Shaft shape: bend, straight or zigzag.", "shape"))
     var shape = "bend"
 
     @Option(help: help("Sign corners: round or sharp.", "corners"))
     var corners = "round"
 
-    @Flag(help: "Add a soft drop shadow instead of the thin black edge (default: no shadow).")
-    var shadow = false
+    @Option(help: help(
+        "shadow (white border and drop shadow), white-black (white border, thin black edge) or black (thin black outline).",
+        "border"
+    ))
+    var border = "shadow"
 
     @Flag(name: .customLong("no-animation"), help: "Show the final frame at once, no draw-on, pulse or fade.")
     var noAnimation = false

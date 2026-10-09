@@ -59,8 +59,9 @@ Say what and by when. One arrow per step: `stop` before pointing at the next thi
 
 Full short sentence ("Franz, click Allow", not "here"). `--say` speaks it. `--color` red, orange,
 yellow, green, teal, blue, purple, pink, black, white or #hex. `--style box|ring` marks without
-covering, `--size S|M|L`, `--shadow` on busy backgrounds, `--duration N` for a plain timed hint
-(default 8 s with `point`).
+covering, `--size S|M|L`, `--duration N` for a plain timed hint (default 8 s with `point`).
+Default look is a white border with a drop shadow; `--border white-black|black` and
+`--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color` change it.
 
 ## Errors
 

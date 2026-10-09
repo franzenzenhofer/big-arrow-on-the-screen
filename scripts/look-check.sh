@@ -1,7 +1,7 @@
 #!/bin/bash
 # Real arrows over real backgrounds, captured from the screen: plain white, macOS grey, dark,
-# black, saturated red, and a busy web page. Shows the default look (thin black outline, no
-# shadow), --shadow, --close-button and the colours where the outline matters most.
+# black, saturated red, and a busy web page. Shows the default look (white border and drop
+# shadow), --border white-black and black, --close-button, custom colours and a black arrow.
 # Run only on a disposable machine (the CI runner). Usage: scripts/look-check.sh <out-dir>
 set -uo pipefail
 OUT="$1"
@@ -14,11 +14,11 @@ trap '$BIN stop --all > /dev/null 2>&1; pkill -f "$OUT/backdrop"' EXIT
 
 LOOKS=(
   "default|--color red"
-  "shadow|--color red --shadow"
+  "white-black|--color red --border white-black"
+  "black-line|--color red --border black"
   "close|--color red --close-button"
-  "yellow|--color yellow --close-button"
+  "custom|--color blue --border-color yellow --text-color yellow"
   "black|--color black"
-  "white|--color white --shadow"
 )
 BACKGROUNDS=("white|--cover-color FFFFFF" "grey|--cover-color F2F2F7" "dark|--cover-color 1E1E1E"
   "black|--cover-color 000000" "red|--cover-color E53935" "page|--cover-image $OUT/page.png")

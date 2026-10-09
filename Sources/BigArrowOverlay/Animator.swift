@@ -53,7 +53,7 @@ enum Animator {
             spring(head, from: 0.2, begin: now + drawOn * 0.8)
             pulse(head, begin: now + drawOn + 0.5)
         }
-        for layer in [layers.sign, layers.signText] {
+        for layer in [layers.signEdge, layers.sign, layers.signText] {
             spring(layer, from: 0.8, begin: now)
             fade(layer, from: 0, to: 1, duration: 0.18)
         }
