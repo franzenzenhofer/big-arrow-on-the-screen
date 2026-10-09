@@ -317,15 +317,15 @@ scene_address() {
   osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
   osascript > /dev/null <<AS
 tell application "System Events" to tell (first process whose unix id is $CHROME_PID)
-  set position of window 1 to {200, 330}
-  set size of window 1 to {900, 420}
+  set position of window 1 to {40, 330}
+  set size of window 1 to {720, 420}
 end tell
 AS
   sleep 1
   arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
-    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --shape bend \
+    --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --shape bend --size S \
     --color blue --border-color yellow --text-color yellow
-  shoot address "200,330,900,420"
+  shoot address "40,330,720,420"
   close_chrome
 }
 
