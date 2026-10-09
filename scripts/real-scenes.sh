@@ -68,6 +68,8 @@ cleanup() {
 trap cleanup EXIT
 defaults write com.apple.dock autohide -bool true; killall Dock
 defaults write com.apple.WindowManager StandardHideWidgets -bool true
+# Leftover notification banners would sit in the top-right of every shot.
+killall NotificationCenter 2>/dev/null
 
 hide_others() {
   osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and name is not \"$1\" to false"
@@ -251,7 +253,8 @@ scene_terminal() {
   TERMINAL_TITLE="my-app build"
   cat > "$WORK/build.command" <<CMD
 #!/bin/zsh -f
-printf '\e]0;$TERMINAL_TITLE\a'; clear; cd /tmp
+# Waits until the scene has placed and titled the window, so nothing printed is lost to the resize.
+sleep 3; clear; cd /tmp
 print -P '%F{blue}my-app%f %% xcodebuild -scheme MyApp build'
 print 'xcodebuild: error: You have not agreed to the Xcode license agreements. You must agree to both license'
 print 'agreements below in order to use Xcode.'
@@ -262,8 +265,22 @@ print -nP '%F{blue}my-app%f %% '
 read -r line
 CMD
   chmod +x "$WORK/build.command"
-  open -a Terminal "$WORK/build.command"; sleep 2.5
+  open -a Terminal "$WORK/build.command"; sleep 1
+  # Only the project name in the title bar (no account name, path or size); other Terminal
+  # windows are minimized, never closed.
+  osascript > /dev/null <<AS
+tell application "Terminal" to tell selected tab of front window
+  set custom title to "$TERMINAL_TITLE"
+  set title displays custom title to true
+  set title displays device name to false
+  set title displays shell path to false
+  set title displays window size to false
+  set title displays settings name to false
+end tell
+AS
+  osascript -e "tell application \"System Events\" to tell process \"Terminal\" to set value of attribute \"AXMinimized\" of (every window whose name does not contain \"$TERMINAL_TITLE\") to true" > /dev/null 2>&1
   hide_others Terminal; place Terminal 60 380 820 300
+  sleep 3
   local win; win=$(frame Terminal)
   # The prompt line: below the title bar and seven printed lines of the default 11 pt profile.
   local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
@@ -288,7 +305,12 @@ scene_address() {
   CHROME_PID=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile" | head -1)
   [ -n "$CHROME_PID" ] || { echo "address: the temporary Chrome did not start" >&2; exit 1; }
   osascript -e "tell application \"System Events\" to set visible of every process whose visible is true and unix id is not $CHROME_PID to false"
-  osascript -e "tell application \"System Events\" to tell (first process whose unix id is $CHROME_PID) to set {position, size} of window 1 to {{200, 330}, {900, 420}}"
+  osascript > /dev/null <<AS
+tell application "System Events" to tell (first process whose unix id is $CHROME_PID)
+  set position of window 1 to {200, 330}
+  set size of window 1 to {900, 420}
+end tell
+AS
   sleep 1
   arrow $BIN start --element "Address and search bar" --app "Google Chrome" \
     --text "Preview is up: paste {{http://localhost:5173}} here" --from bottom-right --color blue --size S
