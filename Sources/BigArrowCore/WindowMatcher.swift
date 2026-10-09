@@ -109,6 +109,13 @@ public enum WindowMatcher {
         }
     }
 
+    /// The part of a window the human can see: its largest overlap with a display. A window left
+    /// half off-screen (a display was unplugged) is pointed at where it is visible.
+    public static func visiblePart(of window: WindowInfo, on displays: [Display]) -> CGRect {
+        let parts = displays.map { $0.frame.intersection(window.bounds) }.filter { !$0.isNull }
+        return parts.max { $0.width * $0.height < $1.width * $1.height } ?? window.bounds
+    }
+
     static func isOnScreen(_ window: WindowInfo, _ displays: [Display]) -> Bool {
         displays.contains { display in
             let visible = display.frame.intersection(window.bounds)

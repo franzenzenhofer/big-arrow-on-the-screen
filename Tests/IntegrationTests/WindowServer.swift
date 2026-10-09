@@ -2,6 +2,7 @@ import AppKit
 import CoreGraphics
 import Foundation
 import BigArrowCore
+import BigArrowOverlay
 import ImageIO
 
 /// Reads the live window server and screen, the way a human would see the arrow.
@@ -36,16 +37,24 @@ enum WindowServer {
         }
     }
 
-    /// Pids that own at least one normal, visible app window.
+    /// Pids that own at least one window `--window` would accept: the CLI's own rule, so the
+    /// test never picks an app whose only windows are transparent or parked off every display.
+    @MainActor
     static func visibleAppWindowOwners() -> [Int32] {
-        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
-        return list.compactMap { entry in
-            guard entry[kCGWindowLayer as String] as? Int == 0,
-                  let dict = entry[kCGWindowBounds as String] as? NSDictionary,
-                  let bounds = CGRect(dictionaryRepresentation: dict as CFDictionary),
-                  bounds.width >= 40, bounds.height >= 40 else { return nil }
-            return entry[kCGWindowOwnerPID as String] as? Int32
-        }
+        let all = (CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? [])
+            .compactMap(windowInfo)
+        let displays = ScreenReader.current().displays
+        return WindowMatcher.windows(of: all.map(\.ownerPID), in: all, title: nil, displays: displays).map(\.ownerPID)
+    }
+
+    static func windowInfo(_ entry: [String: Any]) -> WindowInfo? {
+        guard let pid = entry[kCGWindowOwnerPID as String] as? Int32,
+              let dict = entry[kCGWindowBounds as String] as? NSDictionary,
+              let bounds = CGRect(dictionaryRepresentation: dict as CFDictionary) else { return nil }
+        return WindowInfo(
+            ownerPID: pid, layer: entry[kCGWindowLayer as String] as? Int ?? 0, bounds: bounds,
+            alpha: entry[kCGWindowAlpha as String] as? Double ?? 1, title: nil
+        )
     }
 
     /// Which window a click at this global top-left point would hit.

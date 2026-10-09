@@ -8,6 +8,7 @@ After the [Hacker News thread](https://news.ycombinator.com/item?id=50018817); t
 
 ### Fixed
 - The box or ring around the target no longer drifts while it pulses: its layer scaled around the display's centre, so a box near a corner swam up to 55 pt off its target and back. Found by @jarombouts in #37 (#38).
+- `--window` on a window left half off every display (after unplugging one) points at its visible part instead of failing with "outside every display".
 
 ### Changed
 - Skill: when a click approves, grants, pays, signs, sends or deletes something, the sign says what happens (#42).
