@@ -1,5 +1,6 @@
 // A neutral demo window for screenshots and tests, nothing personal and no real brand.
-//   backdrop [--fullscreen] [--cover] [--title T] [--message M] [--buttons "Cancel,Allow"] [--x X --y Y]
+//   backdrop [--fullscreen] [--cover [--cover-color RRGGBB | --cover-image PNG]] [--title T] [--message M]
+//            [--buttons "Cancel,Allow"] [--x X --y Y]
 // --cover paints a neutral background over the whole main display (menu bar, Dock and
 // notifications included) behind the dialog, so screenshots on a Mac in use show only the scene. Defaults: a "Demo App" permission dialog with Cancel and Allow. Exits after 5 minutes or on SIGTERM.
 import AppKit
@@ -45,6 +46,16 @@ var cover: NSWindow?
 if CommandLine.arguments.contains("--cover"), let screen = NSScreen.screens.first {
     let background = NSWindow(contentRect: screen.frame, styleMask: [.borderless], backing: .buffered, defer: false)
     background.backgroundColor = NSColor(calibratedRed: 0.82, green: 0.86, blue: 0.92, alpha: 1)
+    if let hex = option("--cover-color").flatMap({ UInt32($0, radix: 16) }) {
+        let channel = { (shift: UInt32) in CGFloat((hex >> shift) & 0xFF) / 255 }
+        background.backgroundColor = NSColor(srgbRed: channel(16), green: channel(8), blue: channel(0), alpha: 1)
+    }
+    if let path = option("--cover-image"), let image = NSImage(contentsOfFile: path) {
+        let view = NSImageView(frame: CGRect(origin: .zero, size: screen.frame.size))
+        view.image = image
+        view.imageScaling = .scaleAxesIndependently
+        background.contentView = view
+    }
     background.setFrame(screen.frame, display: true)
     // Just below bigarrow's level (screenSaver), above notifications, menu bar and Dock.
     background.level = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue - 2)

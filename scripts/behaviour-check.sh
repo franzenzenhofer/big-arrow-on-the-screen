@@ -99,16 +99,17 @@ $BIN stop --all > /dev/null
 CHROME_PROFILE=$(mktemp -d)
 echo "<title>Alpha tab</title><h1>Alpha</h1>" > "$CHROME_PROFILE/alpha.html"
 echo "<title>Beta tab</title><h1>Beta</h1>" > "$CHROME_PROFILE/beta.html"
-open -na "Google Chrome" --args --user-data-dir="$CHROME_PROFILE" --no-first-run --no-default-browser-check \
-  "file://$CHROME_PROFILE/alpha.html" "file://$CHROME_PROFILE/beta.html"
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --user-data-dir="$CHROME_PROFILE" --no-first-run \
+  --no-default-browser-check "file://$CHROME_PROFILE/alpha.html" "file://$CHROME_PROFILE/beta.html" > /dev/null 2>&1 &
+CHROME=$!
 sleep 10; limit 10 $KIT activate Finder
 limit 30 $BIN point --at 400,300 --app "Google Chrome:Alpha tab" --text "Alpha" --duration 1 --json > "$OUT/tab.json" 2> "$OUT/tab.err"
 limit 10 $KIT windows "Google Chrome" | tee "$OUT/chrome-windows.txt"
 check "the tab target exits 0 ($(cat "$OUT/tab.err"))" "[ -s $OUT/tab.json ]"
-check "Chrome came to the front" "[ \"\$($KIT frontmost)\" = 'Google Chrome' ]"
+check "Chrome came to the front" "[ \"\$(limit 10 $KIT frontmost)\" = 'Google Chrome' ]"
 check "the Alpha tab is now the selected tab" "grep -q 'kCGWindowName=Alpha tab' $OUT/chrome-windows.txt"
 screencapture -x "$OUT/chrome-tab.png"
-pkill -f "user-data-dir=$CHROME_PROFILE"
+kill $CHROME 2>/dev/null
 
 # --say speaks and still exits 0.
 check "say works" "$BIN point --at 300,300 --text 'Hello from bigarrow' --say --duration 2 > /dev/null"
