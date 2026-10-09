@@ -21,7 +21,7 @@ SCREEN=$(osascript -e 'tell application "Finder" to get bounds of window of desk
 SETTINGS_ADD="${SETTINGS_ADD:-Add}"
 FINDER_ICONS="${FINDER_ICONS:-icon view}"
 # Points from the Terminal window's top to its prompt line (title bar plus seven lines).
-TERM_PROMPT_Y="${TERM_PROMPT_Y:-118}"
+TERM_PROMPT_Y="${TERM_PROMPT_Y:-126}"
 DOCK_AUTOHIDE=$(defaults read com.apple.dock autohide 2>/dev/null || echo 0)
 WIDGETS_HIDDEN=$(defaults read com.apple.WindowManager StandardHideWidgets 2>/dev/null || echo 0)
 # What the scenes opened; each close_* closes only that, so a failed scene leaves nothing behind
@@ -31,7 +31,8 @@ close_chrome() { [ -n "$CHROME_PID" ] && kill "$CHROME_PID" 2>/dev/null; CHROME_
 close_terminal() {
   [ -n "$TERMINAL_TITLE" ] || return
   # An interactive zsh ignores SIGTERM; without KILL, closing the window asks "Terminate?".
-  [ -n "$TERMINAL_TTY" ] && pkill -KILL -t "${TERMINAL_TTY#/dev/}" 2>/dev/null; sleep 1
+  # (macOS pgrep -t does not match "ttys008"; ps -t does.)
+  [ -n "$TERMINAL_TTY" ] && ps -t "${TERMINAL_TTY#/dev/}" -o pid= | xargs kill -KILL 2>/dev/null; sleep 1
   osascript -e "tell application \"Terminal\" to close (every window whose name contains \"$TERMINAL_TITLE\")" > /dev/null 2>&1
   TERMINAL_TITLE=""
 }
