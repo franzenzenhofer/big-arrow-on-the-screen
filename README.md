@@ -106,7 +106,9 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 - Several arrows at once keep their signs out of each other's way
 - Effects, for when a plain arrow is not getting through: `--rainbow` paints sign and arrow in one continuous rainbow, `--drip` turns it into wet paint that runs and drops, `--flames` sets it on fire, `--shake 1|2|3|4` (mild, insistent, angry, topiramate) makes it vibrate. Combine freely. Rainbow and drips render in `--png` too; with Reduce Motion the drips hang still and there are no flames and no shake
 
-![Rainbow, drips, flames](docs/images/effects.png)
+![--rainbow --drip --flames --shake angry](docs/images/effects.gif)
+
+![Rainbow and drips, rendered with --png](docs/images/effects.png)
 
 The shaft grows out of the sign through a flared joint that never runs into a rounded corner. `scripts/gallery.py` renders every combination offscreen and zooms into every joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
 
