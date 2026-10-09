@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 50 tickets: 47 done, 3 not now.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 51 tickets: 48 done, 3 not now.
 
 ## M0 Skeleton and proof
 
@@ -640,3 +640,21 @@ Labels: `type:research` `priority:P3` `size:L`
 **Outcome**: Not possible on iOS/iPadOS: no app may draw over other apps.
 
 Asked for helping aging parents (https://news.ycombinator.com/item?id=50019407). iOS and iPadOS do not let one app draw over other apps, so the tool cannot exist there in this form. macOS only.
+
+## M7 Hand-offs (2026-10-09)
+
+Steps where the agent hands something to the human, beyond a click.
+
+### T51 Copy buttons in the sign
+
+**Status: Done**  
+Labels: `type:feature` `area:overlay` `area:cli` `priority:P1` `size:M`
+
+**Outcome**: `{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section with Terminal and Chrome scenes.
+
+The human often has to paste something the agent may not type: a `sudo` command, a URL, a code. `{{value}}` in `--text` puts the value on the sign with a copy button; one click copies it and the arrow keeps pointing where it goes. Plan: `docs/plan/2026-10-09-copy-button.md`.
+
+**Acceptance criteria**
+- A real click on the chip puts the value on the clipboard and keeps the arrow; a click elsewhere on the sign still ends it.
+- No permission needed; icon from an MIT library with its licence in the repo.
+- README section with a real use case and a small one.

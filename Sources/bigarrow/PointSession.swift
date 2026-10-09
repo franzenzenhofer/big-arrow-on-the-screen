@@ -29,6 +29,8 @@ final class PointSession {
     private var hiddenBecause: Set<HideReason> = []
     var signalSources: [DispatchSourceSignal] = []
     var finished = false
+    /// Clicks on copy chips, reported when the arrow ends.
+    var copies = 0
 
     static let clickZone: CGFloat = 80
     static let signals = [SIGTERM, SIGINT, SIGHUP]
@@ -43,6 +45,7 @@ final class PointSession {
     func start() throws {
         try startClickWatcher()
         overlay.dismissOnClick { [weak self] in self?.finish(.closed) }
+        overlay.onCopy { [weak self] _ in self?.copies += 1 }
         try overlay.show(planned.layout, sign: planned.sign, animated: true)
         announceWhenShown()
         installSignalHandlers()
@@ -176,9 +179,10 @@ final class PointSession {
         ownerWatch?.stop()
         overlay.dismiss {
             self.registry.remove(pid: getpid())
-            var result = PointResult(pid: getpid(), resolved: self.planned.resolved, layout: self.planned.layout)
+            var result = self.planned.result(pid: getpid())
             result.dismissedAfter = (Date().timeIntervalSince(self.startedAt) * 100).rounded() / 100
             result.dismissedReason = reason
+            result.copied = self.copies > 0 ? self.copies : nil
             self.planner.report(result)
             exit(0)
         }

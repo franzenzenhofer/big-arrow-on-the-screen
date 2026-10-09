@@ -28,6 +28,9 @@ bigarrow stop
   49 EUR to Hetzner". The human decides; the facts go on the sign, not only in the terminal.
 - `--say` when the human may not be looking. Time-critical (code expires, page times out, job
   waits): `--color red --say` and say by when: "Franz, enter the 2FA code now, it expires in 60 s".
+- Something to paste (a command you may not run, a URL, a code): put it on the sign as
+  `{{value}}`. It gets a copy button; point at where it goes: "Franz, copy {{sudo xcodebuild
+  -license accept}} and paste it here".
 - One arrow per step; `bigarrow stop` the moment the step is done. Arrows also end alone: after
   300 s, when your session exits, when the human answers (hook below).
 - A click on the sign or shaft removes the arrow (target clicks pass through). A removed arrow

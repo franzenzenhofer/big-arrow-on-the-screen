@@ -7,7 +7,7 @@
 
 ![A real macOS desktop, Hacker News of 2014-06-10 in Chrome, nine bigarrow arrows in nine colours from every side: same since 2007, already argued in 2014, not a lurker? log in, the article is in here, remember me? (Firefox 30), nothing. nothing changed. (a spiral, going round in circles), 20,000 devs 40,000 opinions, finally a bigger arrow, 12 years later: still no consensus](docs/images/hero-hn.png)
 
-[Real apps](#real-apps-real-use-cases) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
+[Real apps](#real-apps-real-use-cases) · [Copy buttons](#copy-buttons-copy-then-paste) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
@@ -93,12 +93,45 @@ bigarrow start --element Group --role menubutton --app Finder \
 
 The whole guide as a 6-page PDF, every screenshot an arrow an agent drew. [Download the PDF](docs/guides/allow-screen-recording/how-to-allow-screen-recording-on-a-mac.pdf) or [read it here](docs/guides/allow-screen-recording/README.md).
 
+## Copy buttons: copy, then paste
+
+Sometimes the human has to paste something: a command the agent may not run, a URL, a code. Put it in the sign between `{{` and `}}` and it gets a copy button. One click copies it, the icon turns into a check, and the arrow stays where the value goes.
+
+### Terminal: a sudo command the agent must not type
+
+![Terminal, a failed xcodebuild: You have not agreed to the Xcode license agreements, admin privileges required. A red arrow at the prompt line: Franz, Xcode needs your password once. Copy [sudo xcodebuild -license accept, with a check: just copied] paste it here, press Return. The command is already pasted at the prompt.](docs/images/real/copy-terminal.png)
+
+```bash
+bigarrow start --rect 424,386,420,20 --app "Terminal:my-app" --from bottom \
+  --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return"
+```
+
+The agent never sees the password, and the human never retypes a command. In this shot the chip was just clicked (the check) and Cmd-V has pasted it.
+
+### Chrome: open the preview
+
+![Chrome, a blue bent arrow with a yellow border and yellow text at the address bar: Preview is up: paste http://localhost:5173 here, the URL on a yellow copy button](docs/images/real/copy-address.png)
+
+```bash
+bigarrow start --element "Address and search bar" --app "Google Chrome" --from bottom-right --size S \
+  --color blue --border-color yellow --text-color yellow \
+  --text "Preview is up: paste {{http://localhost:5173}} here"
+```
+
+The chip takes the sign's text colour, so a yellow-on-blue sign gets a yellow button with the URL in blue.
+
+- Several values per sign work: `"User {{franz}}, password {{correct horse}}"`. A value wider than the sign is shortened in the middle on screen; the whole value is copied.
+- A click on the chip copies and keeps the arrow; a click anywhere else on the sign or the shaft still removes it. No permission: the clipboard needs none.
+- `--json` gives every chip's frame (`copyButtons`, global top-left points) and, when the arrow ends, how often it was copied (`copied`). `--say` reads the sentence without the braces.
+- The copy and check icons are [Feather](https://feathericons.com)'s (MIT), see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## What is this actually for?
 
 Fair question. Arrows have existed since roughly the Paleolithic. What changed: agents now do real work on your Mac, and sooner or later hit a step **only a human may do**, or one the human wants to learn.
 
 - **"Click Allow."** Permission prompts, OAuth consent, "Open with...?". The agent finds the button but must not, or cannot, press it. It can point.
 - **"Your turn."** 2FA, CAPTCHAs, passkeys, payments, signatures. It points, you decide, it continues.
+- **"Paste this."** A `sudo` command, a URL, a code: on the sign with a [copy button](#copy-buttons-copy-then-paste), the arrow on where it goes.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
 - **"Show me how."** Ask how to do something in Blender, and the agent points at each control in turn. A product tour, minus the product.
 - **Helping someone else.** On a parent's Mac or over a screen share, pointing beats "the button at the top, no, the other top".
@@ -159,7 +192,7 @@ Six looks over white, macOS grey, dark, black, red and a busy web page:
 - `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`
 - `--border shadow|white-black|black`: white border with drop shadow (default), a thin black edge instead of the shadow, or just a thin black outline
 - `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color`; left out, each picks a readable colour
-- `--close-button` puts an X inside the sign's right end; `--follow` moves with a window or element; `--until-click` ends on a click on the target; `--say` speaks the sign
+- `{{value}}` in `--text` becomes a [copy button](#copy-buttons-copy-then-paste); `--close-button` puts an X inside the sign's right end; `--follow` moves with a window or element; `--until-click` ends on a click on the target; `--say` speaks the sign
 - Several arrows at once keep their signs out of each other's way
 
 `scripts/gallery.py` renders every combination and zooms into every sign-to-shaft joint ([junctions](docs/images/junctions.png)), because a seam at the joint was, apparently, unacceptable.
@@ -272,8 +305,8 @@ Say, by covering the Decline button? **Not beyond what it can already do.** An a
 
 ## How we know it works
 
-- 91 automated tests: geometry, placement, joints, a golden image, recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
-- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU.
+- 104 automated tests: geometry, placement, joints, a golden image, copy buttons, recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
+- 18 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, a copy button (the clipboard holds the value, the arrow stays), `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
 ## For agents (and the humans who configure them)

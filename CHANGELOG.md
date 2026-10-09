@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added
+- Copy buttons: `{{value}}` in `--text` shows the value in the sign with a copy button. One click puts it on the clipboard (no permission needed), the icon turns into a check for 1.5 s, and the arrow stays where the value goes; a click elsewhere on the sign still removes it. Several per sign; long values are shortened on screen and copied whole. `--json` reports each chip's frame (`copyButtons`) and how often it was copied (`copied`). Icons from [Feather](https://feathericons.com) (MIT, `THIRD_PARTY_NOTICES.md`), drawn from their SVG source by a small SVG path reader. README section "Copy buttons" with two real scenes (Terminal `sudo` command, Chrome address bar), recorded by `scripts/real-scenes.sh terminal address`.
+
+### Fixed
+- `scripts/arthur-gui.sh` launches Ghostty with `--command=` (Ghostty 1.3 asks before every `-e` and unattended runs hung) and records the exit code even when the command calls `exit` (#62).
+
 ### Changed
 - README: a one-line table of contents under the hero, and "Starred by": the companies and universities on the stargazers' public GitHub profiles, no names, no pictures.
 - `main` is protected by a ruleset: no force pushes, no deletion.

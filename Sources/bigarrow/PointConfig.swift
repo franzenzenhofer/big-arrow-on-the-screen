@@ -15,6 +15,8 @@ struct PointConfig {
     static let humanWaitDuration: Double = 300
 
     let target: TargetSpec
+    /// The sign with its `{{value}}` copy buttons; `text` is the same sentence without braces.
+    let sign: SignText
     let text: String
     let duration: Double
     let durationExplicit: Bool
@@ -50,7 +52,8 @@ struct PointConfig {
         let (target, stdinSnapshot) = try Self.target(options, app: home?.app)
         self.target = target
         self.stdinSnapshot = stdinSnapshot
-        text = look.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        sign = try SignText.parse(look.text.trimmingCharacters(in: .whitespacesAndNewlines))
+        text = sign.plain
         guard !text.isEmpty else { throw BigArrowError.badInput("--text must not be empty, write what the human should do") }
         forced = try ApproachDirection.parse(look.from)
         size = try ArrowSize.parse(look.size)
