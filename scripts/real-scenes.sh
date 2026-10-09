@@ -106,6 +106,12 @@ arrow() {
 # them, from the menu bar down, clipped to the main display (1470x956 points on the test Mac),
 # after the given wait (default 1.2 s, for the arrows to settle).
 shoot() {
+  capture "$@"
+  $BIN stop --all > /dev/null
+  : > "$WORK/arrows.json"
+}
+# capture: shoot without ending the arrows, for a scene shown in two states.
+capture() {
   sleep "${3:-1.2}"
   local region
   region=$(python3 - "$2" "$WORK/arrows.json" "$SCREEN" <<'PY'
@@ -127,9 +133,8 @@ print(f"{left:.0f},{top:.0f},{right - left:.0f},{bottom - top:.0f}")
 PY
 )
   screencapture -x -R "$region" "$OUT/$1.png"
+  echo "$OUT/$1.png" >> "$WORK/shots.txt"
   echo "$1: $region"
-  $BIN stop --all > /dev/null
-  : > "$WORK/arrows.json"
 }
 
 scene_settings() {
@@ -254,8 +259,8 @@ scene_finder() {
 }
 
 # Copy buttons, the real case: a build stops because Xcode needs an admin password, which the
-# agent must not type. The sign carries the command; a real click on its chip copies it, Cmd-V
-# pastes it, and the shot is taken while the chip still shows its check.
+# agent must not type. The sign carries the command. Two shots: the copy button, then, after a
+# real click on it and Cmd-V, the pasted command while the chip still shows its check.
 scene_terminal() {
   TERMINAL_TITLE="my-app build"
   # A plain interactive zsh in a folder called my-app, so the title bar reads "my-app" and
@@ -296,14 +301,16 @@ AS
   local prompt; prompt=$(python3 -c "x, y, w, h = map(int, '$win'.split(',')); print(f'{x + 4},{y + $TERM_PROMPT_Y},420,20')")
   arrow $BIN start --rect "$prompt" --app "Terminal:$TERMINAL_TITLE" \
     --text "Franz, Xcode needs your password once. Copy {{sudo xcodebuild -license accept}} paste it here, press Return" \
-    --from bottom --color red
+    --from bottom --color blue --border-color yellow --text-color yellow
+  # First the copy button as the human finds it, then the moment after the click and Cmd-V.
+  capture terminal "$win"
   local chip
   chip=$(tail -1 "$WORK/arrows.json" | python3 -c 'import json, sys
 c = json.load(sys.stdin)["copyButtons"][0]
 print(round(c[0] + c[2] / 2), round(c[1] + c[3] / 2))')
   sleep 1; $KIT click $chip; sleep 0.2
   osascript -e 'tell application "System Events" to keystroke "v" using command down'
-  shoot terminal "$win" 0.4
+  shoot terminal-copied "$win" 0.4
   close_terminal
 }
 
@@ -331,8 +338,9 @@ AS
 
 for scene in $SCENES; do "scene_$scene"; done
 # README size: 256 colours, then smaller until each file is under 700 KB.
-for scene in $SCENES; do
-  python3 - "$OUT/$scene.png" <<'PY'
+# Only this run's shots.
+while read -r shot; do
+  python3 - "$shot" <<'PY'
 import os, sys
 from PIL import Image
 path = sys.argv[1]
@@ -343,5 +351,5 @@ while True:
         break
     image = image.resize((int(image.width * 0.85), int(image.height * 0.85)), Image.LANCZOS)
 PY
-done
+done < "$WORK/shots.txt"
 ls -la "$OUT"
