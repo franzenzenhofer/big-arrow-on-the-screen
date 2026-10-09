@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-10-09
+
+### Fixed
+- The white contrast border is back (0.2.0 replaced it with a thin black outline by mistake). Without a shadow, a thin black edge now runs outside the white border; `--shadow` keeps the white border and uses the shadow instead of the black edge. Every black edge sits below every white border, so the flared joint has no seam.
+
 ## [0.2.0] - 2026-10-09
 
 ### Added

@@ -75,7 +75,7 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("Sign corners: round or sharp.", "corners"))
     var corners = "round"
 
-    @Flag(help: "Add a soft drop shadow (default: none, just a thin outline).")
+    @Flag(help: "Add a soft drop shadow instead of the thin black edge (default: no shadow).")
     var shadow = false
 
     @Flag(name: .customLong("no-animation"), help: "Show the final frame at once, no draw-on, pulse or fade.")

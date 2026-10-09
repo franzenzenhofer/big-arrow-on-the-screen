@@ -121,13 +121,13 @@ public struct ArrowColor: Equatable, Sendable, Codable {
     /// Below this luminance a black outline would vanish into the arrow, so it turns white.
     static let darkThreshold: CGFloat = 0.2
 
-    /// The thin outline around arrow, sign and close mark: black, white only on near-black arrows.
+    /// The close mark's circle: black, white only on near-black signs.
     public var outline: ArrowColor {
         luminance < Self.darkThreshold ? ArrowColor(red: 1, green: 1, blue: 1) : ArrowColor(red: 0, green: 0, blue: 0)
     }
 }
 
-/// `--shadow`: no shadow by default; a soft one lifts the arrow off busy backgrounds.
+/// `--shadow`: by default a thin black edge outside the white border; with it, a soft shadow instead.
 public enum ArrowShadow: Sendable, Equatable {
     case none
     case soft

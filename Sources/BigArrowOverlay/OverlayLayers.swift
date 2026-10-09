@@ -4,9 +4,10 @@ import BigArrowCore
 /// The finished layer tree for one layout. Paths come in display-local top-left points and
 /// are flipped once here into the bottom-left space of the panel's content view.
 ///
-/// The arrow reads as one shape: every outline sits below every coloured fill, so the head and
-/// the shaft share one continuous thin outline, and the coloured shaft is drawn over the sign,
-/// so it grows out of the sign without a line across it. With `--shadow`, one shadow for all.
+/// The arrow reads as one shape: every contrast border sits below every coloured fill, so the
+/// head and the shaft share one continuous border, and the coloured shaft is drawn over the
+/// sign, so it grows out of the sign without a line across it. Without a shadow a thin black
+/// edge runs outside the border; with `--shadow`, one shadow for the whole thing instead.
 @MainActor
 struct OverlayLayers {
     let root = CALayer()
@@ -18,8 +19,10 @@ struct OverlayLayers {
     /// Display-local top-left points to the panel's bottom-left points.
     let flip: CGAffineTransform
 
-    /// Added to a stroke's width, so 1.5 pt of outline shows on each side.
-    static let outlineWidth: CGFloat = 3
+    static let outlineWidth: CGFloat = 6
+    /// Added outside the border when there is no shadow: 1.5 pt of black on each side.
+    static let edgeWidth: CGFloat = 3
+    static let edgeColor = CGColor(gray: 0, alpha: 1)
     static let markLineWidth: CGFloat = 6
 
     init(layout: OverlayLayout, sign image: SignImage, appearance: SignAppearance) {
@@ -29,29 +32,37 @@ struct OverlayLayers {
         flip = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: height)
         let (shaft, head) = (Self.transformed(layout.arrow.shaftPath, flip), Self.transformed(layout.arrow.headPath, flip))
         let stroke = layout.size.metrics.stroke
-        let outlineShaft = Self.stroked(shaft, color: color.outline.cgColor, width: stroke + Self.outlineWidth)
-        let colorShaft = Self.stroked(shaft, color: color.cgColor, width: stroke)
-        let outlineHead = Self.filled(head, color: color.outline.cgColor, outline: Self.outlineWidth)
-        let colorHead = Self.filled(head, color: color.cgColor, outline: 0)
+        let edge = appearance.shadow == .none
         let rootPath = Self.transformed(layout.arrow.root.path, flip)
-        let outlineRoot = Self.filled(rootPath, color: color.outline.cgColor, outline: Self.outlineWidth)
+        let shaftBorders = Self.borders(color: color, edge: edge) { Self.stroked(shaft, color: $0, width: stroke + $1) }
+        let headBorders = Self.borders(color: color, edge: edge) { Self.filled(head, color: $0, outline: $1) }
+        let rootBorders = Self.borders(color: color, edge: edge) { Self.filled(rootPath, color: $0, outline: $1) }
+        let colorShaft = Self.stroked(shaft, color: color.cgColor, width: stroke)
+        let colorHead = Self.filled(head, color: color.cgColor, outline: 0)
         let colorRoot = Self.filled(rootPath, color: color.cgColor, outline: 0)
-        shaftLayers = [outlineShaft, colorShaft]
-        headLayers = [outlineHead, colorHead]
+        shaftLayers = shaftBorders + [colorShaft]
+        headLayers = headBorders + [colorHead]
         let tip = layout.arrow.tip.applying(flip)
         for layer in [root, markGroup] + shaftLayers + headLayers { layer.frame = bounds }
         for layer in headLayers { Self.pin(layer, at: tip, in: bounds) }
-        markGroup.sublayers = Self.markLayers(layout.mark, flip: flip, color: color)
+        markGroup.sublayers = Self.markLayers(layout.mark, flip: flip, color: color, edge: edge)
         let signFrame = Self.flipped(layout.signRect, height: height)
         for (layer, contents) in [(sign, image.body), (signText, image.text)] {
             layer.contents = contents
             layer.contentsScale = layout.display.scale
             layer.frame = signFrame
         }
-        if appearance.shadow == .soft { Self.shadow(root) }
-        root.sublayers = [
-            markGroup, outlineShaft, outlineHead, outlineRoot, sign, colorShaft, colorRoot, colorHead, signText
-        ]
+        if !edge { Self.shadow(root) }
+        // Every black edge below every white border, or the flare's edge cuts across the shaft's border.
+        let parts = [shaftBorders, headBorders, rootBorders]
+        let edges = parts.flatMap { $0.dropLast() }
+        root.sublayers = [markGroup] + edges + parts.compactMap(\.last) + [sign, colorShaft, colorRoot, colorHead, signText]
+    }
+
+    /// The contrast border of one part, and below it, without a shadow, the black edge.
+    static func borders(color: ArrowColor, edge: Bool, _ make: (CGColor, CGFloat) -> CAShapeLayer) -> [CAShapeLayer] {
+        let border = make(color.contrast.cgColor, outlineWidth)
+        return edge ? [make(edgeColor, outlineWidth + edgeWidth), border] : [border]
     }
 
     static func transformed(_ path: CGPath, _ transform: CGAffineTransform) -> CGPath {
@@ -99,7 +110,7 @@ struct OverlayLayers {
         layer.shadowOffset = CGSize(width: 0, height: -2)
     }
 
-    static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, color: ArrowColor) -> [CALayer] {
+    static func markLayers(_ mark: TargetMark, flip: CGAffineTransform, color: ArrowColor, edge: Bool) -> [CALayer] {
         let path: CGPath
         switch mark {
         case .none:
@@ -111,9 +122,7 @@ struct OverlayLayers {
             path = CGPath(ellipseIn: rect, transform: [flip])
         }
         // Border only, no fill: the human must see exactly what is being pointed at.
-        return [
-            stroked(path, color: color.outline.cgColor, width: markLineWidth + outlineWidth),
-            stroked(path, color: color.cgColor, width: markLineWidth)
-        ]
+        return borders(color: color, edge: edge) { stroked(path, color: $0, width: markLineWidth + $1) }
+            + [stroked(path, color: color.cgColor, width: markLineWidth)]
     }
 }

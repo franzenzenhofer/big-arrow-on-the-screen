@@ -89,8 +89,8 @@ It is an arrow, so we spent an unreasonable amount of time on how it looks.
 - `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
 - `--style arrow|ring|box`; rings and boxes are border-only, so you still see what is under them
 - `--size S|M|L`, `--corners round|sharp`
-- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; every arrow gets a thin black outline (white on near-black arrows), light colours get dark text
-- No drop shadow by default; `--shadow` adds a short, soft one for busy backgrounds
+- `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`; every arrow has a white border (dark on light colours) with a thin black edge outside it, so it reads on white, black and busy screens alike
+- No drop shadow by default; `--shadow` swaps the black edge for a short, soft shadow
 - `--close-button` puts an X inside the sign's right end, where it never covers the text or leaves the screen
 - `--follow` moves with a window or element, `--until-click` ends on a click on the target, `--say` speaks the sign
 - Several arrows at once keep their signs out of each other's way

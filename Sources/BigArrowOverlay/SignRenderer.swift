@@ -1,7 +1,8 @@
 import AppKit
 import BigArrowCore
 
-/// The sign: a pill (or square) in the arrow colour with a thin outline, plus heavy rounded
+/// The sign: a pill (or square) in the arrow colour with a contrast border (and, without a
+/// shadow, a thin black edge outside it), plus heavy rounded
 /// text in the contrast colour, and with `--close-button` an X in its right end. Body and text are separate images so the arrow's root can be
 /// drawn between them: it blends into the body and never covers a letter.
 public struct SignImage: @unchecked Sendable {
@@ -16,7 +17,9 @@ public struct SignImage: @unchecked Sendable {
 public enum SignRenderer {
     static let paddingX: CGFloat = 30
     static let paddingY: CGFloat = 16
-    static let outline: CGFloat = 2
+    static let outline: CGFloat = 3.5
+    /// The black edge outside the border when there is no shadow, as wide as the arrow's.
+    static let edge: CGFloat = 1.5
     /// The X: its diameter as a share of the font size (at least the minimum, an easy target),
     /// the gap after the text, and its margin to the sign's edge. On a one-line pill it sits
     /// almost concentric with the rounded end.
@@ -105,13 +108,25 @@ public enum SignRenderer {
     }
 
     static func drawBody(in context: CGContext, pill: CGSize, appearance: SignAppearance) {
-        let rect = CGRect(origin: .zero, size: pill).insetBy(dx: outline / 2, dy: outline / 2)
-        let corner = appearance.corners.radius(height: rect.height)
-        context.addPath(CGPath(roundedRect: rect, cornerWidth: corner, cornerHeight: corner, transform: nil))
+        let bounds = CGRect(origin: .zero, size: pill)
+        let edgeWidth = appearance.shadow == .none ? edge : 0
+        if edgeWidth > 0 {
+            context.addPath(pillPath(bounds.insetBy(dx: edgeWidth / 2, dy: edgeWidth / 2), corners: appearance.corners))
+            context.setStrokeColor(CGColor(gray: 0, alpha: 1))
+            context.setLineWidth(edgeWidth)
+            context.strokePath()
+        }
+        let inset = edgeWidth + outline / 2
+        context.addPath(pillPath(bounds.insetBy(dx: inset, dy: inset), corners: appearance.corners))
         context.setFillColor(appearance.color.cgColor)
-        context.setStrokeColor(appearance.color.outline.cgColor)
+        context.setStrokeColor(appearance.color.contrast.cgColor)
         context.setLineWidth(outline)
         context.drawPath(using: .fillStroke)
+    }
+
+    static func pillPath(_ rect: CGRect, corners: SignCorners) -> CGPath {
+        let corner = corners.radius(height: rect.height)
+        return CGPath(roundedRect: rect, cornerWidth: corner, cornerHeight: corner, transform: nil)
     }
 
     static func drawText(_ text: TextLayout, in context: CGContext, rect textRect: CGRect) {
