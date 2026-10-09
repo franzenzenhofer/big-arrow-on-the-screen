@@ -5,7 +5,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 ## [Unreleased]
 
 ### Changed
-- README: a one-line table of contents under the hero, and "Starred by" with the stargazers' avatars.
+- README: a one-line table of contents under the hero, and "Starred by": the companies and universities on the stargazers' public GitHub profiles, no names, no pictures.
 - `main` is protected by a ruleset: no force pushes, no deletion.
 
 ## [0.4.5] - 2026-10-09
