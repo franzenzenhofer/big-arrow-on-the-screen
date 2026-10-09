@@ -179,6 +179,7 @@ struct ArrowShapeTests {
     @Test("Shapes parse by name and reject anything else")
     func parsing() throws {
         #expect(try ArrowShape.parse("ZigZag") == .zigzag)
-        #expect(throws: BigArrowError.self) { try ArrowShape.parse("spiral") }
+        #expect(try ArrowShape.parse("Spiral") == .spiral)
+        #expect(throws: BigArrowError.self) { try ArrowShape.parse("corkscrew") }
     }
 }

@@ -42,6 +42,8 @@ Staged with a neutral demo dialog and recorded with the real `bigarrow` on a cle
 | `--color purple` | `--close-button`, because the human gets the last word |
 | ![Three arrows, one Save button](docs/images/scenes/which-button.png) | ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png) |
 | three `start`s, one button, zero ambiguity | `--style box --corners sharp`, plus a lesson about macOS permissions |
+| ![Software update: Twirl. Then click.](docs/images/scenes/spiral.png) | ![three spiral arrows: default, purple small, green with white-black border](docs/images/spirals.png) |
+| `--shape spiral`: once around the sign, then to the button | spirals in other looks |
 
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
@@ -92,7 +94,7 @@ Real screenshots on a clean test machine, six looks over white, macOS grey, dark
 
 ![every style, shape, size and colour](docs/images/gallery.png)
 
-- `--shape bend|straight|zigzag` (zigzag for when it is *really* urgent)
+- `--shape bend|straight|zigzag|spiral` (zigzag for when it is *really* urgent; spiral loops once around the sign before it points, for when it must be impossible to miss)
 - `--style arrow|ring|box`; rings and boxes are border-only, so you still see what is under them
 - `--size S|M|L`, `--corners round|sharp`
 - `--color red|orange|yellow|green|teal|blue|purple|pink|black|white|#RRGGBB`
@@ -132,7 +134,7 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 
-- 86 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 87 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
 - 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, raising (and `--no-raise`), hiding while covered, selecting a Chrome tab, ending with the owner process, `stop --hook`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 

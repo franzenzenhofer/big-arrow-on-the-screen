@@ -40,4 +40,6 @@ scene which-button "Save changes?" "Do you want to save the changes you made to 
 
 scene permissions "System Settings" "\"Terminal\" would like to control this computer using accessibility features." "Deny,Open System Settings" \
   $BIN start --element "Open System Settings" --app backdrop --text "Grant it to Terminal, not to bigarrow" --style box --color teal --corners sharp --no-animation
+scene spiral "Software Update" "macOS 27.0.1 is ready. Restart now or be reminded again in exactly four minutes." "Later,Restart Now" \
+  $BIN start --element "Restart Now" --app backdrop --text "Twirl. Then click." --shape spiral --color pink --size S --no-animation
 ls "$OUT"

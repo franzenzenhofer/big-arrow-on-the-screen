@@ -4,7 +4,7 @@ macOS CLI (`bigarrow`) plus an agent skill (`big-arrow`, Claude Code and Codex) 
 
 ## State
 
-Released 0.3.0 on 2026-10-09 (Homebrew `franzenzenhofer/tap/bigarrow`): everything in `docs/plan/PLAN.md` plus T31-T40, then bound and self-ending arrows (owner process, `stop --hook`, 300 s default, raise by default, tab selection, `--border` styles and colour options), see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
+Released 0.4.0 on 2026-10-09 (Homebrew `franzenzenhofer/tap/bigarrow`): everything in `docs/plan/PLAN.md` plus T31-T40, then bound and self-ending arrows (owner process, `stop --hook`, 300 s default, raise by default, tab selection, `--border` styles and colour options, `--shape spiral`), see `CHANGELOG.md`. `docs/plan/tickets.json` is the single source of truth for tickets; regenerate `TICKETS.md` and `report.html` with `scripts/render-tickets.py`, never edit those by hand.
 
 ## Rules
 

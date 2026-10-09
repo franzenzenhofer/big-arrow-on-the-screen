@@ -9,16 +9,18 @@ public enum ArrowShape: String, CaseIterable, Sendable, Codable {
     case straight
     /// A lightning-bolt zigzag with rounded joints.
     case zigzag
+    /// One loop around the sign, then to the target.
+    case spiral
 
     public static func parse(_ raw: String) throws -> ArrowShape {
         guard let shape = ArrowShape(rawValue: raw.lowercased()) else {
-            throw BigArrowError.badInput("shape '\(raw)' is not one of bend, straight, zigzag")
+            throw BigArrowError.badInput("shape '\(raw)' is not one of \(allCases.map(\.rawValue).joined(separator: ", "))")
         }
         return shape
     }
 }
 
-/// How the shaft is drawn: one quadratic curve (bend, straight) or a polyline (zigzag).
+/// How the shaft is drawn: one quadratic curve (bend, straight) or a polyline (zigzag, spiral).
 public enum ShaftLine: Sendable {
     case curve(QuadCurve)
     case polyline([CGPoint])

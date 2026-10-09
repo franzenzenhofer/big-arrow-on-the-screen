@@ -84,7 +84,7 @@ struct LookOptions: ParsableArguments {
     @Option(name: .customLong("close-x-color"), help: help("The X itself (default: the arrow colour).", "colour"))
     var closeXColor: String?
 
-    @Option(help: help("Shaft shape: bend, straight or zigzag.", "shape"))
+    @Option(help: help("Shaft shape: bend, straight, zigzag or spiral (once around the sign, then to the target).", "shape"))
     var shape = "bend"
 
     @Option(help: help("Sign corners: round or sharp.", "corners"))

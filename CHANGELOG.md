@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-09
+
+### Added
+- `--shape spiral`: the shaft leaves the sign, loops once around it on a widening loop that never touches the sign or itself, then sweeps to the target. The loop turns the way that ends heading towards the target, and placement reserves room for it, so it stays on screen.
+- README: spiral sheet (`scripts/gallery.py` writes `spirals.png`) and a real-screen spiral scene.
+
 ## [0.3.0] - 2026-10-09
 
 ### Changed
