@@ -42,8 +42,8 @@ Staged with a neutral demo dialog and recorded with the real `bigarrow` on a cle
 | `--color purple` | `--close-button`, because the human gets the last word |
 | ![Three arrows, one Save button](docs/images/scenes/which-button.png) | ![Grant Accessibility to Terminal, not to bigarrow](docs/images/scenes/permissions.png) |
 | three `start`s, one button, zero ambiguity | `--style box --corners sharp`, plus a lesson about macOS permissions |
-| ![Software update: Twirl. Then click.](docs/images/scenes/spiral.png) | ![three spiral arrows: default, purple small, green with white-black border](docs/images/spirals.png) |
-| `--shape spiral`: once around the sign, then to the button | spirals in other looks |
+| ![Software update: Twirl. Then click.](docs/images/scenes/spiral.png) | |
+| `--shape spiral`: once around the sign, then to the button | |
 
 What it is not: a screen annotator for humans, a click bot, or a screenshot tool. It never clicks, types or captures anything. It only points. Deliberately.
 
