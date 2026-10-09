@@ -50,7 +50,9 @@ public enum AppRaiser {
     /// No window title matches: selects the tab with that title (Chrome, Safari) and raises its window.
     static func raiseWindow(pid: pid_t, title: String) throws -> String {
         let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, TabSelector.messagingTimeout * 4)
         let windows: [AXUIElement] = TabSelector.attribute(app, kAXWindowsAttribute) ?? []
+        windows.forEach { AXUIElementSetMessagingTimeout($0, TabSelector.messagingTimeout * 4) }
         let needle = title.lowercased()
         let window = windows.first { windowTitle($0)?.lowercased().contains(needle) ?? false }
             ?? TabSelector.select(in: windows, title: title)

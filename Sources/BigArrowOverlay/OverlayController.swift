@@ -8,17 +8,18 @@ public final class OverlayController {
     private var layers: OverlayLayers?
     private(set) public var layout: OverlayLayout?
     private let mode: AnimationMode
-    private let color: ArrowColor
-    private var closeButton: CloseButtonPanel?
+    private let appearance: SignAppearance
+    private var tracker: ClickTracker?
+    private var onClick: (@MainActor () -> Void)?
 
-    /// Adds the clickable X to the sign; `onClose` runs when the human clicks it.
-    public func enableCloseButton(onClose: @escaping @MainActor () -> Void) {
-        closeButton = CloseButtonPanel(color: color, onClose: onClose)
+    public init(mode: AnimationMode, appearance: SignAppearance) {
+        self.mode = mode
+        self.appearance = appearance
     }
 
-    public init(mode: AnimationMode, color: ArrowColor) {
-        self.mode = mode
-        self.color = color
+    /// A click on the sign or the shaft (never near the head or on the target) runs `handler`.
+    public func dismissOnClick(_ handler: @escaping @MainActor () -> Void) {
+        onClick = handler
     }
 
     /// Shows the layout on its display. The panel is reused while the display stays the same.
@@ -28,9 +29,9 @@ public final class OverlayController {
         }
         if panel == nil || self.layout?.display != layout.display {
             panel?.orderOut(nil)
-            panel = OverlayPanel(screen: screen)
+            panel = OverlayPanel(screen: screen) { [weak self] in self?.onClick?() }
         }
-        let layers = OverlayLayers(layout: layout, sign: sign, color: color)
+        let layers = OverlayLayers(layout: layout, sign: sign, appearance: appearance)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         panel?.contentView?.layer?.sublayers = [layers.root]
@@ -39,9 +40,9 @@ public final class OverlayController {
         self.layers = layers
         self.layout = layout
         panel?.orderFrontRegardless()
-        if let closeButton {
-            closeButton.place(onSign: Self.appKitRect(layout.signRect, on: layout.display))
-            closeButton.orderFrontRegardless()
+        tracker?.stop()
+        if let panel, onClick != nil {
+            tracker = ClickTracker(panel: panel, root: layers.root, region: ClickRegion(layout: layout, flip: layers.flip))
         }
     }
 
@@ -54,13 +55,12 @@ public final class OverlayController {
 
     /// Hides without ending, used while a followed target is gone.
     public func hide() {
+        panel?.ignoresMouseEvents = true
         panel?.orderOut(nil)
-        closeButton?.orderOut(nil)
     }
 
     public func unhide() {
         panel?.orderFrontRegardless()
-        closeButton?.orderFrontRegardless()
     }
 
     /// The window-server number of the panel, for `--json` and tests.
@@ -68,7 +68,7 @@ public final class OverlayController {
 
     /// Fades out, closes the panel, then calls `completion`.
     public func dismiss(completion: @escaping @MainActor () -> Void) {
-        closeButton?.orderOut(nil)
+        tracker?.stop()
         guard let root = layers?.root, mode.fadeOut > 0, panel?.isVisible == true else {
             close()
             completion()

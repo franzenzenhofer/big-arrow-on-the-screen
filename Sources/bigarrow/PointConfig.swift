@@ -25,6 +25,7 @@ struct PointConfig {
     let corners: SignCorners
     let shape: ArrowShape
     let noAnimation: Bool
+    let shadow: ArrowShadow
     let say: Bool
     let voice: String?
     let follow: Bool
@@ -56,6 +57,7 @@ struct PointConfig {
         corners = try SignCorners.parse(look.corners)
         shape = try ArrowShape.parse(look.shape)
         noAnimation = look.noAnimation
+        shadow = look.shadow ? .soft : .none
         click = try Self.click(behaviour)
         closeButton = behaviour.closeButton
         durationExplicit = behaviour.duration != nil
@@ -68,6 +70,13 @@ struct PointConfig {
         raise = home != nil && !options.noRaise
         follow = behaviour.follow
         guard !follow || target.isFollowable else { throw BigArrowError.badInput("--follow works with --window and --element only") }
+    }
+
+    var appearance: SignAppearance {
+        var appearance = SignAppearance(color: color, size: size, corners: corners)
+        appearance.shadow = shadow
+        appearance.closeMark = closeButton ? .cross : .none
+        return appearance
     }
 
     static func click(_ behaviour: BehaviourOptions) throws -> ClickDismissal {

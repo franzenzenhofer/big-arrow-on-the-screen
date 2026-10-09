@@ -12,8 +12,8 @@ public enum PNGExporter {
 
     /// Writes the PNG and returns its top-left corner in global points and its pixels per point.
     @discardableResult
-    public static func write(_ layout: OverlayLayout, sign: SignImage, color: ArrowColor, to url: URL) throws -> [Double] {
-        let layers = OverlayLayers(layout: layout, sign: sign, color: color)
+    public static func write(_ layout: OverlayLayout, sign: SignImage, appearance: SignAppearance, to url: URL) throws -> [Double] {
+        let layers = OverlayLayers(layout: layout, sign: sign, appearance: appearance)
         let crop = cropRect(layout).insetBy(dx: -margin, dy: -margin)
             .intersection(CGRect(origin: .zero, size: layout.display.frame.size))
         let scale = layout.display.scale

@@ -37,14 +37,12 @@ final class PointSession {
         self.config = config
         self.planner = planner
         self.planned = initial
-        self.overlay = OverlayController(mode: AnimationMode.resolve(disabled: config.noAnimation), color: config.color)
+        self.overlay = OverlayController(mode: AnimationMode.resolve(disabled: config.noAnimation), appearance: config.appearance)
     }
 
     func start() throws {
         try startClickWatcher()
-        if config.closeButton {
-            overlay.enableCloseButton { [weak self] in self?.finish(.closed) }
-        }
+        overlay.dismissOnClick { [weak self] in self?.finish(.closed) }
         try overlay.show(planned.layout, sign: planned.sign, animated: true)
         announceWhenShown()
         installSignalHandlers()

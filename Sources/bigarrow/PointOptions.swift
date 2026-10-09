@@ -75,6 +75,9 @@ struct LookOptions: ParsableArguments {
     @Option(help: help("Sign corners: round or sharp.", "corners"))
     var corners = "round"
 
+    @Flag(help: "Add a soft drop shadow (default: none, just a thin outline).")
+    var shadow = false
+
     @Flag(name: .customLong("no-animation"), help: "Show the final frame at once, no draw-on, pulse or fade.")
     var noAnimation = false
 }
@@ -86,7 +89,7 @@ struct BehaviourOptions: ParsableArguments {
     @Flag(help: "Return at once and leave the arrow up in the background; prints the pid.")
     var detach = false
 
-    @Flag(name: .customLong("close-button"), help: "Put a clickable X on the sign; the human closes the arrow with it.")
+    @Flag(name: .customLong("close-button"), help: "Show an X in the sign. A click on the sign or the shaft always removes the arrow.")
     var closeButton = false
 
     @Flag(name: .customLong("until-click"), help: "Dismiss when the human clicks the target (needs Accessibility).")

@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-10-09
+
+### Added
+- `--app App[:window or tab title]` works with every target. A title that matches no window selects the tab with that title (Chrome, Safari) and raises its window.
+- A bound arrow (`--app` or `--window`) hides while another app's window covers its target and comes back when the target is visible again.
+- An arrow ends when the agent process that drew it exits (`CLAUDE_PID`, or `BIGARROW_OWNER_PID`); new dismissal reason `ownerGone`.
+- `bigarrow stop --session ID` and `bigarrow stop --hook` (Claude Code hook payload on stdin, silent) clear the arrows of one agent session.
+
+### Changed
+- The target's app, window or tab comes to the front by default; `--no-raise` opts out. `--raise` is gone.
+- `start`, `--close-button` and `--until-click` arrows end after 300 s unless `--duration` says otherwise; `--duration 0` is the only way to keep one up indefinitely.
+- Skill: one pattern (`start`, watch, `stop`), no close button by default, `--app` on every in-app target, the hook setup, about a third shorter.
+
 ## [0.1.2] - 2026-10-08
 
 ### Changed

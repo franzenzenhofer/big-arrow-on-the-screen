@@ -23,7 +23,7 @@ Fair question. Arrows have existed since roughly the Paleolithic. Here is what c
 
 - **"Click Allow."** macOS permission prompts, OAuth consent screens, "Open with...?" dialogs. The agent can find the button but must not, or cannot, press it for you. It can now point at it.
 - **"Your turn."** 2FA codes, CAPTCHAs, passkeys, a payment confirmation, a signature, a legal checkbox. The things an agent should never click on its own behalf. It points, you decide, it continues.
-- **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request" --raise`.
+- **"It's this window, not that one."** You have 14 Chrome windows. The agent knows which one it means: `--window "Google Chrome:Pull request"`. It even picks the right tab: `--app "Google Chrome:Pull request"`.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
 - **Guided setups and onboarding.** Walk a human through a settings pane step by step: `start`, wait until they acted, `stop`, next step. Like a product tour, minus the product.
 - **Remote help.** "No, the *other* gear icon." Point at it instead of describing it.
@@ -59,20 +59,22 @@ From source: `swift build -c release` (Xcode 16 or newer, macOS 14 or newer), bi
 ```bash
 bigarrow point --element "Allow" --app "System Settings" --text "Franz, click Allow"   # by label
 bigarrow point --at 760,500 --text "Franz, click HERE"                                 # by coordinate
-bigarrow start --window "Safari:Inbox" --raise --text "This window" && bigarrow stop   # until stopped
+bigarrow start --window "Safari:Inbox" --text "This window" && bigarrow stop            # until stopped
 ```
 
-Three ways an arrow ends, pick your level of commitment:
+Every arrow ends by itself. Nobody has to clean up after an agent that forgot:
 
 | | |
 |---|---|
-| Time limit | `bigarrow point ... --duration 10` (default 8 s) |
+| Time limit | `bigarrow point ... --duration 10` (default 8 s; `start` 300 s; `--duration 0` = no limit) |
 | Start and stop | `bigarrow start ...` returns at once; `bigarrow stop` (or `stop --all`) removes it |
-| The human closes it | `bigarrow point ... --close-button` puts a clickable X on the sign |
+| The agent goes away | an arrow ends when the agent process that drew it exits (`CLAUDE_PID`, or `BIGARROW_OWNER_PID`) |
+| The human answers | `bigarrow stop --hook` as a Claude Code `UserPromptSubmit` hook clears that session's arrows |
+| The human closes it | `--close-button` puts a clickable X on the sign (opt-in) |
 
 Targets: `--at X,Y`, `--rect X,Y,W,H`, `--mouse`, `--window App[:title]`, `--element Label --app App`, `--peekaboo ID --snapshot see.json` (from Peekaboo's `see --json`). Coordinates are global top-left logical points, the space Accessibility, CGWindowList and Peekaboo report. `--display N` makes `--at` and `--rect` relative to one display.
 
-`bigarrow front --app X` or `point --raise` brings the target's app to the front first, because pointing at a window hidden behind your terminal is a special kind of unhelpful. `bigarrow elements --app X` lists what `--element` can match. `bigarrow doctor` shows permissions, who owns them, and your displays.
+An arrow is tied to the app it points into. `--app App[:window or tab title]` (or `--window`) brings that app, window or Chrome/Safari tab to the front first, because pointing at a window hidden behind your terminal is a special kind of unhelpful; and while another app covers the target, the arrow hides and comes back with it. `--no-raise` leaves your windows alone. `bigarrow elements --app X` lists what `--element` can match. `bigarrow doctor` shows permissions, who owns them, and your displays.
 
 Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found, 4 permission missing. Agents love exit codes. Humans tolerate them.
 
@@ -121,8 +123,8 @@ No. It is the least intelligent part of your AI stack, and proud of it.
 
 ## How we know it works
 
-- 76 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
-- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, `--raise`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
+- 82 automated tests: geometry, placement, joint smoothness, a golden image, recorded window-server, Accessibility and Peekaboo 4.9.0 fixtures, and tests against the real window server (window level 1000, clicks pass through, focus never moves, detach and stop timing). CI runs them on macOS 15; they also passed on macOS 26 and macOS 27.
+- 17 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): real clicks on the X, `--until-click`, `--follow`, raising (and `--no-raise`), hiding while covered, selecting a Chrome tab, ending with the owner process, `stop --hook`, `--say`, full-screen apps, Stage Manager, a Space switch, a second display, a 2x display, unplugging a display mid-arrow, CPU. The demo GIF above is recorded by the same workflow, on a desktop with nothing personal on it.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
 ## For agents (and the humans who configure them)

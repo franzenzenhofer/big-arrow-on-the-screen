@@ -5,7 +5,7 @@ import BigArrowCore
 /// on every Space. Recipe from Apple DTS: https://developer.apple.com/forums/thread/826308
 @MainActor
 final class OverlayPanel: NSPanel {
-    init(screen: NSScreen) {
+    init(screen: NSScreen, onClick: @escaping @MainActor () -> Void) {
         super.init(
             contentRect: screen.frame, styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered, defer: false
@@ -21,13 +21,26 @@ final class OverlayPanel: NSPanel {
         isReleasedWhenClosed = false
         animationBehavior = .none
         setFrame(screen.frame, display: false)
-        let view = NSView(frame: CGRect(origin: .zero, size: screen.frame.size))
+        let view = ClickView(frame: CGRect(origin: .zero, size: screen.frame.size))
+        view.onClick = onClick
         view.wantsLayer = true
         contentView = view
     }
 
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
+}
+
+/// Receives the click while `ClickTracker` has made the panel clickable; never activates the app.
+@MainActor
+final class ClickView: NSView {
+    var onClick: (@MainActor () -> Void)?
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+    }
 }
 
 /// Makes sure an unbundled executable may create windows without a Dock icon or focus change.

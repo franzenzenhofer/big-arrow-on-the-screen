@@ -11,14 +11,14 @@ struct FrontCommand: ParsableCommand {
         Examples:
           bigarrow front --app "Google Chrome"
           bigarrow front --app Safari --window Inbox     (raising a window by title needs Accessibility)
-        'point --raise' does the same as part of pointing.
+        'point' does the same by default for --window and --app targets.
         """
     )
 
     @Option(help: help("App name or bundle id.", "name"))
     var app: String
 
-    @Option(help: help("Also raise the app's window whose title contains this text.", "title"))
+    @Option(help: help("Also raise the app's window, or select its tab, whose title contains this text.", "title"))
     var window: String?
 
     @Flag(help: "Print JSON.")

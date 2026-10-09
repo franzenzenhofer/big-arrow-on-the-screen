@@ -7,6 +7,8 @@ OUT="$1"
 BIN=.build/release/bigarrow
 mkdir -p "$OUT"
 FAILED=0
+# Runs a command with a hard time limit (macOS has no timeout(1)); a hang fails, never blocks.
+limit() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 check() { if eval "$2"; then echo "PASS $1"; else echo "FAIL $1"; FAILED=1; fi; }
 field() { python3 -c "import json,sys; d=json.load(open('$1')); print(eval('d' + sys.argv[1]))" "$2"; }
 
@@ -17,14 +19,25 @@ KIT="$OUT/testkit"
 trap 'kill $BACKDROP 2>/dev/null; $BIN stop --all >/dev/null 2>&1' EXIT
 sleep 2
 
-# The close button: a real click on the X ends the arrow and leaves the focus where it was.
+# The close button: a real click on the X (inside the sign's right end) ends the arrow and
+# leaves the focus where it was.
 FRONT=$($KIT frontmost)
 $BIN start --at 300,300 --text "Close me" --close-button --json > "$OUT/close.json"
 PID=$(field "$OUT/close.json" "['pid']")
-read -r X Y < <(python3 -c "import json; s=json.load(open('$OUT/close.json'))['sign']; print(int(s[0]+s[2]-8), int(s[1]+8))")
-sleep 1; $KIT click "$X" "$Y"; sleep 1
+read -r X Y < <(python3 -c "import json; s=json.load(open('$OUT/close.json'))['sign']; print(int(s[0]+s[2]-37), int(s[1]+s[3]/2))")
+sleep 1; screencapture -x "$OUT/close-button.png"; $KIT click "$X" "$Y"; sleep 1
 check "close button ends the arrow" "! kill -0 $PID 2>/dev/null"
 check "clicking the X keeps the focus" "[ \"\$($KIT frontmost)\" = \"$FRONT\" ]"
+
+# Without an X, a click on the sign ends the arrow; a click on the target still passes through.
+$BIN start --at 300,300 --text "Click the sign" --json > "$OUT/sign-click.json"
+PID=$(field "$OUT/sign-click.json" "['pid']")
+sleep 1; $KIT click 300 300; sleep 0.5
+check "a click on the target passes through and keeps the arrow" "kill -0 $PID 2>/dev/null"
+read -r X Y < <(python3 -c "import json; s=json.load(open('$OUT/sign-click.json'))['sign']; print(int(s[0]+s[2]/2), int(s[1]+s[3]/2))")
+$KIT click "$X" "$Y"; sleep 1
+check "a click on the sign ends the arrow" "! kill -0 $PID 2>/dev/null"
+check "clicking the sign keeps the focus" "[ \"\$($KIT frontmost)\" = \"$FRONT\" ]"
 
 # --until-click: a click on the target ends it with dismissedReason clicked.
 $BIN point --at 400,500 --text "Click the target" --until-click --json > "$OUT/until-click.json" & POINT=$!
@@ -84,11 +97,13 @@ $BIN stop --all > /dev/null
 
 # --app "Google Chrome:<tab title>" selects a background tab and raises its window.
 CHROME_PROFILE=$(mktemp -d)
+echo "<title>Alpha tab</title><h1>Alpha</h1>" > "$CHROME_PROFILE/alpha.html"
+echo "<title>Beta tab</title><h1>Beta</h1>" > "$CHROME_PROFILE/beta.html"
 open -na "Google Chrome" --args --user-data-dir="$CHROME_PROFILE" --no-first-run --no-default-browser-check \
-  "data:text/html,<title>Alpha tab</title><h1>Alpha</h1>" "data:text/html,<title>Beta tab</title><h1>Beta</h1>"
-sleep 8; $KIT activate Finder
-$BIN point --at 400,300 --app "Google Chrome:Alpha tab" --text "Alpha" --duration 1 --json > "$OUT/tab.json" 2> "$OUT/tab.err"
-$KIT windows "Google Chrome" | tee "$OUT/chrome-windows.txt"
+  "file://$CHROME_PROFILE/alpha.html" "file://$CHROME_PROFILE/beta.html"
+sleep 10; limit 10 $KIT activate Finder
+limit 30 $BIN point --at 400,300 --app "Google Chrome:Alpha tab" --text "Alpha" --duration 1 --json > "$OUT/tab.json" 2> "$OUT/tab.err"
+limit 10 $KIT windows "Google Chrome" | tee "$OUT/chrome-windows.txt"
 check "the tab target exits 0 ($(cat "$OUT/tab.err"))" "[ -s $OUT/tab.json ]"
 check "Chrome came to the front" "[ \"\$($KIT frontmost)\" = 'Google Chrome' ]"
 check "the Alpha tab is now the selected tab" "grep -q 'kCGWindowName=Alpha tab' $OUT/chrome-windows.txt"

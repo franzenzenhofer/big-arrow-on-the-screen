@@ -30,7 +30,7 @@ let package = Package(
         ),
         .testTarget(
             name: "IntegrationTests",
-            dependencies: ["BigArrowCore", "bigarrow"]
+            dependencies: ["BigArrowCore", "BigArrowOverlay", "bigarrow"]
         )
     ]
 )
