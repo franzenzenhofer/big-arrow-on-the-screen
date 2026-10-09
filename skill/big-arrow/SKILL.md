@@ -57,7 +57,10 @@ Say what and by when. One arrow per step: `stop` before pointing at the next thi
 
 ## Sign and look
 
-Full short sentence ("Franz, click Allow", not "here"). `--say` speaks it. `--color` red, orange,
+Full short sentence ("Franz, click Save", not "here"). When the click approves, grants, pays,
+signs, sends or deletes something, the sign also says what happens: "Franz, click Allow: Ghostty
+may control your Mac", "Franz, click Pay: 49 EUR to Hetzner". The human decides; give them the
+facts on the sign, not only in the terminal. `--say` speaks it. `--color` red, orange,
 yellow, green, teal, blue, purple, pink, black, white or #hex. `--style box|ring` marks without
 covering, `--size S|M|L`, `--duration N` for a plain timed hint (default 8 s with `point`).
 Default look is a white border with a drop shadow; `--border white-black|black` and
