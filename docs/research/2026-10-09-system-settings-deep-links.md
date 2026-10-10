@@ -1,6 +1,6 @@
 # System Settings deep links on macOS 27 - verified
 
-Research date: 2026-10-09, issue #43. Tested on the project's test Mac (Arthur Mac): macOS 27.0.1, build 26A434 (`sw_vers`).
+Research date: 2026-10-09, issue #43. Tested on the project's test Mac: macOS 27.0.1, build 26A434 (`sw_vers`).
 
 ## Method
 

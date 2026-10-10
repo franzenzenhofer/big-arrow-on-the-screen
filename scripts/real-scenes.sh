@@ -1,7 +1,7 @@
 #!/bin/bash
 # Real apps, real use cases for the README: System Settings, Keynote, TextEdit, Chrome and Finder
 # staged with neutral content, one real bigarrow command each, captured at Retina resolution
-# around the app and the arrow. Run on the test Mac (Arthur), never on a desk in use.
+# around the app and the arrow. Run on a dedicated test Mac, never on a desk in use.
 # Other apps are hidden, the Dock and desktop widgets too (restored on exit); demo files live in
 # a temporary folder and Chrome gets a fresh temporary profile, so nothing personal is on screen.
 # Usage: scripts/real-scenes.sh <out-dir> [scene ...]

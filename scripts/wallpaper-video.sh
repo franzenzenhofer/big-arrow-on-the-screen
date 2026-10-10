@@ -2,7 +2,7 @@
 # The README video: an agent walks a human through the most complained-about Mac setting since
 # 2023, "Click wallpaper to show desktop" in Desktop & Dock, with real bigarrow arrows and real
 # clicks (glided like a hand, so you can follow the pointer). Records the whole main display.
-# Run on the test Mac (Arthur, lid closed: one 1920x1080 display), never on a desk in use.
+# Run on a dedicated test Mac (lid closed: one 1920x1080 display), never on a desk in use.
 # Nothing personal on screen: other apps, the Dock and desktop widgets are hidden, Finder windows
 # are closed (and reopened on exit), the two demo windows are TextEdit files in a temporary
 # folder, and System Settings' sidebar is scrolled past the Apple Account row before the
