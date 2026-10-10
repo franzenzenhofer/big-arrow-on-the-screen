@@ -39,8 +39,9 @@ width). `--display N` makes `--at` and `--rect` relative to display N (1-based, 
   `--border-color`, `--text-color`, `--edge-color`, `--close-color`, `--close-x-color`
 - `--from <side>` preferred side of the sign; `--anchor center|title|top-left|...` with `--window`
 - `--no-animation`, `--corners round|sharp`, `--voice` for `--say`
-- `{{value}}` in `--text`: a copy button, several per sign; a click copies and keeps the arrow,
-  `--json` lists their frames as `copyButtons` and reports `copied` when the arrow ends
+- `{{value}}` in `--text`: a copy button, several per sign; a click copies and keeps the arrow.
+  A long value is shortened on screen and copied whole; `--say` speaks it; unbalanced braces
+  exit 2. `--json` lists the frames as `copyButtons` and reports `copied` when the arrow ends
 
 ## Timing and ending
 
