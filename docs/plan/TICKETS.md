@@ -650,7 +650,7 @@ Steps where the agent hands something to the human, beyond a click.
 **Status: Done**  
 Labels: `type:feature` `area:overlay` `area:cli` `priority:P1` `size:M`
 
-**Outcome**: `{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section "Copy & paste": a made-up PIN, before and after the click.
+**Outcome**: `{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section "Copy & paste": a made-up PIN, before and after the click. The skill teaches it: values to paste go on the sign as `{{value}}`, a copy click keeps the arrow.
 
 The human often has to paste something the agent may not type: a `sudo` command, a URL, a code. `{{value}}` in `--text` puts the value on the sign with a copy button; one click copies it and the arrow keeps pointing where it goes. Plan: `docs/plan/2026-10-09-copy-button.md`.
 

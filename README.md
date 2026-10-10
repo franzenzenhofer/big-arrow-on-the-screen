@@ -274,7 +274,7 @@ Say, by covering the Decline button? **Not beyond what it can already do.** An a
 
 ### Why a skill? Is that a lot of tokens?
 
-**182 tokens, most of the time.** That is the skill's description, the only part the agent always sees. The instructions, 1,398 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point; pane ids and look flags (1,008 more) only when it needs them.
+**182 tokens, most of the time.** That is the skill's description, the only part the agent always sees. The instructions, 1,528 tokens (Anthropic's token-count API, Claude Opus 5.5), load only when it decides to point; pane ids and look flags (1,118 more) only when it needs them.
 
 ### Why not just use a screen annotation app?
 

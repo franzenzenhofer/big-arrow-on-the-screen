@@ -29,12 +29,14 @@ bigarrow stop
 - `--say` when the human may not be looking. Time-critical (code expires, page times out, job
   waits): `--color red --say` and say by when: "Franz, enter the 2FA code now, it expires in 60 s".
 - Something to paste (a command you may not run, a URL, a code): put it on the sign as
-  `{{value}}`. It gets a copy button; point at where it goes: "Franz, copy {{sudo xcodebuild
-  -license accept}} and paste it here".
+  `{{value}}`. The human sees the value on a copy button (no braces); one click copies all of it
+  and the arrow stays. Point at where it goes: "Franz, copy {{sudo xcodebuild -license accept}}
+  and paste it here", then check that it was pasted.
 - One arrow per step; `bigarrow stop` the moment the step is done. Arrows also end alone: after
   300 s, when your session exits, when the human answers (hook below).
-- A click on the sign or shaft removes the arrow (target clicks pass through). A removed arrow
-  was seen: check the result, do not redraw. Skip `--close-button` unless asked.
+- A click on the sign or shaft, except a copy button, removes the arrow (target clicks pass
+  through). A removed arrow was seen: check the result, do not redraw. Skip `--close-button`
+  unless asked.
 
 ## Targets
 

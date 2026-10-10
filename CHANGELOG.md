@@ -6,6 +6,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ### Added
 - Copy buttons: `{{value}}` in `--text` shows the value in the sign with a copy button. One click puts it on the clipboard (no permission needed), the icon turns into a check for 1.5 s, and the arrow stays where the value goes; a click elsewhere on the sign still removes it. Several per sign; long values are shortened on screen and copied whole. `--json` reports each chip's frame (`copyButtons`) and how often it was copied (`copied`). Icons from [Feather](https://feathericons.com) (MIT, `THIRD_PARTY_NOTICES.md`), drawn from their SVG source by a small SVG path reader. README section "Copy & paste": a made-up PIN in blue with a yellow border and text, before and after the click, recorded by `scripts/real-scenes.sh pin`.
+- Skill: knows copy buttons. Anything to paste goes on the sign as `{{value}}`, a click on a copy button copies and keeps the arrow (only a click elsewhere on the sign removes it); long values, `--say` and unbalanced braces in `reference.md`. SKILL.md 1,528 tokens, reference.md 1,118 (Anthropic's token-count API).
 
 ### Fixed
 - `scripts/arthur-gui.sh` launches Ghostty with `--command=` (Ghostty 1.3 asks before every `-e` and unattended runs hung) and records the exit code even when the command calls `exit` (#62).
