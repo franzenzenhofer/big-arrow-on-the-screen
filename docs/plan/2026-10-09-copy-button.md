@@ -55,7 +55,7 @@ The sign reads `Franz, this needs your password. Copy [sudo xcodebuild -license 
    copies and swaps the sign text for 1.5 s; elsewhere dismisses.
 6. `PointConfig`, `PointSession`: parse once, speak and record plain text.
 7. Tests: offscreen chip rects inside the sign, copy without dismissing (unit, real
-   pasteboard), golden render unchanged for signs without chips. On the test Mac: a real click on
+   pasteboard), golden render unchanged for signs without chips. On Arthur Mac: a real click on
    the chip puts the value on the clipboard and the arrow stays.
 8. Docs: README section "Copy buttons" with a real use case (Terminal, a `sudo` command) and a
    small one, the skill (one rule plus example), `--help`, CHANGELOG, ticket T51.

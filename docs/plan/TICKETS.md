@@ -427,7 +427,7 @@ Labels: `type:infra` `area:distribution` `size:M` `priority:P0`
 Add `Formula/bigarrow.rb` to the existing tap (pattern: `Formula/openit.rb`): build from source with `swift build -c release --disable-sandbox`, install the binary and the skill folder into `share/bigarrow/skill`, `depends_on :macos`, `depends_on xcode: ['16.0', :build]`. Formula `test do` runs `bigarrow --version` and `bigarrow doctor --json`. Also a `release.yml` in this repo that tags, builds an ad-hoc signed universal binary, attaches it to the GitHub release, and opens the tap bump PR. Notarization is not required for a formula built from source; document that the optional prebuilt binary is ad-hoc signed (`codesign --sign -`) and what Gatekeeper does with it.
 
 **Acceptance criteria**
-- `brew install franzenzenhofer/tap/bigarrow` works on a clean Mac (test on the test Mac over SSH).
+- `brew install franzenzenhofer/tap/bigarrow` works on a clean Mac (test on Arthur Mac over SSH).
 - `brew test bigarrow` passes.
 - `brew audit --strict bigarrow` passes.
 
@@ -467,7 +467,7 @@ Labels: `type:infra` `area:distribution` `size:S` `priority:P0`
 `CHANGELOG.md` (Keep a Changelog), tag `v0.1.0`, GitHub release with notes and the ad-hoc signed binary, tap formula bumped to the tag's tarball sha256.
 
 **Acceptance criteria**
-- `brew upgrade bigarrow` on this Mac and the test Mac results in `bigarrow --version` = `bigarrow 0.1.0`.
+- `brew upgrade bigarrow` on this Mac and Arthur Mac results in `bigarrow --version` = `bigarrow 0.1.0`.
 
 ### T38 Funny real-world scenes for the README
 
@@ -528,7 +528,7 @@ The real criticism and the real use cases from the Hacker News thread (https://n
 **Status: Done** · Issue: #38  
 Labels: `bug` `priority:P1` `size:S`
 
-**Outcome**: Mark group pinned to the mark's centre. MarkTests: 55 pt drift before, under 0.5 pt after; on the test Mac's real screen the box centre moves at most 1 pt across 8 pulse frames. Found by @jarombouts in #37.
+**Outcome**: Mark group pinned to the mark's centre. MarkTests: 55 pt drift before, under 0.5 pt after; on Arthur Mac's real screen the box centre moves at most 1 pt across 8 pulse frames. Found by @jarombouts in #37.
 
 The mark layer covers the whole display, so the pulse scales it around the display's centre and a box away from the centre swims by up to 8 % of that distance every 0.9 s. Pulse each mark around its own centre. Found and fixed by @jarombouts in PR #37 (commit 5d1d1c4); take that fix with credit, without the effects.
 
@@ -555,7 +555,7 @@ Commenters could not parse the permissions FAQ (https://news.ycombinator.com/ite
 **Status: Done** · Issue: #40  
 Labels: `type:docs` `priority:P1` `size:M`
 
-**Outcome**: scripts/real-scenes.sh records five real-app scenes on macOS 27 (System Settings, Keynote, TextEdit print, Chrome tabs, Finder), shown one per row in "Real apps, real use cases"; plus the guide docs/guides/allow-screen-recording/ (six steps, real password sheet). Recorded on the test Mac.
+**Outcome**: scripts/real-scenes.sh records five real-app scenes on macOS 27 (System Settings, Keynote, TextEdit print, Chrome tabs, Finder), shown one per row in "Real apps, real use cases"; plus the guide docs/guides/allow-screen-recording/ (six steps, real password sheet). Recorded by Arthur.
 
 The strongest reactions were about guiding, not doing: a tutorial in a complicated app (https://news.ycombinator.com/item?id=50019008, https://news.ycombinator.com/item?id=50020002), docs where the screenshot still makes you search (https://news.ycombinator.com/item?id=50019113), helping a parent over the phone (https://news.ycombinator.com/item?id=50019233, https://news.ycombinator.com/item?id=50019407, https://news.ycombinator.com/item?id=50020456). The README only shows staged dialogs and a joke HN page. Record real apps on the test Mac (System Settings, Keynote, Chrome, Finder) with real bigarrow commands, nothing personal on screen, C2PA stripped, and show them big further down the README.
 
@@ -650,7 +650,7 @@ Steps where the agent hands something to the human, beyond a click.
 **Status: Done**  
 Labels: `type:feature` `area:overlay` `area:cli` `priority:P1` `size:M`
 
-**Outcome**: `{{value}}` copy chips with Feather icons, verified by a real click on the test Mac and a behaviour check; README section "Copy & paste": a made-up PIN, before and after the click.
+**Outcome**: `{{value}}` copy chips with Feather icons, verified by a real click on Arthur Mac and a behaviour check; README section "Copy & paste": a made-up PIN, before and after the click.
 
 The human often has to paste something the agent may not type: a `sudo` command, a URL, a code. `{{value}}` in `--text` puts the value on the sign with a copy button; one click copies it and the arrow keeps pointing where it goes. Plan: `docs/plan/2026-10-09-copy-button.md`.
 

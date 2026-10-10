@@ -7,14 +7,14 @@ Screen Recording granted), via `scripts/behaviour-check.sh` in
 [visual.yml](../../.github/workflows/visual.yml), run
 https://github.com/franzenzenhofer/big-arrow-on-the-screen/actions/runs/37762744052 .
 **MBP** = the planning MacBook Pro (macOS 26.1, built-in display at 2x), `swift test` with the
-screen tests on. **Test Mac** = a dedicated test Mac (macOS 27.0.1), `BIGARROW_SCREEN_TESTS=1 swift test` in its GUI session.
+screen tests on. **Arthur** = Arthur Mac (macOS 27.0.1), `BIGARROW_SCREEN_TESTS=1 swift test` in its GUI session.
 
 | Case | Result | Where, date | Evidence |
 |---|---|---|---|
-| Overlay at window level 1000, covering the display | pass | CI, MBP, Test Mac, 2026-10-08 | `OverlayTests` |
-| Clicks pass through the arrow to the window below | pass | CI, MBP, Test Mac, 2026-10-08 | `OverlayTests` hit test |
-| Frontmost app unchanged by `point`, `start`, `--detach` | pass | CI, MBP, Test Mac, 2026-10-08 | `OverlayTests`; root cause of the one failure found: `NSApplication.run()` activates detached processes, replaced by a plain event pump |
-| Sign pixels have the arrow colour | pass | CI, MBP, Test Mac, 2026-10-08 | `OverlayTests` pixel check |
+| Overlay at window level 1000, covering the display | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` |
+| Clicks pass through the arrow to the window below | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` hit test |
+| Frontmost app unchanged by `point`, `start`, `--detach` | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests`; root cause of the one failure found: `NSApplication.run()` activates detached processes, replaced by a plain event pump |
+| Sign pixels have the arrow colour | pass | CI, MBP, Arthur, 2026-10-08 | `OverlayTests` pixel check |
 | Above a full-screen app, which keeps its Space and the focus | pass | CI, 2026-10-08 | ![](images/fullscreen.png) pixel 255,83,39 |
 | Stage Manager on | pass | CI, 2026-10-08 | ![](images/stage-manager.png) pixel 0,153,255 |
 | Second display (virtual, right of main), `--display 2` | pass | CI, 2026-10-08 | ![](images/two-displays-2.png) |
@@ -37,6 +37,6 @@ screen tests on. **Test Mac** = a dedicated test Mac (macOS 27.0.1), `BIGARROW_S
   so `--follow` is checked through `--element` there (same follow code). On real Macs both agree.
 - The runner's virtual display reports backing scale 1 even in 2x mode; scale 2 is covered by the
   MacBook's built-in display.
-- Test Mac: the first run was on a locked screen (window-server checks only). Unlocked, all 74
+- Arthur Mac: the first run was on a locked screen (window-server checks only). Unlocked, all 74
   tests (as of 2026-10-08) ran through Ghostty with no skips, and the README scenes were recorded
   there (`scripts/funny-scenes.sh --cover`).

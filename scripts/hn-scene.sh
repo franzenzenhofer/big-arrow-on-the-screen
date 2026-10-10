@@ -1,7 +1,7 @@
 #!/bin/zsh
 # README hero: a Hacker News front page on a real desktop (menu bar, Dock, a normal Chrome window
-# with tabs and address bar) and nine arrows that make a point, no two alike. Run on a dedicated test
-# Mac through scripts/remote-gui.sh, never on a desk in use.
+# with tabs and address bar) and nine arrows that make a point, no two alike. Run on the test Mac
+# (Arthur) through scripts/arthur-gui.sh, never on a desk in use.
 # - The page is the front page of 2014-06-10: every visible headline is tech, nothing political,
 #   criminal or sad, and it fits "already argued in 2014".
 # - Chrome gets a fresh temporary profile: no account, bookmarks or history. Other apps are hidden.

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Screenshots for docs/guides/allow-screen-recording, one real bigarrow arrow per step, captured
-# at Retina resolution around System Settings and the sign. Run on a dedicated test Mac, never
+# at Retina resolution around System Settings and the sign. Run on the test Mac (Arthur), never
 # on a desk in use.
 # Steps 1-4 only point. Step 5 shows the real password sheet: the script presses the switch of
 # an entry that is off and harmless (python3.14), shoots the sheet, presses Cancel and checks
