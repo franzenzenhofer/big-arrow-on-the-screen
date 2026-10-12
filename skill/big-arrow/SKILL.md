@@ -12,6 +12,9 @@ metadata:
 `bigarrow` draws a click-through arrow with a sign, needs no permission and never takes the
 focus. Point at the thing itself, a line in the terminal is easy to miss.
 
+Needs bigarrow 0.4.6 or newer. If `bigarrow --version` prints an older one, run
+`brew upgrade franzenzenhofer/tap/bigarrow` first: an old binary prints `{{value}}` as plain text.
+
 ```bash
 open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
 bigarrow start --element "Ghostty" --app "System Settings" --text "Franz, switch this on: Ghostty may record your screen" --say
