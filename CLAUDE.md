@@ -18,6 +18,7 @@ Released 0.4.5 on 2026-10-09 (Homebrew `franzenzenhofer/tap/bigarrow`); 0.4.5 tr
 - Gates before every commit: `swiftlint lint --strict`, `swift build -c release`, `swift test`. All green or no commit.
 - Every image committed to the repo has C2PA metadata stripped and shows no personal content.
 - English only in code, comments, commits and docs.
+- The skill is symlinked from this checkout into `~/.claude/skills` and `~/.codex/skills`, so it is live the moment it lands on main, while the binary comes from Homebrew. A skill change that teaches a new flag or syntax bumps "Needs bigarrow X or newer" in `SKILL.md` to the release that ships it and is released right away (`SkillVersionTests` fails until `BigArrowVersion` reaches it, so bump that in the same change; `scripts/release.sh` then tags it as is).
 
 ## Where to test what
 
