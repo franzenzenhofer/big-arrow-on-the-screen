@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Changed
+- README: "Funny cue cards", six real on-screen scenes (buttons, a choice, a question, a checklist, a row arrow, copy buttons), re-created by `scripts/card-scenes.sh`.
+
+### Fixed
+- A card with `app` now sits beside that app's window, as specified; it always fell back to the display's bottom-right corner because the window lookup returned a point, not the window's frame.
+
 ## [0.5.1] - 2026-10-26
 
 ### Changed

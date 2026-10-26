@@ -94,8 +94,7 @@ final class CardSession {
     /// The front window of the card's `app`, if it names one.
     func homeWindow() throws -> CGRect? {
         guard let app = document.app else { return nil }
-        let resolved = try WindowTarget.resolve(try WindowQuery(app), anchor: .center, screens: ScreenReader.current())
-        return resolved.shape.rect
+        return try WindowTarget.frame(try WindowQuery(app), screens: ScreenReader.current())
     }
 
     func makeEvents() -> CardEvents {
