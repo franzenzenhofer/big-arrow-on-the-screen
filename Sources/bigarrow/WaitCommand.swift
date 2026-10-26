@@ -8,9 +8,9 @@ struct WaitCommand: ParsableCommand {
         commandName: "wait",
         abstract: "Wait for the human to answer a card, then print the reply JSON (exit 0 answered, 1 not).",
         discussion: """
-        Without a pid: the newest live card of this agent session. The card ends by itself, so
-        this returns at the latest when the card's time runs out; --timeout returns sooner with
-        {"result":"pending"} and leaves the card up.
+        Without a pid: the newest live card of this agent session. Returns as soon as the human
+        answers (the card stays up until its X) or closes the card. --timeout returns sooner
+        with {"result":"pending"} and leaves the card up.
         """
     )
 
@@ -32,7 +32,11 @@ struct WaitCommand: ParsableCommand {
     }
 
     func run() throws {
-        let pid = try self.pid ?? Self.newestCard()
+        try Self.reply(of: try pid ?? Self.newestCard(), timeout: timeout)
+    }
+
+    /// Prints the card's reply as soon as there is one and exits with its code.
+    static func reply(of pid: Int32, timeout: Double) throws -> Never {
         let registry = PidRegistry()
         let deadline = timeout > 0 ? Date().addingTimeInterval(timeout) : Date.distantFuture
         while true {
@@ -48,7 +52,7 @@ struct WaitCommand: ParsableCommand {
                 Output.json(Pending(pid: pid))
                 Darwin.exit(1)
             }
-            Thread.sleep(forTimeInterval: Self.pollInterval)
+            Thread.sleep(forTimeInterval: pollInterval)
         }
     }
 

@@ -12,7 +12,7 @@ metadata:
 `bigarrow` draws a click-through arrow with a sign, needs no permission and never takes the
 focus. Point at the thing itself, a line in the terminal is easy to miss.
 
-Needs bigarrow 0.5.0 or newer. If `bigarrow --version` prints an older one, run
+Needs bigarrow 0.5.1 or newer. If `bigarrow --version` prints an older one, run
 `brew upgrade franzenzenhofer/tap/bigarrow` first: an old binary has no `card` and prints
 `{{value}}` as plain text.
 
@@ -50,14 +50,18 @@ a cue card, a floating window with copy buttons that never takes the focus.
 ```bash
 bigarrow card --title "Franz, log in to Hetzner" --app "Google Chrome" --field "User=franz@example.com" \
   --secret "Password=keychain:hetzner/franz" --link https://console.hetzner.cloud --button "done=I'm in"
-bigarrow wait          # blocks; prints {"result":"button","value":"done","copied":["User","Password"],...}
+bigarrow wait          # blocks until an answer: {"result":"button","value":"done","copied":["User","Password"],...}
 ```
 
 - Secrets never go on the command line (`ps` shows it to everyone): `--secret` takes a source,
   `pass:`, `keychain:<service>/<account>`, `op:`, `env:`, `file:`, or put the value in a JSON card
   on stdin. They show as dots, copy as concealed and leave the clipboard after 30 s.
 - `--ask "Question?"` (typed reply), `--choice id=Label` (2 to 6), `--button id=Label`. `wait`
-  exits 0 for an answer, 1 when the card was closed or ran out: then ask in the terminal.
+  exits 0 for an answer, 1 when the human closed the card without one: then ask in the terminal.
+- A card with questions closes itself once every question is answered (`--keep` keeps it until
+  the X); the reply's `answers` has them all. A card with only values stays until the human's X.
+  It survives your session and the prompt hook: close it yourself when it is no longer needed,
+  `bigarrow stop --pid <pid>` or `bigarrow stop --cards`.
 - A row can point: in a JSON card, `"point": {"element": "Password"}` aims the arrow at where that
   value goes, and it moves on when the human copies the next one. `start ... --card card.json`
   shows an arrow and a card together. Row types and JSON: [reference.md](reference.md#cards).

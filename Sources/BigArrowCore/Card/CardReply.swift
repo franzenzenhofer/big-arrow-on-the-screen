@@ -42,6 +42,8 @@ public struct CardReply: Codable, Equatable, Sendable {
     public var value: String?
     /// Every input row's text by row id, also when a button answered.
     public var inputs: [String: String]?
+    /// With more than one question: every answer by row (its id, else "row N").
+    public var answers: [String: String]?
     public var checked: [String]?
     public var copied: [String]?
     public var opened: [String]?
@@ -75,6 +77,7 @@ public struct CardProgress: Sendable {
     public var opened: [String] = []
     public var checked: [String] = []
     public var inputs: [String: String] = [:]
+    public var answers: [String: String] = [:]
 
     public init() {}
 
@@ -94,6 +97,7 @@ public struct CardProgress: Sendable {
         reply.checked = checked.isEmpty ? nil : checked
         let typed = inputs.filter { !$0.value.isEmpty }
         reply.inputs = typed.isEmpty ? nil : typed
+        reply.answers = answers.isEmpty ? nil : answers
         return reply
     }
 }

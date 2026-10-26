@@ -55,16 +55,15 @@ struct CardDocumentTests {
         #expect(badInput(twice)?.contains("used twice") == true)
     }
 
-    @Test("A secret is masked, shortens the card's life and never survives redaction")
+    @Test("A secret is masked and never survives redaction; a card has no time limit")
     func secrets() throws {
         let card = try parse(#"{"title":"t","rows":[{"type":"field","label":"Password","value":"hunter2","masked":true}]}"#)
         #expect(card.hasSecret)
-        #expect(card.resolvedDuration == CardDocument.secretDuration)
         let redacted = JSONOutput.encode(card.redacted)
         #expect(!redacted.contains("hunter2"))
         #expect(redacted.contains(CardDocument.redaction))
         let plain = try parse(#"{"title":"t","rows":[{"type":"field","label":"User","value":"franz"}]}"#)
-        #expect(plain.resolvedDuration == CardDocument.defaultDuration)
+        #expect(badInput(#"{"title":"t","rows":[{"type":"text","value":"x"}],"duration":60}"#)?.contains("'duration'") == true)
         #expect(JSONOutput.encode(plain.redacted).contains("franz"))
     }
 

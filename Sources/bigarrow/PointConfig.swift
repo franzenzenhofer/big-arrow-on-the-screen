@@ -72,7 +72,7 @@ struct PointConfig {
         card = try Self.card(behaviour, app: options.app ?? options.window, color: color, stdinTaken: stdinSnapshot != nil)
         replyFile = behaviour.replyFile
         let waitsForHuman = click != .off || closeButton || mode == .background || card != nil
-        duration = behaviour.duration ?? card?.resolvedDuration ?? (waitsForHuman ? Self.humanWaitDuration : Self.defaultDuration)
+        duration = behaviour.duration ?? (waitsForHuman ? Self.humanWaitDuration : Self.defaultDuration)
         guard duration >= 0, duration.isFinite else { throw BigArrowError.badInput("--duration must be 0 or more seconds") }
         (say, voice, json, dryRun) = (behaviour.say, behaviour.voice, behaviour.json, behaviour.dryRun)
         detach = behaviour.detach || mode == .background

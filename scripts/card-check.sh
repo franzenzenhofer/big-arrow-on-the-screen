@@ -21,7 +21,7 @@ windows() { "$KIT" windows "$1" | grep -c 'IsOnscreen=1'; }
 
 swiftc -O scripts/testkit.swift -o "$OUT/testkit" || exit 1
 KIT="$OUT/testkit"
-trap '"$BIN" stop --all >/dev/null 2>&1' EXIT
+trap '"$BIN" stop --all >/dev/null 2>&1; "$BIN" stop --cards >/dev/null 2>&1' EXIT
 FRONT=$("$KIT" frontmost)
 
 # Showing a card and clicking its buttons never takes the focus; a copy keeps the card up.
@@ -42,6 +42,30 @@ CODE=$(reply "$PID" "$OUT/basic-reply.json")
 check "a button answers: exit 0, value ok, copied User ($(cat "$OUT/basic-reply.json"))" \
   "[ $CODE = 0 ] && [ \"\$(json $OUT/basic-reply.json \"['value']\")\" = ok ] && grep -q '\"User\"' $OUT/basic-reply.json"
 check "clicking the card keeps the focus" "[ \"\$(\"$KIT\" frontmost)\" = \"$FRONT\" ]"
+sleep 1.5
+check "a card with one question closes itself once it is answered" "! kill -0 $PID 2>/dev/null"
+
+# Several questions: the card stays until the last one is answered, and the reply has them all.
+"$BIN" card --title "Franz, two questions" --choice "a=Alpha" --choice "b=Beta" --ask "And why?" > "$OUT/multi.json"
+PID=$(json "$OUT/multi.json" "['pid']"); sleep 1
+press "$OUT/multi.json" "Beta"; sleep 1
+check "one of two answers keeps the card" "kill -0 $PID 2>/dev/null"
+press "$OUT/multi.json" "And why?"; sleep 0.3
+"$KIT" type "because" --return
+CODE=$(reply "$PID" "$OUT/multi-reply.json"); sleep 1.5
+check "the last answer closes it; the reply has both ($(cat "$OUT/multi-reply.json"))" \
+  "[ $CODE = 0 ] && ! kill -0 $PID 2>/dev/null && grep -q '\"b\"' $OUT/multi-reply.json && grep -q because $OUT/multi-reply.json"
+
+# --keep: answered, it stays with a "Sent" banner until its X.
+"$BIN" card --title "Franz, keep me" --keep --button "ok=OK" > "$OUT/keep.json"
+PID=$(json "$OUT/keep.json" "['pid']"); sleep 1
+press "$OUT/keep.json" "OK"
+CODE=$(reply "$PID" "$OUT/keep-reply.json"); sleep 1
+check "--keep: the answer goes out and the card stays" "[ $CODE = 0 ] && kill -0 $PID 2>/dev/null"
+screencapture -x "$OUT/keep-sent.png"
+# The card grew, so its X may have moved: the pid file has the new frames.
+press "${TMPDIR:-/tmp/}bigarrow/$PID.json" "Close"; sleep 1
+check "--keep: the X closes it" "! kill -0 $PID 2>/dev/null"
 
 # The X closes without an answer.
 "$BIN" card --title "Franz, close me" --note "Nothing to do" > "$OUT/close.json"
@@ -59,6 +83,7 @@ CODE=$(reply "$PID" "$OUT/ask-reply.json")
 check "typing answers: input 'Arthur Ficial' ($(cat "$OUT/ask-reply.json"))" \
   "[ $CODE = 0 ] && [ \"\$(json $OUT/ask-reply.json \"['value']\")\" = 'Arthur Ficial' ]"
 check "typing into the card keeps the human's app frontmost" "[ \"\$(\"$KIT\" frontmost)\" = \"$FRONT\" ]"
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 
 # A choice.
 "$BIN" card --title "Franz, pick one" --choice "a=Alpha" --choice "b=Beta" > "$OUT/choice.json"
@@ -66,6 +91,7 @@ PID=$(json "$OUT/choice.json" "['pid']"); sleep 1
 press "$OUT/choice.json" "Beta"
 CODE=$(reply "$PID" "$OUT/choice-reply.json")
 check "a choice answers with its id" "[ $CODE = 0 ] && [ \"\$(json $OUT/choice-reply.json \"['value']\")\" = b ]"
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 
 # A secret: never on the command line, hidden from screenshots, concealed on the clipboard,
 # never in the reply, gone from the clipboard after 30 s.
@@ -89,19 +115,24 @@ reply "$PID" "$OUT/secret-reply.json" > /dev/null
 check "the reply holds no secret ($(cat "$OUT/secret-reply.json"))" "grep -q Password $OUT/secret-reply.json && ! grep -q \"\$CARD_CHECK_SECRET\" $OUT/secret-reply.json"
 sleep 31
 check "the clipboard forgets the secret after 30 s" "[ \"\$(pbpaste)\" != \"\$CARD_CHECK_SECRET\" ]"
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 
-# Lifetimes: time limit, stop --hook for the session, the owner process exiting.
-"$BIN" card --title "Franz, short" --note "x" --duration 2 > "$OUT/timeout.json"
-CODE=$(reply "$(json "$OUT/timeout.json" "['pid']")" "$OUT/timeout-reply.json")
-check "a card ends by its time limit" "[ $CODE = 1 ] && grep -q '\"timeout\"' $OUT/timeout-reply.json"
+# Only the X or the agent on purpose (stop --pid, stop --cards) close a card: not the prompt
+# hook, not stop --all, not the agent exiting, and there is no time limit to set.
+check "a card has no time limit to set" "! \"$BIN\" card --title t --note x --duration 2 --dry-run > /dev/null 2>&1"
 BIGARROW_SESSION=card-check "$BIN" card --title "Franz, hook" --note "x" > "$OUT/hook.json"
+PID=$(json "$OUT/hook.json" "['pid']"); sleep 1
 echo '{"session_id":"card-check"}' | "$BIN" stop --hook
-reply "$(json "$OUT/hook.json" "['pid']")" "$OUT/hook-reply.json" > /dev/null
-check "stop --hook ends the session's card" "grep -q '\"stopped\"' $OUT/hook-reply.json"
-sleep 3 & OWNER=$!
+"$BIN" stop --all > /dev/null; sleep 1
+check "stop --hook and stop --all leave the card" "kill -0 $PID 2>/dev/null"
+BIGARROW_SESSION=card-check "$BIN" stop --cards > /dev/null
+reply "$PID" "$OUT/hook-reply.json" > /dev/null
+check "stop --cards closes the session's card" "grep -q '\"stopped\"' $OUT/hook-reply.json"
+sleep 2 & OWNER=$!
 BIGARROW_OWNER_PID=$OWNER "$BIN" card --title "Franz, owner" --note "x" > "$OUT/owner.json"
-reply "$(json "$OUT/owner.json" "['pid']")" "$OUT/owner-reply.json" > /dev/null
-check "the card ends with its owner" "grep -q '\"ownerGone\"' $OUT/owner-reply.json"
+PID=$(json "$OUT/owner.json" "['pid']"); sleep 3
+check "the card outlives the agent process" "kill -0 $PID 2>/dev/null"
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 
 # Arrow and card together: start --card is one process with two windows; a row's point shows
 # an arrow from the card's process; card --update replaces the rows.
@@ -110,9 +141,13 @@ echo '{"title":"Franz, click the box","rows":[{"type":"actions","items":[{"id":"
 PID=$(json "$OUT/start.json" "['pid']"); sleep 1
 screencapture -x "$OUT/start-card.png"
 check "start --card shows arrow and card from one process ($(windows "$PID"))" "[ \$(windows $PID) -ge 2 ]"
-"$BIN" stop --pid "$PID" > /dev/null
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 reply "$PID" "$OUT/start-reply.json" > /dev/null
 check "start --card leaves a reply for wait" "grep -q '\"stopped\"' $OUT/start-reply.json"
+"$BIN" start --at 500,500 --text "Here" --card "$OUT/with-arrow.json" --duration 2 --json > "$OUT/start2.json"
+PID=$(json "$OUT/start2.json" "['pid']"); sleep 3.5
+check "--duration ends the arrow, the card stays ($(windows "$PID"))" "kill -0 $PID 2>/dev/null && [ \$(windows $PID) -eq 1 ]"
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 echo '{"title":"Franz, paste here","rows":[{"type":"field","label":"Code","value":"123","point":{"rect":"400,400,200,40"}}]}' > "$OUT/row.json"
 "$BIN" card "$OUT/row.json" > "$OUT/row-out.json"
 PID=$(json "$OUT/row-out.json" "['pid']"); sleep 1
@@ -122,7 +157,7 @@ echo '{"title":"Franz, updated","rows":[{"type":"progress","value":"Step 2 of 3"
 sleep 1; screencapture -x "$OUT/updated.png"
 check "update keeps the card alive" "kill -0 $PID 2>/dev/null"
 check "a card updated to rows without a point drops the arrow ($(windows "$PID"))" "[ \$(windows $PID) -eq 1 ]"
-"$BIN" stop --all > /dev/null
+"$BIN" stop --pid "$PID" > /dev/null 2>&1
 
 [ "$FAILED" = 0 ] && echo "ALL CARD CHECKS PASSED"
 exit "$FAILED"

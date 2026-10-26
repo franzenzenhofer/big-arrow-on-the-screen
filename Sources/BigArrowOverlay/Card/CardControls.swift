@@ -8,8 +8,8 @@ public final class CardEvents {
     public var copy: (CardRow, String) -> Void = { _, _ in }
     /// A link opened.
     public var open: (String) -> Void = { _ in }
-    /// The card is answered: the outcome and its value (button id, option id, typed text).
-    public var answer: (CardOutcome, String?) -> Void = { _, _ in }
+    /// A row is answered: the row, the outcome and its value (button id, option id, typed text).
+    public var answer: (CardRow, CardOutcome, String?) -> Void = { _, _, _ in }
     /// The X button or Esc.
     public var close: () -> Void = {}
     /// A row (or checklist item) with a `point` became the one the human is working on.
@@ -55,6 +55,11 @@ final class ActionButton: NSButton {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
+    override func mouseDown(with event: NSEvent) {
+        CardMotion.press(self)
+        super.mouseDown(with: event)
+    }
+
     @objc func run() {
         handler()
     }
@@ -78,10 +83,42 @@ final class PillButton: NSButton {
         ])
         setAccessibilityLabel(title)
         self.handler = handler
+        self.primary = primary
+        self.tint = style.tint
         target = self
         action = #selector(run)
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(greaterThanOrEqualToConstant: 42).isActive = true
+        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+    }
+
+    private var primary = false
+    private var tint = NSColor.systemRed
+    /// False once its question is answered. The button stays enabled: a disabled button draws its
+    /// title in the system's disabled colour, which would hide the picked answer.
+    var isAnswerable = true
+
+    /// Under the pointer a filled button gets lighter and an outlined one fills faintly.
+    override func mouseEntered(with event: NSEvent) {
+        guard isAnswerable else { return }
+        layer?.backgroundColor = primary ? tint.blended(withFraction: 0.18, of: .white)?.cgColor : tint.withAlphaComponent(0.12).cgColor
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        guard isAnswerable else { return }
+        layer?.backgroundColor = primary ? tint.cgColor : NSColor.clear.cgColor
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard isAnswerable else { return }
+        CardMotion.press(self)
+        super.mouseDown(with: event)
+    }
+
+    /// The answer that was given: filled, whatever it looked like before.
+    func markChosen() {
+        layer?.backgroundColor = tint.cgColor
+        attributedTitle = NSAttributedString(string: title, attributes: [.font: CardStyle.buttonFont, .foregroundColor: NSColor.white])
     }
 
     override var intrinsicContentSize: NSSize {
@@ -92,6 +129,7 @@ final class PillButton: NSButton {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     @objc func run() {
+        guard isAnswerable else { return }
         handler()
     }
 }

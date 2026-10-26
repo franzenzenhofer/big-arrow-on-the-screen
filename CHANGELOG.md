@@ -4,6 +4,19 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-26
+
+### Changed
+- A cue card closes only when the human clicks its X or the agent closes it on purpose: `bigarrow stop --pid <pid>` or the new `bigarrow stop --cards` (this session's cards). No time limit (`--duration` and the `duration` key are gone from cards); the prompt hook, `stop`, `stop --all` and the agent exiting leave cards alone. In 0.5.0 the hook closed a card the moment the human typed a reply. With `start ... --card`, `--duration` now limits only the arrow.
+- Questions close the card: one question closes it once answered, several once all are answered (the reply's new `answers` has every one), `--keep` / `"keep": true` keeps it with a "Sent" banner until its X. A card with only values stays until the X. `card --wait` now detaches the card and waits, instead of holding the card's process.
+- The card's header uses the arrow sign's font (SF Pro Rounded Heavy, 30 pt), centred, with more room; the card's border is the sign's contrast colour; more space between rows.
+- README: links see-the-arrow (https://github.com/chocodev11/see-the-arrow), the same arrow for Windows and Linux, and the FAQ points to it and to Agent Pointer (Windows) (#70).
+- Homebrew: the formula no longer requires Xcode; the Command Line Tools build it (#71, thanks to the reporter's tap PR).
+- Cards animate what the human does: they slide in and fade out, buttons press down and light up under the pointer, a copy pops its icon, washes the row and shows a "Copied" pill, the eye and checklist boxes pop, and the chosen answer fills while the rest dims.
+
+### Fixed
+- An answered card at the bottom of the screen grew under the Dock; it now grows upwards there.
+
 ## [0.5.0] - 2026-10-26
 
 ### Added

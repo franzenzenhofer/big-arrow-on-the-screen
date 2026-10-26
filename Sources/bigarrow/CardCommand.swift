@@ -8,11 +8,13 @@ struct CardCommand: ParsableCommand {
         commandName: "card",
         abstract: "Show a cue card: a floating window with values to copy, secrets, links, buttons and questions.",
         discussion: """
-        The card floats above every window, never takes the focus, has an X, and ends by itself
-        (300 s, 120 s with a secret, 'stop', or when the agent exits). It returns at once and
-        prints its pid; 'bigarrow wait <pid>' (or --wait) prints what the human did as JSON:
+        The card floats above every window, never takes the focus, and stays until the human
+        clicks its X or the agent closes it ('stop --pid <pid>', 'stop --cards'); no time limit.
+        It returns at once and prints its pid; 'bigarrow wait <pid>' (or --wait) prints what the
+        human did as JSON as soon as they answer:
         {"result":"button","value":"done","copied":["User","Password"],...}. Exit 0 for an
-        answer, 1 when the card was closed or ran out.
+        answer, 1 when the card was closed without one. An answered card stays up, showing
+        what was sent, until its X.
 
         Secrets never go on the command line: --secret 'Password=pass:hetzner/web', or a JSON
         card on stdin. A row's "point" makes the arrow point at where its value goes.
@@ -56,27 +58,30 @@ struct CardCommand: ParsableCommand {
             let resolved = try document.resolvingSecrets()
             if let pid = options.update { return try update(pid, with: resolved) }
             if let png = options.png { return try render(resolved, to: png) }
-            if options.wait || options.child { try show(resolved) }
-            try detach(resolved)
+            if options.child { try show(resolved) }
+            let pid = try detach(resolved)
+            if options.wait { try WaitCommand.reply(of: pid, timeout: 0) }
         }
     }
 
     @MainActor
     func show(_ document: CardDocument) throws -> Never {
         OverlayApplication.prepare()
-        let session = try CardSession(document: document, base: nil, replyTarget: options.child ? .file : .stdout, raise: true)
+        let session = try CardSession(document: document, base: nil, replyTarget: .file, raise: true)
         try session.start()
         OverlayApplication.runWithoutActivating()
     }
 
-    func detach(_ document: CardDocument) throws {
+    @discardableResult
+    func detach(_ document: CardDocument) throws -> Int32 {
         guard let executable = Bundle.main.executablePath else {
             throw BigArrowError.badInput("cannot find the bigarrow executable to detach")
         }
         let pid = try ChildProcess.spawn(executable, [executable, "card", "--child", "-"], stdin: document.encoded())
         try ChildProcess.waitUntilShown(pid)
         let record = PidRegistry().read(pid: pid)
-        Output.json(Started(pid: pid, card: record?.signFrame ?? [], controls: record?.controls))
+        if !options.wait { Output.json(Started(pid: pid, card: record?.signFrame ?? [], controls: record?.controls)) }
+        return pid
     }
 
     @MainActor

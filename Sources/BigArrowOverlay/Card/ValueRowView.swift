@@ -100,12 +100,18 @@ final class ValueRowView: NSView {
         let value = totp.map { $0.code(at: Date()) } ?? (row.type == .link ? row.url : row.value) ?? ""
         events.copy(row, value)
         copyButton?.flash(.check, back: .copy)
+        if let copyButton {
+            CardMotion.pop(copyButton)
+            CardMotion.toast(row.isMasked || totp != nil ? "Copied, gone in 30 s" : "Copied", above: copyButton, style: style)
+        }
+        CardMotion.flash(self, color: style.tint)
         if let point = row.point { events.activate(point, row.name) }
     }
 
     func toggleReveal() {
         revealed.toggle()
         eye?.image = CardStyle.icon(revealed ? .eyeOff : .eye)
+        if let eye { CardMotion.pop(eye) }
         refresh()
         guard revealed else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.revealSeconds) { [weak self] in

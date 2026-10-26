@@ -1,7 +1,8 @@
 import Foundation
 
 /// A cue card: a floating window with a title and rows of values, actions and questions.
-/// Read as JSON (a file or stdin) or built from `bigarrow card` flags.
+/// Read as JSON (a file or stdin) or built from `bigarrow card` flags. It has no time limit:
+/// only the human's click on its X closes it (or `bigarrow stop --pid`).
 public struct CardDocument: Codable, Equatable, Sendable {
     public var title: String
     public var rows: [CardRow]
@@ -9,28 +10,25 @@ public struct CardDocument: Codable, Equatable, Sendable {
     public var app: String?
     /// The card's colour, same names as `--color`; red by default.
     public var color: String?
-    /// Seconds until the card ends by itself; 0 = until stopped.
-    public var duration: Double?
     /// auto, light or dark.
     public var theme: String?
     public var say: Bool?
+    /// Stay up after every question is answered, until the X. By default a card closes itself
+    /// once its last question (buttons, choice, text field, checklist) is answered.
+    public var keep: Bool?
 
     public init(title: String, rows: [CardRow]) {
         self.title = title
         self.rows = rows
     }
 
-    static let keys: Set<String> = ["title", "rows", "app", "color", "duration", "theme", "say"]
-    public static let defaultDuration: Double = 300
-    /// A card with a secret on it goes away sooner.
-    public static let secretDuration: Double = 120
+    static let keys: Set<String> = ["title", "rows", "app", "color", "theme", "say", "keep"]
+
+    /// The rows that ask something, by index.
+    public var questions: [Int] { rows.indices.filter { rows[$0].type.answers } }
     public static let themes = ["auto", "light", "dark"]
 
     public var hasSecret: Bool { rows.contains { $0.isMasked || $0.type == .totp } }
-
-    public var resolvedDuration: Double {
-        duration ?? (hasSecret ? Self.secretDuration : Self.defaultDuration)
-    }
 
     /// Parses and validates; unknown keys are an error, so a typo never silently drops a row.
     public static func parse(_ data: Data) throws -> CardDocument {
@@ -59,9 +57,6 @@ public struct CardDocument: Codable, Equatable, Sendable {
         for (index, row) in rows.enumerated() { try row.validate(index: index + 1) }
         if let theme, !Self.themes.contains(theme) {
             throw BigArrowError.badInput("theme '\(theme)' is not one of \(Self.themes.joined(separator: ", "))")
-        }
-        if let duration, duration < 0 || !duration.isFinite {
-            throw BigArrowError.badInput("duration must be 0 or more seconds")
         }
         let ids = rows.flatMap { $0.items ?? [] }.map(\.id)
         if let twice = Dictionary(grouping: ids, by: { $0 }).first(where: { $0.value.count > 1 })?.key {
