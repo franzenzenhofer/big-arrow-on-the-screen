@@ -55,12 +55,15 @@ width). `--display N` makes `--at` and `--rect` relative to display N (1-based, 
 ## Cards
 
 `bigarrow card` returns at once with `{"pid", "card", "controls"}`; `bigarrow wait [pid]` (or
-`card --wait`) prints the reply. Ends by itself: 300 s, 120 s with a secret, `stop`, the hook, or
-when your session exits. `card --update <pid>` replaces the rows (progress); `--png` renders it
-offscreen, `--dry-run` checks it and prints it with secrets hidden.
+`card --wait`) prints the reply once every question is answered; the card then closes itself
+(`--keep` / `"keep": true`: it stays, showing "Sent", until its X). No time limit: a card without
+questions stays until its X, or until you run `stop --pid <pid>` / `stop --cards` (`stop`, `--all`
+and the hook leave cards alone). With `start ... --card`, `--duration` limits the arrow only. `card --update <pid>`
+replaces the rows (progress); `--png` renders it offscreen, `--dry-run` checks it and prints it
+with secrets hidden.
 
 A JSON card (`bigarrow card card.json` or `bigarrow card - <<'EOF'`): `title`, `rows`, and
-optionally `app`, `color`, `duration`, `theme` (auto/light/dark), `say`. Rows by `type`:
+optionally `app`, `color`, `theme` (auto/light/dark), `say`, `keep`. Rows by `type`:
 
 - `field` label + `value` or `secret` (a source; `"masked": true` hides a literal value)
 - `code` (monospace, copy), `link` `url`, `text` `value` (inline Markdown), `qr` `value`
@@ -72,7 +75,8 @@ optionally `app`, `color`, `duration`, `theme` (auto/light/dark), `say`. Rows by
 
 `point` on a row or checklist item: `element`, `rect`, `at` or `window`, plus `app`, `role`,
 `anchor`, `text` (the arrow's sign; default "Paste <label> here"). Unknown keys exit 2. The
-reply: `result` (button, choice, input, checklist; or closed, timeout, stopped, ownerGone),
-`value`, `inputs`, `checked`, `copied` (labels, never values), `opened`. Examples of 20 real
+reply: `result` (button, choice, input, checklist; or closed, stopped),
+`value` (the last answer), `answers` (every answer by row id, else "row N"), `inputs`, `checked`,
+`copied` (labels, never values), `opened`. Examples of 20 real
 cases: `docs/cards/`.
 

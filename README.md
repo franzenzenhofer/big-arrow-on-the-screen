@@ -108,7 +108,7 @@ bigarrow start --element "PIN code" --role textfield --app "Google Chrome:Acme s
 
 ## Cue cards: values, secrets, answers
 
-When the human needs more than one value, a secret, or has to answer, the agent holds up a cue card: a floating window with copy buttons, an X, and nothing that takes your focus. `bigarrow wait` tells the agent what you did.
+When the human needs more than one value, a secret, or has to answer, the agent holds up a cue card: a floating window with copy buttons, an X, and nothing that takes your focus. `bigarrow wait` tells the agent what you did. A card with questions closes itself once you have answered them all (`--keep` keeps it until its X); a card with only values stays until you click its X or the agent closes it (`bigarrow stop --cards`). No time limit, and typing to your agent does not close it.
 
 ![Four cue cards rendered by bigarrow: a Hetzner login with user, masked password and console link; a choice between three headers in dark mode; a live 2FA code with its countdown; a deploy's progress with a Cancel button](docs/images/cards.png)
 
@@ -119,7 +119,7 @@ bigarrow wait   # {"result":"button","value":"done","copied":["User","Password"]
 ```
 
 - **Secrets stay secret.** `--secret` reads from `pass:`, `keychain:`, `op:` (1Password), `env:` or `file:`, never from the command line, where `ps` shows it to every user. Dots until you reveal them, copied as concealed (clipboard managers skip it), gone from the clipboard after 30 s, never in the reply. A card with a secret asks macOS to keep it out of screenshots and recordings (`screencapture` on macOS 27 leaves it out).
-- **Questions while you are away.** `--ask` for a typed answer, `--choice` for options, `--button` for decisions. The agent gets JSON and exit 0, or exit 1 when you closed it or it ran out.
+- **Questions while you are away.** `--ask` for a typed answer, `--choice` for options, `--button` for decisions. The agent gets JSON with every answer and exit 0 once you have answered, or exit 1 when you closed the card first.
 - **Arrow and card together.** A row can point at where its value goes; copy the user name and the arrow shows the user field, copy the password and it moves on. `bigarrow start ... --card card.json` puts an arrow and a card up as one.
 - 13 row types (field, code, link, text, live 2FA code, QR, image, file to drag out, choice, question, checklist, progress, buttons) in a JSON card; [20 real use cases](docs/cards/) as files.
 
@@ -147,7 +147,9 @@ brew install franzenzenhofer/tap/bigarrow
 bigarrow install-skill          # teaches Claude Code (~/.claude/skills) and Codex (~/.agents/skills)
 ```
 
-From source: `swift build -c release` (Xcode 16+, macOS 14+), binary at `.build/release/bigarrow`. The binary is pure Swift; `scripts/` only records screenshots and runs tests.
+From source: `swift build -c release` (the Command Line Tools or Xcode, Swift 6, macOS 14+), binary at `.build/release/bigarrow`. The binary is pure Swift; `scripts/` only records screenshots and runs tests.
+
+On Windows or Linux? [see-the-arrow](https://github.com/chocodev11/see-the-arrow) brings the same arrow there (Rust, MIT): an agent points at each step, you click, and it finds buttons by name or, in apps like Blender that draw their own interface, in a screenshot. More in the [FAQ](#windows-or-linux).
 
 ## The three commands an agent needs
 
@@ -249,7 +251,7 @@ three `start`s, one button, zero ambiguity
 
 ## FAQ
 
-[Permissions?](#does-it-need-screen-recording-or-accessibility) · [In front without focus?](#it-never-takes-the-focus-how-is-it-in-front) · [Steals my typing?](#will-it-steal-my-focus-while-im-typing) · [Click through?](#can-i-click-through-it) · [Displays and Spaces?](#multiple-displays-full-screen-apps-stage-manager-spaces) · [CPU?](#how-much-cpu-does-a-pulsing-arrow-cost) · [Web pages?](#does---element-work-inside-web-pages) · [Can it trick me?](#could-an-agent-use-this-to-trick-me) · [Token cost?](#why-a-skill-is-that-a-lot-of-tokens) · [Why not an annotation app?](#why-not-just-use-a-screen-annotation-app) · [Is it AI?](#is-it-ai)
+[Permissions?](#does-it-need-screen-recording-or-accessibility) · [In front without focus?](#it-never-takes-the-focus-how-is-it-in-front) · [Steals my typing?](#will-it-steal-my-focus-while-im-typing) · [Click through?](#can-i-click-through-it) · [Displays and Spaces?](#multiple-displays-full-screen-apps-stage-manager-spaces) · [CPU?](#how-much-cpu-does-a-pulsing-arrow-cost) · [Web pages?](#does---element-work-inside-web-pages) · [Can it trick me?](#could-an-agent-use-this-to-trick-me) · [Token cost?](#why-a-skill-is-that-a-lot-of-tokens) · [Why not an annotation app?](#why-not-just-use-a-screen-annotation-app) · [Is it AI?](#is-it-ai) · [Windows or Linux?](#windows-or-linux) · [Do I need Xcode?](#do-i-need-xcode)
 
 ### Does it need Screen Recording or Accessibility?
 
@@ -303,11 +305,19 @@ Say, by covering the Decline button? **Not beyond what it can already do.** An a
 
 **No.** It is the least intelligent part of your AI stack, and proud of it.
 
+### Windows or Linux?
+
+Not from us, but two ports keep the same command line: [see-the-arrow](https://github.com/chocodev11/see-the-arrow) for Windows and Linux (X11), which adds a `screenshot` command and a step-by-step teach mode, and [Agent Pointer](https://github.com/castorhrio/agent-pointer-desktop) for Windows. Both MIT, both made by people from [issue #70](https://github.com/franzenzenhofer/big-arrow-on-the-screen/issues/70).
+
+### Do I need Xcode?
+
+No. The Command Line Tools are enough to build it, and since 0.5.1 the Homebrew formula no longer asks for Xcode ([#71](https://github.com/franzenzenhofer/big-arrow-on-the-screen/issues/71)).
+
 ## How we know it works
 
 - 126 automated tests: geometry, placement, joints, a golden image, copy buttons, cue cards (format, secret sources, the RFC 6238 2FA vectors, the real login keychain), recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
 - 18 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, a copy button (the clipboard holds the value, the arrow stays), `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU.
-- 25 cue card checks with real clicks and typing ([card-check.sh](scripts/card-check.sh)): the focus never moves, buttons, the X, a typed answer, a choice, secrets (not in any process's arguments, not on disk, not in screenshots, concealed on the clipboard and gone after 30 s), time limit, `stop --hook`, owner exit, arrow and card together.
+- 33 cue card checks with real clicks and typing ([card-check.sh](scripts/card-check.sh)): the focus never moves, buttons, the X, a typed answer, a choice, secrets (not in any process's arguments, not on disk, not in screenshots, concealed on the clipboard and gone after 30 s), one question closes the card, two need both answers, `--keep` stays until the X, only the X or `stop --pid`/`--cards` close a card (not the hook, `stop --all` or the agent exiting), arrow and card together.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
 ## For agents (and the humans who configure them)

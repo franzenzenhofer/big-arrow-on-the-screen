@@ -8,8 +8,8 @@ public struct CardStyle {
     public let color: ArrowColor
 
     public static let width: CGFloat = 440
-    static let padding: CGFloat = 20
-    static let rowSpacing: CGFloat = 14
+    static let padding: CGFloat = 22
+    static let rowSpacing: CGFloat = 20
     static let corner: CGFloat = 18
     static let border: CGFloat = 3.5
     static let iconButton: CGFloat = 34
@@ -28,7 +28,8 @@ public struct CardStyle {
         NSColor(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1)
     }
 
-    static let titleFont = SignRenderer.font(22)
+    /// The sign's own font: SF Pro Rounded Heavy, at the small sign's size.
+    static let titleFont = SignRenderer.font(ArrowSize.small.metrics.fontSize)
     static let labelFont = NSFont.systemFont(ofSize: 16, weight: .semibold)
     static let bodyFont = NSFont.systemFont(ofSize: 18, weight: .regular)
     static let valueFont = NSFont.monospacedSystemFont(ofSize: 18, weight: .medium)

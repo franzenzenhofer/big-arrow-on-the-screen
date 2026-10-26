@@ -9,6 +9,7 @@ public final class CardView: NSView {
     let style: CardStyle
     let events: CardEvents
     private(set) var rows: [RowContainer] = []
+    private var body: NSStackView?
 
     public init(document: CardDocument, color: ArrowColor, events: CardEvents, maxHeight: CGFloat) throws {
         self.document = document
@@ -18,8 +19,9 @@ public final class CardView: NSView {
         wantsLayer = true
         layer?.cornerRadius = CardStyle.corner
         layer?.masksToBounds = true
+        // The sign's border: its contrast colour (white on dark colours) all round.
         layer?.borderWidth = CardStyle.border
-        layer?.borderColor = style.tint.cgColor
+        layer?.borderColor = style.onTint.cgColor
         rows = try document.rows.map { row in
             RowContainer(row: row, content: try RowFactory.view(for: row, style: style, events: events), style: style, events: events)
         }
@@ -32,8 +34,9 @@ public final class CardView: NSView {
     func build(maxHeight: CGFloat) throws {
         let header = CardHeader(title: document.title, style: style) { [events] in events.close() }
         let body = Stack.vertical(rows, spacing: CardStyle.rowSpacing)
-        body.edgeInsets = NSEdgeInsets(top: 18, left: 0, bottom: 20, right: 0)
+        body.edgeInsets = NSEdgeInsets(top: 22, left: 0, bottom: 24, right: 0)
         rows.forEach { $0.widthAnchor.constraint(equalTo: body.widthAnchor).isActive = true }
+        self.body = body
         let content = Stack.vertical([header, scrolling(body, maxHeight: maxHeight - header.fittingSize.height)], spacing: 0)
         content.arrangedSubviews.forEach { $0.widthAnchor.constraint(equalTo: content.widthAnchor).isActive = true }
         RowLayout.fill(self, with: content)
@@ -73,6 +76,34 @@ public final class CardView: NSView {
         }
     }
 
+    /// A question answered: its buttons, options and field dim and stop answering, the pick
+    /// fills and pops. Copy buttons keep working.
+    public func markRowAnswered(_ index: Int, chosen: String?) {
+        guard rows.indices.contains(index) else { return }
+        for control in Self.controlViews(in: rows[index]) where control is PillButton || control is OptionView || control is NSTextField {
+            let picked = chosen != nil && control.accessibilityLabel() == chosen
+            control.alphaValue = picked ? 1 : 0.35
+            (control as? NSTextField)?.isEnabled = false
+            (control as? PillButton)?.isAnswerable = false
+            (control as? OptionView)?.isAnswerable = false
+            guard picked else { continue }
+            (control as? OptionView)?.markChosen()
+            (control as? PillButton)?.markChosen()
+            CardMotion.pop(control)
+        }
+    }
+
+    /// With `keep`, once everything is answered: a banner in the card colour at the bottom.
+    public func showSent(_ text: String) {
+        guard let body else { return }
+        let banner = SentBanner(text: text, style: style)
+        let row = NSView()
+        RowLayout.fill(row, with: banner, horizontal: CardStyle.padding)
+        body.addArrangedSubview(row)
+        row.widthAnchor.constraint(equalTo: body.widthAnchor).isActive = true
+        DispatchQueue.main.async { CardMotion.enter(banner) }
+    }
+
     /// Marks the row (or the checklist holding the item) the arrow points from.
     public func markActive(_ name: String?) {
         for row in rows { row.setActive(name != nil && row.names.contains(name ?? "")) }
@@ -89,33 +120,6 @@ public final class CardView: NSView {
             layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
         }
     }
-}
-
-/// The card colour band with the title and the X button.
-@MainActor
-final class CardHeader: NSView {
-    static let spacing: CGFloat = 10
-    static let trailing: CGFloat = 14
-
-    init(title: String, style: CardStyle, close: @escaping () -> Void) {
-        super.init(frame: .zero)
-        wantsLayer = true
-        layer?.backgroundColor = style.tint.cgColor
-        // Room left of the X: side insets, the X, and the stack's spacing on both sides of the spacer.
-        let width = CardStyle.width - CardStyle.padding - Self.trailing - CardStyle.iconButton - Self.spacing * 2
-        let label = CardStyle.label(title, font: CardStyle.titleFont, color: style.onTint, width: width)
-        let button = ActionButton(icon: .close, tint: style.tint, tooltip: "Close") { close() }
-        button.wantsLayer = true
-        button.layer?.cornerRadius = CardStyle.iconButton / 2
-        button.layer?.backgroundColor = style.onTint.cgColor
-        let line = Stack.horizontal([label, NSView(), button], spacing: Self.spacing)
-        line.alignment = .top
-        line.edgeInsets = NSEdgeInsets(top: 16, left: CardStyle.padding, bottom: 16, right: Self.trailing)
-        RowLayout.fill(self, with: line)
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) { preconditionFailure("cards are built in code") }
 }
 
 /// One row with the card's side padding and an accent bar while its arrow is shown. A click on a

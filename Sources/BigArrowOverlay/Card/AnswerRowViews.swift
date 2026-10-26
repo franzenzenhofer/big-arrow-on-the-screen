@@ -9,7 +9,7 @@ enum AnswerRows {
         let items = row.items ?? []
         let buttons = items.enumerated().map { index, item in
             let primary = item.style.map { $0 == "primary" } ?? (index == items.count - 1)
-            return PillButton(item.label, primary: primary, style: style) { events.answer(.button, item.id) }
+            return PillButton(item.label, primary: primary, style: style) { events.answer(row, .button, item.id) }
         }
         let line = Stack.horizontal([NSView()] + buttons, spacing: 10)
         return withLabel(row.label, line)
@@ -17,7 +17,7 @@ enum AnswerRows {
 
     static func choice(_ row: CardRow, style: CardStyle, events: CardEvents) -> NSView {
         let options = (row.items ?? []).map { item -> NSView in
-            OptionView(item: item, style: style) { events.answer(.choice, item.id) }
+            OptionView(item: item, style: style) { events.answer(row, .choice, item.id) }
         }
         let stack = Stack.vertical(options, spacing: 8)
         options.forEach { $0.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true }
@@ -39,6 +39,8 @@ enum AnswerRows {
 final class OptionView: NSView {
     let handler: () -> Void
     let style: CardStyle
+    /// False once the card is answered.
+    var isAnswerable = true
 
     init(item: CardItem, style: CardStyle, handler: @escaping () -> Void) {
         self.handler = handler
@@ -66,13 +68,22 @@ final class OptionView: NSView {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     override func mouseUp(with event: NSEvent) {
-        guard bounds.contains(convert(event.locationInWindow, from: nil)) else { return }
+        guard isAnswerable, bounds.contains(convert(event.locationInWindow, from: nil)) else { return }
         handler()
     }
 
-    override func mouseDown(with event: NSEvent) {}
+    override func mouseDown(with event: NSEvent) {
+        if isAnswerable { CardMotion.press(self) }
+    }
+
+    /// The option that was picked: filled with a stronger wash and a thicker border.
+    func markChosen() {
+        layer?.backgroundColor = style.tint.withAlphaComponent(0.2).cgColor
+        layer?.borderWidth = 3
+    }
 
     override func mouseEntered(with event: NSEvent) {
+        guard isAnswerable else { return }
         layer?.backgroundColor = style.tint.withAlphaComponent(0.12).cgColor
     }
 
@@ -119,7 +130,7 @@ final class InputRowView: NSView, NSTextFieldDelegate {
     var rowID: String { row.id ?? "input" }
 
     func send() {
-        events.answer(.input, field.stringValue)
+        events.answer(row, .input, field.stringValue)
     }
 
     func controlTextDidChange(_ notification: Notification) {
@@ -173,9 +184,13 @@ final class ChecklistRowView: NSView {
     func toggle(_ id: String) {
         if let index = checked.firstIndex(of: id) { checked.remove(at: index) } else { checked.append(id) }
         boxes[id]?.image = CardStyle.icon(checked.contains(id) ? .checkSquare : .square)
+        if let box = boxes[id] {
+            CardMotion.pop(box)
+            if let line = box.superview { CardMotion.flash(line, color: style.tint) }
+        }
         events.checked(checked)
         if checked.count == items.count {
-            events.answer(.checklist, nil)
+            events.answer(row, .checklist, nil)
         } else if let next, let point = next.point {
             events.activate(point, next.label)
         }

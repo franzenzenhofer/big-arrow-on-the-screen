@@ -52,14 +52,21 @@ struct PointRunner {
             report(result)
             exit(0)
         }
-        if var card = config.card {
-            card.duration = config.duration
-            let target: CardReplyTarget = config.replyFile ? .file : .stdout
-            try CardSession(document: card, base: planned, replyTarget: target, raise: false).start()
+        if let card = config.card {
+            try startCard(card, with: planned)
         } else {
             try PointSession(config: config, planner: self, initial: planned).start()
         }
         OverlayApplication.runWithoutActivating()
+    }
+
+    /// `point --card`: arrow and card in one session; --duration limits the arrow, the card stays
+    /// until the human clicks its X.
+    func startCard(_ card: CardDocument, with planned: PlannedArrow) throws {
+        let target: CardReplyTarget = config.replyFile ? .file : .stdout
+        let session = try CardSession(document: card, base: planned, replyTarget: target, raise: false)
+        session.arrowLimit = config.duration
+        try session.start()
     }
 
     func render(_ planned: PlannedArrow, to png: String) throws -> Never {

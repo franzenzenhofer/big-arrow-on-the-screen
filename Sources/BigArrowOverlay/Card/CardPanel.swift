@@ -84,6 +84,7 @@ public final class CardController {
         panel.onEscape = { [events = view.events] in events.close() }
         panel.orderFrontRegardless()
         self.panel = panel
+        CardMotion.enter(view)
     }
 
     /// The panel's frame in global top-left points (the human may have moved it).
@@ -94,10 +95,39 @@ public final class CardController {
 
     public var windowNumber: Int? { panel?.windowNumber }
 
+    public func markRowAnswered(_ index: Int, chosen: String?) {
+        view.markRowAnswered(index, chosen: chosen)
+    }
+
+    /// Shows the "Sent" banner and grows the panel downwards, its top edge where it was.
+    public func showSent(_ text: String) {
+        view.showSent(text)
+        guard let panel else { return }
+        view.layoutSubtreeIfNeeded()
+        let size = view.fittingSize
+        var frame = panel.frame
+        frame.origin.y += frame.height - size.height
+        frame.size = size
+        // At the bottom of the screen it grows upwards instead, never under the Dock.
+        if let visible = panel.screen?.visibleFrame, frame.minY < visible.minY + CardPlacement.margin {
+            frame.origin.y = visible.minY + CardPlacement.margin
+        }
+        panel.setFrame(frame, display: true)
+    }
+
     public func close() {
         panel?.orderOut(nil)
         panel?.close()
         panel = nil
+    }
+
+    /// Fades the card out, then closes it.
+    public func close(completion: @escaping @MainActor () -> Void) {
+        guard panel != nil else { return completion() }
+        CardMotion.leave(view) { [weak self] in
+            self?.close()
+            completion()
+        }
     }
 
     static func appearance(_ theme: String?) -> NSAppearance? {

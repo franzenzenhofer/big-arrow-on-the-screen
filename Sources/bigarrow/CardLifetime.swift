@@ -3,8 +3,10 @@ import BigArrowCore
 import BigArrowOverlay
 import Foundation
 
-/// How a card ends by itself, as every arrow does: its time limit, `bigarrow stop` (a signal),
-/// the agent session exiting. SIGUSR1 means `card --update` left a new card to show.
+/// A card ends only when the human clicks its X or the agent closes it on purpose
+/// (`stop --pid`, `stop --cards`: a signal). No time limit, no prompt hook, no agent exit. Its
+/// arrow is different: it goes after its time limit or when the agent exits, as every arrow does.
+/// SIGUSR1 means `card --update` left a new card to show.
 extension CardSession {
     static let endSignals = [SIGTERM, SIGINT, SIGHUP]
 
@@ -13,14 +15,20 @@ extension CardSession {
             listen(number) { [weak self] in self?.finish(.stopped, value: nil) }
         }
         listen(SIGUSR1) { [weak self] in self?.applyUpdate() }
-        let duration = document.resolvedDuration
-        if duration > 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-                MainActor.assumeIsolated { self?.finish(.timeout, value: nil) }
+        if let limit = arrowLimit, limit > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + limit) { [weak self] in
+                MainActor.assumeIsolated { self?.dropArrows() }
             }
         }
         watchOwner()
         if document.say == true { speech = Speech.say(document.title, voice: nil) }
+    }
+
+    /// The arrows go; the card stays.
+    func dropArrows() {
+        arrows.base = nil
+        arrows.hide()
+        controller?.view.markActive(nil)
     }
 
     func listen(_ number: Int32, handler: @escaping @MainActor () -> Void) {
@@ -34,10 +42,10 @@ extension CardSession {
     func watchOwner() {
         guard let pid = owner.pid else { return }
         guard PidRegistry.isProcessAlive(pid) else {
-            DispatchQueue.main.async { MainActor.assumeIsolated { self.finish(.ownerGone, value: nil) } }
+            DispatchQueue.main.async { MainActor.assumeIsolated { self.dropArrows() } }
             return
         }
-        ownerWatch = OwnerWatch(pid: pid) { [weak self] in self?.finish(.ownerGone, value: nil) }
+        ownerWatch = OwnerWatch(pid: pid) { [weak self] in self?.dropArrows() }
     }
 
     /// The pid file is the "card is on screen" signal for the detaching parent.
@@ -90,25 +98,67 @@ extension CardSession {
         controller.show(at: topLeft, theme: next.theme)
         self.controller = controller
         view.markActive(arrows.retarget(next))
+        try? writeRecord()
     }
 
+    /// Arrow and card fade out together; once both are gone the reply goes out and the process exits.
     func finish(_ outcome: CardOutcome, value: String?) {
         guard !finished else { return }
         finished = true
         speech?.terminate()
         ownerWatch?.stop()
-        controller?.close()
-        arrows.dismiss {
-            let registry = PidRegistry()
-            registry.remove(pid: getpid())
-            let reply = self.progress.reply(pid: getpid(), result: outcome, value: value, startedAt: self.startedAt)
-            switch self.replyTarget {
-            case .stdout: Output.print(reply.line())
-            case .file: try? registry.writeReply(reply)
-            }
-            exit(reply.exitCode)
+        var pending = 2
+        let done: @MainActor () -> Void = { [self] in
+            pending -= 1
+            if pending == 0 { exitWithReply(outcome, value: value) }
         }
+        arrows.dismiss(completion: done)
+        if let controller { controller.close(completion: done) } else { done() }
     }
+
+    func exitWithReply(_ outcome: CardOutcome, value: String?) -> Never {
+        PidRegistry().remove(pid: getpid())
+        // Every question answered: the last answer is the result; otherwise how it ended
+        // ("closed" for the X), with whatever was answered so far in `answers`.
+        let (result, answer) = isComplete ? (self.answer ?? (outcome, value)) : (outcome, value)
+        let reply = progress.reply(pid: getpid(), result: result, value: answer, startedAt: startedAt)
+        if replyTarget == .stdout {
+            Output.print(reply.line())
+        } else if !replied {
+            try? PidRegistry().writeReply(reply)
+        }
+        exit(reply.exitCode)
+    }
+
+    /// One question answered: that row dims, its pick lit. Once every question is answered the
+    /// reply goes out (`wait` returns) and the card closes itself, or with `keep` stays until its X.
+    func answered(_ row: CardRow, outcome: CardOutcome, value: String?) {
+        guard let index = document.questions.first(where: { document.rows[$0] == row && answeredRows[$0] == nil }) else { return }
+        answeredRows[index] = outcome
+        answer = (outcome, value)
+        progress.answers[row.id ?? "row \(index + 1)"] = value ?? outcome.rawValue
+        controller?.markRowAnswered(index, chosen: row.items?.first { $0.id == value }?.label)
+        guard isComplete else { return }
+        if replyTarget == .file {
+            let reply = progress.reply(pid: getpid(), result: outcome, value: value, startedAt: startedAt)
+            replied = (try? PidRegistry().writeReply(reply)) != nil
+        }
+        dropArrows()
+        guard document.keep == true else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.closeDelay) { [weak self] in
+                MainActor.assumeIsolated { self?.finish(outcome, value: value) }
+            }
+            return
+        }
+        controller?.showSent("Sent. Close this card with the X.")
+        // The card grew: frame and controls in the pid file follow.
+        try? writeRecord()
+    }
+
+    /// Long enough to see the picked answer light up before the card goes.
+    static let closeDelay: TimeInterval = 0.7
+
+    var isComplete: Bool { !document.questions.isEmpty && answeredRows.count == document.questions.count }
 }
 
 /// Where `card --update` leaves the new card for a running one.

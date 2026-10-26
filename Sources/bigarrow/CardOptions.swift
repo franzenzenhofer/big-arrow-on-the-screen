@@ -46,15 +46,15 @@ struct CardContentOptions: ParsableArguments {
     @Option(help: help("auto, light or dark.", "theme"))
     var theme: String?
 
-    @Option(help: help("Seconds until the card ends by itself (default 300, 120 with a secret). 0 = until stopped.", "seconds"))
-    var duration: Double?
-
     @Flag(help: "Speak the title with macOS 'say'.")
     var say = false
+
+    @Flag(help: "Stay up after every question is answered, until the X (default: the card closes itself then).")
+    var keep = false
 }
 
 struct CardRunOptions: ParsableArguments {
-    @Flag(help: "Stay until the human answers or closes the card, then print the reply (default: return at once, see 'wait').")
+    @Flag(help: "Return when the human answers or closes the card and print the reply (default: return at once, see 'wait').")
     var wait = false
 
     @Option(help: help("Replace the rows of the running card with this pid; what was copied, ticked and typed stays.", "pid"))
@@ -90,8 +90,8 @@ enum CardFlags {
         document.app = options.app ?? document.app
         document.color = options.color ?? document.color
         document.theme = options.theme ?? document.theme
-        document.duration = options.duration ?? document.duration
         if options.say { document.say = true }
+        if options.keep { document.keep = true }
         try document.validate()
         try document.checkSecretSources()
         if let color = document.color { _ = try ArrowColor.parse(color) }

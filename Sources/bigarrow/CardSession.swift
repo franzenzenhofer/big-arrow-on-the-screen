@@ -27,6 +27,12 @@ final class CardSession {
     var signalSources: [DispatchSourceSignal] = []
     var finished = false
     var speech: Process?
+    /// The last answer, and which question rows are answered.
+    var answer: (CardOutcome, String?)?
+    var answeredRows: [Int: CardOutcome] = [:]
+    var replied = false
+    /// `point --card --duration`: seconds until the arrow goes; the card stays.
+    var arrowLimit: Double?
     /// The process's one card session. Its handlers hold it weakly, so this keeps it alive until it exits.
     static var current: CardSession?
 
@@ -96,7 +102,7 @@ final class CardSession {
         let events = CardEvents()
         events.copy = { [weak self] row, value in self?.copied(row, value: value) }
         events.open = { [weak self] url in self?.open(url) }
-        events.answer = { [weak self] outcome, value in self?.finish(outcome, value: value) }
+        events.answer = { [weak self] row, outcome, value in self?.answered(row, outcome: outcome, value: value) }
         events.close = { [weak self] in self?.finish(.closed, value: nil) }
         events.activate = { [weak self] point, name in self?.activate(point, name: name) }
         events.checked = { [weak self] ids in self?.progress.checked = ids }
