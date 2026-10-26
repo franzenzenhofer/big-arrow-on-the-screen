@@ -1,13 +1,15 @@
 import CoreGraphics
 import Foundation
 
-/// An SVG `d` attribute with M L H V A Z, absolute and relative, repeated parameters allowed.
+/// An SVG `d` attribute with M L H V C S A Z, absolute and relative, repeated parameters allowed.
 /// Arcs follow the endpoint-to-centre conversion of SVG 1.1, appendix F.6.5:
 /// https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter
 struct PathData {
     private var scanner: PathScanner
     private var current = CGPoint.zero
     private var start = CGPoint.zero
+    /// The second control point of the last cubic curve, which `S` mirrors.
+    private var control: CGPoint?
 
     init(_ data: String) {
         scanner = PathScanner(data)
@@ -37,6 +39,8 @@ struct PathData {
 
     private mutating func step(_ command: String, relative: Bool, path: CGMutablePath) throws {
         let origin = relative ? current : .zero
+        let previous = control
+        control = nil
         switch command {
         case "M":
             current = try scanner.point() + origin
@@ -45,10 +49,21 @@ struct PathData {
         case "L": current = try scanner.point() + origin; path.addLine(to: current)
         case "H": current.x = try scanner.number() + origin.x; path.addLine(to: current)
         case "V": current.y = try scanner.number() + origin.y; path.addLine(to: current)
+        case "C": try curve(try scanner.point() + origin, origin: origin, path: path)
+        case "S": try curve(previous.map { current * 2 - $0 } ?? current, origin: origin, path: path)
         case "A": try arc(origin: origin, path: path)
         case "Z": path.closeSubpath(); current = start
         default: throw SVGPath.Unsupported(description: "SVG path command '\(command)' is not supported")
         }
+    }
+
+    /// A cubic curve from the current point; `first` is its first control point, already absolute.
+    private mutating func curve(_ first: CGPoint, origin: CGPoint, path: CGMutablePath) throws {
+        let second = try scanner.point() + origin
+        let end = try scanner.point() + origin
+        path.addCurve(to: end, control1: first, control2: second)
+        control = second
+        current = end
     }
 
     private mutating func arc(origin: CGPoint, path: CGMutablePath) throws {

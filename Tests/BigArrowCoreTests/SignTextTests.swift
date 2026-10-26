@@ -59,7 +59,7 @@ struct SVGPathTests {
     }
 
     @Test("Unsupported commands and elements fail loudly", arguments: [
-        #"<path d="M0 0C1 1 2 2 3 3"></path>"#, #"<circle cx="1" cy="1" r="1"></circle>"#, "", #"<path d="M0 0L1"></path>"#
+        #"<path d="M0 0Q1 1 2 2"></path>"#, #"<ellipse cx="1" cy="1" rx="1" ry="2"></ellipse>"#, "", #"<path d="M0 0L1"></path>"#
     ])
     func unsupported(svg: String) {
         #expect(throws: SVGPath.Unsupported.self) { try SVGPath.icon(svg) }

@@ -7,7 +7,7 @@
 
 ![A real macOS desktop, Hacker News of 2014-06-10 in Chrome, nine bigarrow arrows in nine colours from every side: same since 2007, already argued in 2014, not a lurker? log in, the article is in here, remember me? (Firefox 30), nothing. nothing changed. (a spiral, going round in circles), 20,000 devs 40,000 opinions, finally a bigger arrow, 12 years later: still no consensus](docs/images/hero-hn.png)
 
-[Real apps](#real-apps-real-use-cases) · [Copy & paste](#copy--paste) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
+[Real apps](#real-apps-real-use-cases) · [Copy & paste](#copy--paste) · [Cue cards](#cue-cards-values-secrets-answers) · [What is it for?](#what-is-this-actually-for) · [Install](#install) · [Commands](#the-three-commands-an-agent-needs) · [Looks](#looks) · [Creative arrows](#creative-arrows) · [Starred by](#starred-by) · [FAQ](#faq) · [How we know it works](#how-we-know-it-works) · [For agents](#for-agents-and-the-humans-who-configure-them) · [Plan](#plan-decisions-research) · [Prior art](#prior-art-and-thanks) · [License](#license)
 
 > Your AI agent can refactor a monorepo, write a migration and explain monads, but when it needs you to click one button it prints *"please click Allow in the dialog"* into a terminal you are not looking at. `bigarrow` gives it a finger.
 
@@ -106,6 +106,23 @@ bigarrow start --element "PIN code" --role textfield --app "Google Chrome:Acme s
   --color blue --border-color yellow --text-color yellow --text "Franz, copy & paste the PIN {{482913}} here"
 ```
 
+## Cue cards: values, secrets, answers
+
+When the human needs more than one value, a secret, or has to answer, the agent holds up a cue card: a floating window with copy buttons, an X, and nothing that takes your focus. `bigarrow wait` tells the agent what you did.
+
+![Four cue cards rendered by bigarrow: a Hetzner login with user, masked password and console link; a choice between three headers in dark mode; a live 2FA code with its countdown; a deploy's progress with a Cancel button](docs/images/cards.png)
+
+```bash
+bigarrow card --title "Franz, log in to Hetzner" --app "Google Chrome" --field "User=franz@example.com" \
+  --secret "Password=keychain:hetzner/franz" --link https://console.hetzner.cloud --button "done=I'm in"
+bigarrow wait   # {"result":"button","value":"done","copied":["User","Password"],"after":41.2,...}
+```
+
+- **Secrets stay secret.** `--secret` reads from `pass:`, `keychain:`, `op:` (1Password), `env:` or `file:`, never from the command line, where `ps` shows it to every user. Dots until you reveal them, copied as concealed (clipboard managers skip it), gone from the clipboard after 30 s, never in the reply. A card with a secret asks macOS to keep it out of screenshots and recordings (`screencapture` on macOS 27 leaves it out).
+- **Questions while you are away.** `--ask` for a typed answer, `--choice` for options, `--button` for decisions. The agent gets JSON and exit 0, or exit 1 when you closed it or it ran out.
+- **Arrow and card together.** A row can point at where its value goes; copy the user name and the arrow shows the user field, copy the password and it moves on. `bigarrow start ... --card card.json` puts an arrow and a card up as one.
+- 13 row types (field, code, link, text, live 2FA code, QR, image, file to drag out, choice, question, checklist, progress, buttons) in a JSON card; [20 real use cases](docs/cards/) as files.
+
 ## What is this actually for?
 
 Fair question. Arrows have existed since roughly the Paleolithic. What changed: agents now do real work on your Mac, and sooner or later hit a step **only a human may do**, or one the human wants to learn.
@@ -113,13 +130,15 @@ Fair question. Arrows have existed since roughly the Paleolithic. What changed: 
 - **"Click Allow."** Permission prompts, OAuth consent, "Open with...?". The agent finds the button but must not, or cannot, press it. It can point.
 - **"Your turn."** 2FA, CAPTCHAs, passkeys, payments, signatures. It points, you decide, it continues.
 - **"Paste this."** A code, a URL, a command: on the sign with a [copy button](#copy--paste).
+- **"Log in, the captcha is yours."** User, password, 2FA code and the link on a [cue card](#cue-cards-values-secrets-answers), the arrow on the field each one goes into.
+- **"Which one?"** A question or a choice on a card while you are away from the terminal; the agent gets your answer as JSON.
 - **"I need you, and you're making coffee."** `--say` reads the sign aloud. Your Mac will literally call you back to your desk.
 - **"Show me how."** Ask how to do something in Blender, and the agent points at each control in turn. A product tour, minus the product.
 - **Helping someone else.** On a parent's Mac or over a screen share, pointing beats "the button at the top, no, the other top".
 - **Demos and docs.** Highlight while recording, or render straight to a PNG with `--png`.
 - **Debugging coordinates.** Point at your Accessibility or Peekaboo coordinates and look. `--dry-run --json` says where it *would* point.
 
-Not a screen annotator, not a click bot, not a screenshot tool. It never clicks, types or captures. It only points. Deliberately.
+Not a screen annotator, not a click bot, not a screenshot tool, not a password manager. It never clicks, types or captures. It points, and holds up a card. Deliberately.
 
 ## Install
 
@@ -152,7 +171,7 @@ Targets: `--at X,Y`, `--rect X,Y,W,H`, `--mouse`, `--window App[:title]`, `--ele
 
 `--app App[:window or tab title]` (or `--window`) first brings that app, window or Chrome/Safari tab to the front, because pointing at a window hidden behind your terminal is a special kind of unhelpful. If another app covers the target later, the arrow hides until it is visible again. `--no-raise` opts out. `bigarrow elements --app X` lists what `--element` can match; `bigarrow doctor` shows permissions and displays.
 
-Every command takes `--json`. Exit codes: 0 ok, 2 bad input, 3 target not found, 4 permission missing. Agents love exit codes. Humans tolerate them.
+Every command takes `--json`. Exit codes: 0 ok, 1 a card ended without an answer, 2 bad input, 3 target not found, 4 permission missing. Agents love exit codes. Humans tolerate them.
 
 ## Looks
 
@@ -286,8 +305,9 @@ Say, by covering the Decline button? **Not beyond what it can already do.** An a
 
 ## How we know it works
 
-- 104 automated tests: geometry, placement, joints, a golden image, copy buttons, recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
+- 126 automated tests: geometry, placement, joints, a golden image, copy buttons, cue cards (format, secret sources, the RFC 6238 2FA vectors, the real login keychain), recorded window-server, Accessibility and Peekaboo fixtures, and the real window server (click-through, focus never moves, stop timing). CI runs macOS 15; also passed on macOS 26 and 27.
 - 18 behaviour checks on a clean runner ([visual.yml](.github/workflows/visual.yml)): clicks on the X, a copy button (the clipboard holds the value, the arrow stays), `--until-click`, `--follow`, raising and `--no-raise`, hiding while covered, Chrome tab selection, owner exit, `stop --hook`, `--say`, full-screen, Stage Manager, Spaces, second and 2x displays, unplugging mid-arrow, CPU.
+- 25 cue card checks with real clicks and typing ([card-check.sh](scripts/card-check.sh)): the focus never moves, buttons, the X, a typed answer, a choice, secrets (not in any process's arguments, not on disk, not in screenshots, concealed on the clipboard and gone after 30 s), time limit, `stop --hook`, owner exit, arrow and card together.
 - A fresh agent given only the skill and "show Franz where the Reload button in Chrome is" found it by label and built the right command ([transcript](docs/skill-tests/2026-10-08-chrome-reload.md)). It also found a bug, which is now a test.
 
 ## For agents (and the humans who configure them)

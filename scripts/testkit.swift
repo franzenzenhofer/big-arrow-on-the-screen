@@ -6,9 +6,11 @@
 //   testkit resize-window APP W H    resizes APP's first window via Accessibility
 //   testkit frontmost                prints the frontmost app's name
 //   testkit activate APP             brings APP to the front
-//   testkit windows APP              prints APP's windows as the window server lists them
+//   testkit windows APP|PID          prints APP's (or that process's) windows as the window server lists them
 //   testkit pixel X Y                prints the screen colour at X,Y as "r g b" (0-255)
 //   testkit cpu PID SECONDS          prints the CPU share PID used over SECONDS, in percent
+//   testkit type TEXT                types TEXT into the focused field, then Return with --return
+//   testkit pasteboard               prints the clipboard's types, one per line, then its string
 import AppKit
 import ApplicationServices
 
@@ -53,6 +55,23 @@ func scroll(at point: CGPoint, lines: Int) {
     }
 }
 
+/// Types like a keyboard: one Unicode key event per character.
+func type(_ text: String, pressReturn: Bool) {
+    for character in text.utf16 {
+        for down in [true, false] {
+            let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: down)
+            event?.keyboardSetUnicodeString(stringLength: 1, unicodeString: [character])
+            event?.post(tap: .cghidEventTap)
+            usleep(20_000)
+        }
+    }
+    guard pressReturn else { return }
+    for down in [true, false] {
+        CGEvent(keyboardEventSource: nil, virtualKey: 36, keyDown: down)?.post(tap: .cghidEventTap)
+        usleep(20_000)
+    }
+}
+
 func firstWindow(of name: String) -> AXUIElement {
     let element = AXUIElementCreateApplication(app(named: name).processIdentifier)
     var windows: CFTypeRef?
@@ -80,7 +99,7 @@ case "glide": glide(to: CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0
 case "scroll": scroll(at: CGPoint(x: Double(args[2]) ?? 0, y: Double(args[3]) ?? 0), lines: Int(args[4]) ?? 3)
 case "move-window": moveWindow(of: args[2], to: CGPoint(x: Double(args[3]) ?? 0, y: Double(args[4]) ?? 0))
 case "windows":
-    let pid = app(named: args[2]).processIdentifier
+    let pid = Int32(args[2]) ?? app(named: args[2]).processIdentifier
     let list = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
     for entry in list where entry[kCGWindowOwnerPID as String] as? Int32 == pid {
         let keys = [kCGWindowNumber, kCGWindowLayer, kCGWindowBounds, kCGWindowIsOnscreen, kCGWindowAlpha, kCGWindowName]
@@ -115,6 +134,11 @@ case "cpu":
     Thread.sleep(forTimeInterval: seconds)
     print(String(format: "%.2f", (cpuTime() - start) / seconds * 100))
 case "resize-window": resizeWindow(of: args[2], to: CGSize(width: Double(args[3]) ?? 800, height: Double(args[4]) ?? 600))
+case "type": type(args[2], pressReturn: args.contains("--return"))
+case "pasteboard":
+    let pasteboard = NSPasteboard.general
+    (pasteboard.types ?? []).forEach { print($0.rawValue) }
+    print(pasteboard.string(forType: .string) ?? "")
 case "frontmost": print(NSWorkspace.shared.frontmostApplication?.localizedName ?? "")
 case "activate":
     app(named: args[2]).activate()

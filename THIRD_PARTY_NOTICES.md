@@ -1,6 +1,6 @@
 # Third-party notices
 
-`bigarrow` draws the copy and check icons of the copy button from [Feather](https://feathericons.com) (`feather-icons` 4.29.2, https://github.com/feathericons/feather), kept verbatim in `Sources/BigArrowCore/FeatherIcon.swift`. Its licence:
+`bigarrow` draws the icons of the copy button and of cue cards (copy, check, eye, eye-off, external-link, x, file, square, check-square) from [Feather](https://feathericons.com) (`feather-icons` 4.29.2, https://github.com/feathericons/feather), kept verbatim in `Sources/BigArrowCore/FeatherIcon.swift`. Its licence:
 
 ```text
 The MIT License (MIT)

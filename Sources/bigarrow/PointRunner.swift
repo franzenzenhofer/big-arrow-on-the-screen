@@ -36,13 +36,7 @@ struct PointRunner {
         }
         let screens = ScreenReader.current()
         let planned = try plan(config.target.resolve(screens: screens), screens: screens)
-        if let png = config.png {
-            var result = planned.result(pid: getpid())
-            let file = URL(fileURLWithPath: png)
-            result.image = try PNGExporter.write(planned.layout, sign: planned.sign, appearance: config.appearance, to: file)
-            Output.print(config.json ? JSONOutput.encode(result) : "bigarrow: wrote \(png)")
-            exit(0)
-        }
+        if let png = config.png { try render(planned, to: png) }
         if config.dryRun {
             var result = planned.result(pid: getpid())
             result.dryRun = true
@@ -58,8 +52,22 @@ struct PointRunner {
             report(result)
             exit(0)
         }
-        try PointSession(config: config, planner: self, initial: planned).start()
+        if var card = config.card {
+            card.duration = config.duration
+            let target: CardReplyTarget = config.replyFile ? .file : .stdout
+            try CardSession(document: card, base: planned, replyTarget: target, raise: false).start()
+        } else {
+            try PointSession(config: config, planner: self, initial: planned).start()
+        }
         OverlayApplication.runWithoutActivating()
+    }
+
+    func render(_ planned: PlannedArrow, to png: String) throws -> Never {
+        var result = planned.result(pid: getpid())
+        let file = URL(fileURLWithPath: png)
+        result.image = try PNGExporter.write(planned.layout, sign: planned.sign, appearance: config.appearance, to: file)
+        Output.print(config.json ? JSONOutput.encode(result) : "bigarrow: wrote \(png)")
+        exit(0)
     }
 
     func plan(_ resolved: ResolvedTarget, screens: ScreenSpace) throws -> PlannedArrow {
