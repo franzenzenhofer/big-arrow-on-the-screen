@@ -123,6 +123,58 @@ bigarrow wait   # {"result":"button","value":"done","copied":["User","Password"]
 - **Arrow and card together.** A row can point at where its value goes; copy the user name and the arrow shows the user field, copy the password and it moves on. `bigarrow start ... --card card.json` puts an arrow and a card up as one.
 - 13 row types (field, code, link, text, live 2FA code, QR, image, file to drag out, choice, question, checklist, progress, buttons) in a JSON card; [20 real use cases](docs/cards/) as files.
 
+### Funny cue cards
+
+Real apps on a real Mac, an arrow and a card each, clicked and typed into for real, staged by `scripts/card-scenes.sh`. The situations are made up. The buttons work.
+
+#### Buttons: delete node_modules
+
+![Finder shows a folder my-app; a green arrow rings node_modules with the sign 847,293 files live here. Rent-free. Beside it a green card: Franz, delete node_modules? 3.4 GB, 847,293 files. You have opened none of them. Buttons: Let me grieve first, Yes, finally](docs/images/cards-real/node-modules.png)
+
+```bash
+bigarrow card --title "Franz, delete node_modules?" --note "**3.4 GB**, 847,293 files. You have opened none of them." --button "Let me grieve first" --button "Yes, finally" --app Finder --color green
+```
+
+#### A choice: more arrows
+
+![A dialog Arrow budget: Franz has used 40 of 40 arrows this week. A purple arrow on its Ask Franz button says Too late. He picked. The purple card Franz, approve 3 more arrows? shows the picked option One, but bigger lit and Sent. Close this card with the X.](docs/images/cards-real/arrows.png)
+
+```bash
+bigarrow card --title "Franz, approve 3 more arrows?" --choice "Yes, 3 more" --choice "Make it 12" --choice "One, but bigger" --keep --color purple
+```
+
+#### A question: lunch
+
+![A canteen page lists Mystery casserole, Soup of the day (yesterday) and Salad, which is lettuce; an orange arrow on Mystery casserole says Brave. Not recommended. The orange card Franz, what do you want for lunch? has the answer Anything but the casserole typed in and a Send button.](docs/images/cards-real/lunch.png)
+
+```bash
+bigarrow card --title "Franz, what do you want for lunch?" --ask "Orders close at 11:30. The agent cannot taste, so you choose." --color orange
+```
+
+#### A checklist: Friday deploy
+
+![A dialog: Deploy to production? It is Friday, 17:55. A blue arrow on Deploy says Only when all five are ticked. The blue card Franz, Friday deploy checklist has Tests are green, Rollback plan written and Team told ticked, Phone charged for the weekend and Inner peace found still open.](docs/images/cards-real/deploy.png)
+
+```bash
+bigarrow card - <<< '{"title": "Franz, Friday deploy checklist", "rows": [{"type": "checklist", "items": [{"id": "tests", "label": "Tests are green"}, {"id": "rollback", "label": "Rollback plan written"}, {"id": "team", "label": "Team told"}, {"id": "phone", "label": "Phone charged for the weekend"}, {"id": "peace", "label": "Inner peace found"}]}]}'
+```
+
+#### A value and where it goes: the coffee machine
+
+![A coffee machine page with a PIN field and a Brew button; a brown arrow from the card rings the PIN field with the sign Paste the PIN here, then Brew. The brown card Franz, coffee is one PIN away has Machine PIN 4711 and Strength Yes, each with a copy button, and Cups today: 4. The agent is not judging.](docs/images/cards-real/coffee.png)
+
+```bash
+bigarrow card - <<< '{"title": "Franz, coffee is one PIN away", "app": "Google Chrome", "rows": [{"type": "field", "label": "Machine PIN", "value": "4711", "point": {"element": "PIN", "text": "Paste the PIN here, then Brew"}}]}'
+```
+
+#### Copy buttons: the git command you search every week
+
+![A search page: how to undo the last git commit, You searched for this 52 times this year; a teal arrow on the query says No need. The agent remembers. The teal card Franz, it's this one. Again. shows git reset --soft HEAD~1 just copied, with its check and a Copied pill, and Searched this year: 52 times.](docs/images/cards-real/git.png)
+
+```bash
+bigarrow card --title "Franz, it's this one. Again." --code "git reset --soft HEAD~1" --field "Searched this year=52 times" --color teal
+```
+
 ## What is this actually for?
 
 Fair question. Arrows have existed since roughly the Paleolithic. What changed: agents now do real work on your Mac, and sooner or later hit a step **only a human may do**, or one the human wants to learn.
