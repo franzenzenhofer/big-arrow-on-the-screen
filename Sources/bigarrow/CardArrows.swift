@@ -9,7 +9,7 @@ import Foundation
 /// A click on its sign hides it; the card stays.
 @MainActor
 final class CardArrows {
-    let document: CardDocument
+    var document: CardDocument
     let color: String
     let overlay: OverlayController
     let raise: Bool
@@ -61,6 +61,14 @@ final class CardArrows {
     func activate(_ point: CardPoint, name: String) -> Bool {
         guard let planned = try? plan(point, name: name) else { return false }
         return (try? show(planned)) != nil
+    }
+
+    /// After `card --update`: the new card's first point, else the base arrow, else no arrow.
+    func retarget(_ next: CardDocument) -> String? {
+        document = next
+        if let (point, name) = CardSession.firstPoint(in: next), activate(point, name: name) { return name }
+        if let base { try? show(base) } else { hide() }
+        return nil
     }
 
     func hide() {

@@ -27,6 +27,8 @@ final class CardSession {
     var signalSources: [DispatchSourceSignal] = []
     var finished = false
     var speech: Process?
+    /// The process's one card session. Its handlers hold it weakly, so this keeps it alive until it exits.
+    static var current: CardSession?
 
     init(document: CardDocument, base: PlannedArrow?, replyTarget: CardReplyTarget, raise: Bool) throws {
         self.document = document
@@ -40,6 +42,7 @@ final class CardSession {
     /// Shows arrow and card. The first arrow (the base arrow, else the first row that points
     /// somewhere) must resolve, so a wrong target fails with exit 3 before anything is shown.
     func start() throws {
+        Self.current = self
         let first = try firstArrow()
         if let first { try arrows.show(first.planned) }
         let display = try placementDisplay()

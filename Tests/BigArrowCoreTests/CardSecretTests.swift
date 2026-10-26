@@ -95,13 +95,13 @@ struct CardSecretTests {
         #expect(placement.origin().x == 20 + 1470 - CardPlacement.gap - size.width)
     }
 
-    @Test("Without a window the card sits top right, and it moves off a rect it must keep clear")
+    @Test("Without a window the card sits bottom right, clear of notifications, and moves off a rect it must keep clear")
     func corners() {
         var placement = CardPlacement(size: size, display: display)
         let area = display.visibleFrame.insetBy(dx: CardPlacement.margin, dy: CardPlacement.margin)
-        #expect(placement.origin() == CGPoint(x: area.maxX - size.width, y: area.minY))
-        placement.avoid = [CGRect(x: 1300, y: 100, width: 40, height: 40)]
-        #expect(placement.origin() == CGPoint(x: area.minX, y: area.minY))
+        #expect(placement.origin() == CGPoint(x: area.maxX - size.width, y: area.maxY - size.height))
+        placement.avoid = [CGRect(x: 1300, y: 800, width: 40, height: 40)]
+        #expect(placement.origin() == CGPoint(x: area.minX, y: area.maxY - size.height))
         let card = CGRect(origin: placement.origin(), size: size)
         #expect(display.visibleFrame.contains(card))
     }

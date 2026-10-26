@@ -103,6 +103,7 @@ final class InputRowView: NSView, NSTextFieldDelegate {
         field.usesSingleLineMode = row.multiline != true
         field.cell?.wraps = row.multiline == true
         field.delegate = self
+        field.setAccessibilityLabel(row.label)
         if row.multiline == true { field.heightAnchor.constraint(greaterThanOrEqualToConstant: 96).isActive = true }
         let send = PillButton("Send", primary: true, style: style) { [weak self] in self?.send() }
         let question = CardStyle.label(row.label ?? "", font: CardStyle.labelFont, color: .secondaryLabelColor)

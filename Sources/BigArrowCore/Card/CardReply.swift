@@ -1,4 +1,16 @@
+import CoreGraphics
 import Foundation
+
+/// A button or field on a card: its label and its rect (x, y, width, height).
+public struct CardControl: Codable, Equatable, Sendable {
+    public let name: String
+    public let rect: [Double]
+
+    public init(name: String, rect: CGRect) {
+        self.name = name
+        self.rect = [rect.minX, rect.minY, rect.width, rect.height].map { Double($0) }
+    }
+}
 
 /// How a card ended.
 public enum CardOutcome: String, Codable, Sendable {

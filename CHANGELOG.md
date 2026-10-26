@@ -4,6 +4,20 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-26
+
+### Added
+- Cue cards: `bigarrow card` shows a floating card with the values, secrets and questions of a step: copy buttons, masked secrets with a reveal eye, live 2FA codes, links, QR codes, images, files to drag out, choices, a question, a checklist, progress and buttons. It never takes the focus, has an X, and ends by itself like an arrow (300 s, 120 s with a secret, `stop`, the hook, the owner exiting). Flags for the common case, a JSON card for everything (13 row types, unknown keys are bad input). Spec: `docs/plan/2026-10-26-cue-cards.md`; 20 real use cases in `docs/cards/`.
+- `bigarrow wait [pid]` prints what the human did as JSON (button, option, typed text, ticks, which rows were copied, never their values); exit 0 for an answer, 1 when the card was closed or ran out. `card --wait` does the same in one call, `card --update <pid>` replaces the rows of a running card.
+- Secrets never go on the command line: `--secret Label=source` with `pass:`, `keychain:<service>/<account>`, `op:`, `env:` or `file:`, or a JSON card on stdin; the detached card gets them through a pipe. Copied secrets are marked concealed and transient for clipboard managers and leave the clipboard after 30 s; a card with a secret stays out of screenshots.
+- Arrow and card together: `point`/`start --card card.json` shows both as one; a row's `point` aims the arrow at where its value goes and moves on as the human copies the next one.
+- `scripts/card-check.sh`: 25 on-screen checks (real clicks, typing, clipboard, secrets, lifetimes, arrows), run on the test Mac and in `visual.yml`; `scripts/card-gallery.py` renders the 20 use cases offscreen.
+- Skill: "Cards: values, secrets, answers" (one value: a chip; more, a secret or a question: a card), the format in `reference.md`. Needs bigarrow 0.5.0.
+
+### Changed
+- The SVG reader also takes cubic curves (C, S), `<line>` and `<circle>`, for Feather's eye, eye-off, external-link, x, file, square and check-square icons.
+- `scripts/testkit.swift`: `type`, `pasteboard`, and `windows` by pid.
+
 ## [0.4.6] - 2026-10-12
 
 ### Added

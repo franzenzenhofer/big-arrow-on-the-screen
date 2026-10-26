@@ -64,6 +64,11 @@ extension CardSession {
         )
         record.owner = owner.pid == nil && owner.session == nil ? nil : owner
         record.kind = "card"
+        record.controls = controller?.view.controls().map { control in
+            CardControl(name: control.name, rect: CGRect(
+                x: frame.minX + control.rect[0], y: frame.minY + control.rect[1], width: control.rect[2], height: control.rect[3]
+            ))
+        }
         try PidRegistry().write(record)
     }
 
@@ -84,6 +89,7 @@ extension CardSession {
         let controller = CardController(view: view)
         controller.show(at: topLeft, theme: next.theme)
         self.controller = controller
+        view.markActive(arrows.retarget(next))
     }
 
     func finish(_ outcome: CardOutcome, value: String?) {

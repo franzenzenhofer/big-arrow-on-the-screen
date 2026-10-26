@@ -1,7 +1,8 @@
 import CoreGraphics
 
 /// Where a card goes, in global top-left points: beside the app's window when there is one, else
-/// in a corner of the display. Never over a rect it must keep clear (a target, an arrow's sign)
+/// in a corner of the display, bottom right first: macOS shows notifications top right, over
+/// every window. Never over a rect it must keep clear (a target, an arrow's sign)
 /// when any candidate can avoid it.
 public struct CardPlacement: Sendable {
     public let size: CGSize
@@ -26,6 +27,7 @@ public struct CardPlacement: Sendable {
     }
 
     /// Beside the window (right, left), inside its top-right corner, then the display's corners.
+    /// Next to a window the card starts at the window's top, below the notification banners.
     func candidates(area: CGRect) -> [CGPoint] {
         var points: [CGPoint] = []
         if let window {
@@ -38,8 +40,8 @@ public struct CardPlacement: Sendable {
         }
         let (right, bottom) = (area.maxX - size.width, area.maxY - size.height)
         points += [
-            CGPoint(x: right, y: area.minY), CGPoint(x: area.minX, y: area.minY),
-            CGPoint(x: right, y: bottom), CGPoint(x: area.minX, y: bottom)
+            CGPoint(x: right, y: bottom), CGPoint(x: area.minX, y: bottom),
+            CGPoint(x: right, y: area.minY), CGPoint(x: area.minX, y: area.minY)
         ]
         return points
     }

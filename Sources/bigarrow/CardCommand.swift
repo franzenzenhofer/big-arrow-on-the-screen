@@ -34,12 +34,16 @@ struct CardCommand: ParsableCommand {
         let pid: Int32
         /// The card's frame in global top-left points: x, y, width, height.
         let card: [Double]
+        /// Its buttons and fields in global top-left points.
+        var controls: [CardControl]?
     }
 
     struct Rendered: Codable {
         var ok = true
         let image: String
         let size: [Double]
+        /// Its buttons and fields in the card's top-left points.
+        let controls: [CardControl]
     }
 
     func run() throws {
@@ -71,8 +75,8 @@ struct CardCommand: ParsableCommand {
         }
         let pid = try ChildProcess.spawn(executable, [executable, "card", "--child", "-"], stdin: document.encoded())
         try ChildProcess.waitUntilShown(pid)
-        let frame = PidRegistry().read(pid: pid)?.signFrame ?? []
-        Output.json(Started(pid: pid, card: frame))
+        let record = PidRegistry().read(pid: pid)
+        Output.json(Started(pid: pid, card: record?.signFrame ?? [], controls: record?.controls))
     }
 
     @MainActor
@@ -82,7 +86,7 @@ struct CardCommand: ParsableCommand {
                                 events: CardEvents(), maxHeight: .greatestFiniteMagnitude)
         try CardPNG.write(view, theme: document.theme, scale: 2, to: URL(fileURLWithPath: path))
         let size = view.fittingSize
-        Output.json(Rendered(image: path, size: [Double(size.width), Double(size.height)]))
+        Output.json(Rendered(image: path, size: [Double(size.width), Double(size.height)], controls: view.controls()))
     }
 
     /// Leaves the new card next to the running one's pid file and tells it to show it.

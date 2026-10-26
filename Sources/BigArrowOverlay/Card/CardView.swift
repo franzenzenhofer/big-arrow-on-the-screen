@@ -55,6 +55,24 @@ public final class CardView: NSView {
         return scroll
     }
 
+    /// Every button and text field with its label, in the card's top-left points, in reading order.
+    public func controls() -> [CardControl] {
+        layoutSubtreeIfNeeded()
+        return Self.controlViews(in: self).map { control in
+            let rect = convert(control.bounds, from: control)
+            let topLeft = CGRect(x: rect.minX, y: bounds.height - rect.maxY, width: rect.width, height: rect.height)
+            let name = control.accessibilityLabel() ?? (control as? NSTextField)?.placeholderString ?? "control"
+            return CardControl(name: name, rect: topLeft)
+        }
+    }
+
+    static func controlViews(in view: NSView) -> [NSView] {
+        view.subviews.flatMap { sub -> [NSView] in
+            let isControl = sub is ActionButton || sub is PillButton || sub is OptionView || (sub as? NSTextField)?.isEditable == true
+            return isControl ? [sub] : controlViews(in: sub)
+        }
+    }
+
     /// Marks the row (or the checklist holding the item) the arrow points from.
     public func markActive(_ name: String?) {
         for row in rows { row.setActive(name != nil && row.names.contains(name ?? "")) }

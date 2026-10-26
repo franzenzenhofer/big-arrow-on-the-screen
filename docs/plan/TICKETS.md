@@ -1,6 +1,6 @@
 # Tickets
 
-Generated from `tickets.json` by `scripts/render-tickets.py`. 51 tickets: 48 done, 3 not now.
+Generated from `tickets.json` by `scripts/render-tickets.py`. 57 tickets: 54 done, 3 not now.
 
 ## M0 Skeleton and proof
 
@@ -658,3 +658,84 @@ The human often has to paste something the agent may not type: a `sudo` command,
 - A real click on the chip puts the value on the clipboard and keeps the arrow; a click elsewhere on the sign still ends it.
 - No permission needed; icon from an MIT library with its licence in the repo.
 - README section with a real use case and a small one.
+
+## M8 Cue cards (2026-10-26)
+
+Values, secrets and questions on a floating card that combines with the arrow both ways. Spec: docs/plan/2026-10-26-cue-cards.md.
+
+### T52 Card format, secret sources, TOTP
+
+**Status: Done**  
+Labels: `type:feature` `area:cli` `priority:P1` `size:M`
+
+**Outcome**: `CardDocument`, `CardRow`, `SecretSource`, `TOTP` in BigArrowCore; unit tests against the RFC vectors and the real login keychain.
+
+A JSON card (title, rows, app, colour, duration, theme) with 13 row types, strict validation (unknown keys exit 2), secret sources pass/keychain/op/env/file (never argv), RFC 6238 TOTP.
+
+**Acceptance criteria**
+- A literal secret on the command line exits 2 without echoing it.
+- TOTP matches the RFC 6238 vectors.
+- Every use case in docs/cards parses.
+
+### T53 The card window
+
+**Status: Done**  
+Labels: `type:feature` `area:overlay` `priority:P1` `size:L`
+
+**Outcome**: `CardView`, `CardPanel`, row views; 24 behaviour checks pass on the test Mac (`scripts/card-check.sh`); `scripts/card-gallery.py` renders the 20 use cases.
+
+A floating, non-activating panel: header in the card colour with an X, rows with copy, reveal and open buttons, choices, a question, a checklist, progress, QR, image, a file to drag out. Light and dark, nothing under 16 pt.
+
+**Acceptance criteria**
+- Showing it and clicking it never moves the focus; typing into it keeps the human's app frontmost.
+- `--png` renders it offscreen.
+
+### T54 card, wait, update and the reply
+
+**Status: Done**  
+Labels: `type:feature` `area:cli` `priority:P1` `size:M`
+
+**Outcome**: `CardCommand`, `WaitCommand`, `ChildProcess` (stdin pipe), reply files in the registry, cleaned after an hour.
+
+`bigarrow card` detaches and prints pid, frame and control frames; `wait` prints the reply (exit 0 answered, 1 not); `--wait`; `--update` replaces rows; lifetimes as for arrows (time limit, stop, hook, owner exit).
+
+**Acceptance criteria**
+- The reply names copied rows, never values.
+- Secrets reach the detached child through a pipe, never its arguments.
+
+### T55 Arrow and card together
+
+**Status: Done**  
+Labels: `type:feature` `area:overlay` `area:targeting` `priority:P1` `size:M`
+
+**Outcome**: `CardArrows` plans row arrows with the same code as `point`; checked on the test Mac.
+
+`point/start --card` shows an arrow with a card as one process; a row's `point` aims the arrow at where its value goes and moves on as the human copies.
+
+**Acceptance criteria**
+- One `stop` ends both; the reply reaches `wait`.
+- An update without points drops the arrow.
+
+### T56 Secrets on the clipboard and on screen
+
+**Status: Done**  
+Labels: `type:feature` `area:overlay` `priority:P1` `size:S`
+
+**Outcome**: `CardClipboard`, the hidden `clipboard-guard` helper, `sharingType = .none` for secret cards only (other cards stay visible in screenshots and demos).
+
+Copied secrets carry the nspasteboard.org concealed and transient markers and leave the clipboard after 30 s unless something else was copied; a card with a secret is kept out of screen capture.
+
+**Acceptance criteria**
+- Verified with real clicks and `screencapture` on the test Mac.
+
+### T57 Skill, README and release 0.5.0
+
+**Status: Done**  
+Labels: `type:docs` `area:skill` `priority:P1` `size:S`
+
+**Outcome**: SKILL.md section "Cards: values, secrets, answers", reference.md "Cards", README "Cue cards".
+
+The skill teaches cards (one value: chip; more, a secret or a question: card), reference.md lists the format; README section with rendered cards; release 0.5.0.
+
+**Acceptance criteria**
+- "Needs bigarrow 0.5.0" and the binary agree (`SkillVersionTests`).

@@ -52,7 +52,8 @@ struct PointRunner {
             report(result)
             exit(0)
         }
-        if let card = config.card {
+        if var card = config.card {
+            card.duration = config.duration
             let target: CardReplyTarget = config.replyFile ? .file : .stdout
             try CardSession(document: card, base: planned, replyTarget: target, raise: false).start()
         } else {

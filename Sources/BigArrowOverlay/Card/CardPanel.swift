@@ -23,14 +23,15 @@ enum RowFactory {
 /// The card's window: floating above normal windows (below the arrow overlay), on every Space and
 /// over full-screen apps, movable by its background. Non-activating: showing it or clicking its
 /// buttons never activates bigarrow, so the human's app keeps the focus. It becomes key only when
-/// the human clicks into an input row, and asks the window server to keep it out of screenshots
-/// and screen recordings, since it may hold a secret.
+/// the human clicks into an input row. A card with a secret asks the window server to keep it out
+/// of screenshots and screen recordings.
 @MainActor
 final class CardPanel: NSPanel {
     let acceptsTyping: Bool
     var onEscape: () -> Void = {}
 
     init(view: CardView, origin: CGPoint, acceptsTyping: Bool) {
+        let hidden = view.document.hasSecret
         self.acceptsTyping = acceptsTyping
         let size = view.fittingSize
         super.init(
@@ -48,7 +49,7 @@ final class CardPanel: NSPanel {
         isMovableByWindowBackground = true
         isReleasedWhenClosed = false
         animationBehavior = .utilityWindow
-        sharingType = .none
+        sharingType = hidden ? .none : .readOnly
         contentView = view
         setFrameOrigin(origin)
     }
