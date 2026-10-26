@@ -134,17 +134,7 @@ final class PointSession {
     }
 
     func speak() {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/say")
-        process.arguments = (config.voice.map { ["-v", $0] } ?? []) + [config.text]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        do {
-            try process.run()
-            speech = process
-        } catch {
-            Output.printError("bigarrow: could not run /usr/bin/say: \(error.localizedDescription)")
-        }
+        speech = Speech.say(config.text, voice: config.voice)
     }
 
     func installSignalHandlers() {

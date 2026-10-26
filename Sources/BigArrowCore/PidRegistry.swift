@@ -13,6 +13,8 @@ public struct ArrowRecord: Codable, Equatable, Sendable {
     public let startedAt: Date
     /// The agent session that drew the arrow, if it was started from one.
     public var owner: ArrowOwner?
+    /// "card" for a cue card (its frame is `signFrame`); nil for an arrow.
+    public var kind: String?
 
     public init(pid: Int32, text: String, target: CGPoint, display: Int, sign: (frame: CGRect, direction: String), startedAt: Date) {
         self.pid = pid
@@ -55,6 +57,21 @@ public struct PidRegistry: Sendable {
 
     public func remove(pid: Int32) {
         try? FileManager.default.removeItem(at: file(for: pid))
+    }
+
+    /// What the human did with card `pid`, written when the card ends and read by `bigarrow wait`.
+    public func replyFile(for pid: Int32) -> URL {
+        directory.appendingPathComponent("\(pid).\(Self.replyExtension)")
+    }
+
+    public static let replyExtension = "reply"
+
+    /// Written readable by this user only, since a typed answer can be private.
+    public func writeReply(_ reply: CardReply) throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let url = replyFile(for: reply.pid)
+        try Data(reply.line().utf8).write(to: url, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
     }
 
     /// Live arrows, oldest first. Stale and unreadable files are removed.

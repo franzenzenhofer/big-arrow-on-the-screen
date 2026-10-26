@@ -1,8 +1,8 @@
 import CoreGraphics
 import Foundation
 
-/// Reads the small SVG subset icon sets like Feather use: `<path d>` with M L H V A Z (absolute
-/// and relative), `<rect>` with rx, and `<polyline>`. Anything else throws, so an icon that
+/// Reads the small SVG subset icon sets like Feather use: `<path d>` with M L H V C S A Z
+/// (absolute and relative), `<rect>` with rx, `<polyline>`, `<line>` and `<circle>`. Anything else throws, so an icon that
 /// needs more fails at once instead of drawing wrong.
 public enum SVGPath {
     public struct Unsupported: Error, Equatable, CustomStringConvertible {
@@ -28,6 +28,14 @@ public enum SVGPath {
             try data.append(to: path)
         case "rect": try addRect(attributes, to: path)
         case "polyline": try addPolyline(attributes, to: path)
+        case "line":
+            let numbers = try ["x1", "y1", "x2", "y2"].map { try number(attribute($0, attributes)) }
+            path.move(to: CGPoint(x: numbers[0], y: numbers[1]))
+            path.addLine(to: CGPoint(x: numbers[2], y: numbers[3]))
+        case "circle":
+            let numbers = try ["cx", "cy", "r"].map { try number(attribute($0, attributes)) }
+            let (center, radius) = (CGPoint(x: numbers[0], y: numbers[1]), numbers[2])
+            path.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2))
         default: throw Unsupported(description: "SVG element <\(name)> is not supported")
         }
     }
